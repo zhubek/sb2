@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+next-env.d.ts
+
+# локальные референсы дизайна (не часть приложения)
+ref/
+index.html
+.mcp.json
