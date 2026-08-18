@@ -155,7 +155,7 @@ export default function SectionQuiz({
                     onClick={() => setAnswers({ ...answers, [k]: o.value })}
                     className={`flex h-10 flex-1 items-center justify-center rounded-lg border font-mono text-sm transition ${
                       selected === o.value
-                        ? "border-stone-900 bg-stone-900 text-white"
+                        ? "border-violet-500 bg-violet-500 text-white"
                         : "border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-700"
                     }`}
                   >
@@ -187,7 +187,7 @@ export default function SectionQuiz({
         <button
           onClick={next}
           disabled={!sectionAnswered(sectionIdx)}
-          className="rounded-full bg-stone-900 px-8 py-3 text-sm font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-30"
+          className="rounded-2xl bg-violet-500 px-8 py-3 text-sm font-medium text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-30"
         >
           {last ? "Завершить тест" : "Следующий раздел"}
         </button>

@@ -6,21 +6,26 @@ import UniversityExplorer from "@/components/university-explorer";
 
 export default function UniversityList({
   presetProgram,
+  presetIndustry,
 }: {
   presetProgram: string | null;
+  presetIndustry: string | null;
 }) {
   // Баннер пресета скрывается по «Сбросить»; сам фильтр живёт в explorer
-  const [showPreset, setShowPreset] = useState(Boolean(presetProgram));
+  const [showPreset, setShowPreset] = useState(
+    Boolean(presetProgram || presetIndustry)
+  );
   const [explorerKey, setExplorerKey] = useState(0);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Навигатор по ВУЗам
+          Навигатор образования
         </h1>
         <p className="mt-1 text-stone-500">
-          Все казахстанские университеты и ~100 популярных зарубежных
+          Вузы и колледжи Казахстана, зарубежные университеты и образовательные
+          программы
         </p>
       </div>
 
@@ -31,8 +36,17 @@ export default function UniversityList({
               size={15}
               className="mr-1.5 -mt-0.5 inline text-violet-600"
             />
-            Фильтр по вашей программе:{" "}
-            <span className="font-semibold">{presetProgram}</span>
+            {presetProgram ? (
+              <>
+                Фильтр по вашей программе:{" "}
+                <span className="font-semibold">{presetProgram}</span>
+              </>
+            ) : (
+              <>
+                Фильтр по вашей отрасли:{" "}
+                <span className="font-semibold">{presetIndustry}</span>
+              </>
+            )}
           </span>
           <button
             onClick={() => {
@@ -51,6 +65,7 @@ export default function UniversityList({
         tone="violet"
         detailBase="/universities"
         presetProgram={showPreset ? presetProgram : null}
+        presetIndustry={showPreset ? presetIndustry : null}
       />
     </div>
   );

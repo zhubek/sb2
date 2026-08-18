@@ -1,8 +1,13 @@
-﻿import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 import ActivityChart from "@/components/activity-chart";
+import AnalyticsTabs from "@/components/analytics-tabs";
 import BarList from "@/components/bar-list";
 import ReportButton from "@/components/report-button";
 import {
+  type Period,
+  periodSummary,
   popularProfessions,
   schoolClasses,
   schoolInterests,
@@ -10,7 +15,17 @@ import {
   teacher,
 } from "@/lib/teacher-mock-data";
 
+const periods: { key: Period; label: string }[] = [
+  { key: "week", label: "Неделя" },
+  { key: "month", label: "Месяц" },
+  { key: "quarter", label: "Четверть" },
+  { key: "year", label: "Год" },
+];
+
 export default function SchoolAnalyticsPage() {
+  const [period, setPeriod] = useState<Period>("quarter");
+  const summary = periodSummary[period];
+
   const tests = [
     { name: "1-й тест · DeBruce", value: schoolStats.test1 },
     { name: "2-й тест · MBTI", value: schoolStats.test2 },
@@ -21,16 +36,64 @@ export default function SchoolAnalyticsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-400">
-            Аналитика · уровень «Школа»
-          </p>
+          <p className="text-sm text-slate-400">Аналитика · уровень «Школа»</p>
           <h1 className="mt-0.5 text-2xl font-bold">{teacher.school}</h1>
           <p className="mt-1 text-slate-500">
-            {schoolStats.registered} учеников на платформе
+            {schoolStats.registered} из {schoolStats.total} учеников на
+            платформе
           </p>
         </div>
         <ReportButton label="Скачать отчёт по школе" />
       </div>
+
+      <AnalyticsTabs />
+
+      {/* Сводка за период */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Сводка за период</h2>
+            <p className="text-sm text-slate-500">
+              Общие показатели школы за выбранный период времени
+            </p>
+          </div>
+          <div className="flex rounded-xl bg-slate-100 p-1 text-sm font-medium">
+            {periods.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`rounded-lg px-3 py-1.5 transition ${
+                  period === p.key
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-4">
+          <div>
+            <p className="text-2xl font-bold">{summary.active}</p>
+            <p className="mt-1 text-sm text-slate-500">Активных учеников</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{summary.testsDone}</p>
+            <p className="mt-1 text-sm text-slate-500">Пройдено тестов</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold">
+              {summary.aiSessions.toLocaleString("ru-RU")}
+            </p>
+            <p className="mt-1 text-sm text-slate-500">Диалогов с AI</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{summary.newRegs}</p>
+            <p className="mt-1 text-sm text-slate-500">Новых регистраций</p>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Распределение интересов */}
@@ -106,47 +169,6 @@ export default function SchoolAnalyticsPage() {
 
       {/* Динамика активности */}
       <ActivityChart />
-
-      {/* Классы → drill-down */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Классы</h2>
-        <p className="text-sm text-slate-500">
-          Перейдите в класс для детальной аналитики
-        </p>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                <th className="py-2.5 pr-4 font-medium">Класс</th>
-                <th className="py-2.5 pr-4 font-medium">Учеников</th>
-                <th className="py-2.5 pr-4 font-medium">Начали диагностику</th>
-                <th className="py-2.5 pr-4 font-medium">Полные профили (3/3)</th>
-                <th className="py-2.5 font-medium" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {schoolClasses.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50/60">
-                  <td className="py-3 pr-4 font-medium">{c.name}</td>
-                  <td className="py-3 pr-4 text-slate-600">{c.students}</td>
-                  <td className="py-3 pr-4 text-slate-600">
-                    {c.tested} ({Math.round((c.tested / c.students) * 100)}%)
-                  </td>
-                  <td className="py-3 pr-4 text-slate-600">{c.fullProfiles}</td>
-                  <td className="py-3 text-right">
-                    <Link
-                      href={`/teacher/analytics/class/${c.id}`}
-                      className="text-sm font-medium text-teal-600 hover:text-teal-700"
-                    >
-                      Открыть →
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   );
 }

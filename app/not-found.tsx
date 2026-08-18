@@ -16,7 +16,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/dashboard"
-        className="group mt-8 flex items-center gap-2 rounded-full bg-stone-900 py-3 pr-7 pl-5 text-sm font-medium text-white transition hover:bg-violet-700"
+        className="group mt-8 flex items-center gap-2 rounded-2xl bg-violet-500 py-3 pr-7 pl-5 text-sm font-medium text-white transition hover:bg-violet-600"
       >
         <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
         В личный кабинет

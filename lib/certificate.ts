@@ -18,12 +18,12 @@ export async function generateCertificateSvg(
   const qr = await QRCode.toDataURL(d.verifyUrl, {
     margin: 0,
     width: 240,
-    color: { dark: "#134e4a", light: "#ffffff" },
+    color: { dark: "#064430", light: "#ffffff" },
   });
 
-  const TEAL = "#0d9488";
-  const INK = "#1c1917";
-  const MUTED = "#a8a29e";
+  const TEAL = "#12a465";
+  const INK = "#2a2e3b";
+  const MUTED = "#9aa1b4";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1123" height="794" viewBox="0 0 1123 794">
   <rect width="1123" height="794" fill="#ffffff"/>

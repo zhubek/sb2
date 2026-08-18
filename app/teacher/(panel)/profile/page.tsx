@@ -1,17 +1,16 @@
 "use client";
 
-import { Award, BookOpen, FileBadge, Pencil, Trophy } from "lucide-react";
+import { Award, BookOpen, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  gamificationSteps,
+  courseModules,
+  moduleStatusLabels,
   teacher,
   teacherBadges,
-  teacherCourses,
 } from "@/lib/teacher-mock-data";
 
 export default function TeacherProfilePage() {
-  const [certEarned, setCertEarned] = useState(false);
   const [profile, setProfile] = useState({
     firstName: teacher.firstName,
     lastName: teacher.lastName,
@@ -21,17 +20,14 @@ export default function TeacherProfilePage() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem("teacher-gamification-done");
-    if (saved) {
-      const done: string[] = JSON.parse(saved);
-      setCertEarned(gamificationSteps.every((s) => done.includes(s.id)));
-    }
     // Правки из «Редактирование профиля» хранятся локально
     const stored = localStorage.getItem("teacher-profile");
     if (stored) setProfile((p) => ({ ...p, ...JSON.parse(stored) }));
   }, []);
 
   const earnedBadges = teacherBadges.filter((b) => b.earned);
+  const doneModules = courseModules.filter((m) => m.status === "done");
+  const inProgress = courseModules.filter((m) => m.status === "progress");
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -69,74 +65,10 @@ export default function TeacherProfilePage() {
             <Pencil size={14} />
             Редактировать
           </Link>
-          <Link
-            href="/teacher/certificate"
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-          >
-            Мой прогресс
-          </Link>
         </div>
       </section>
 
-      {/* Сертификаты */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="flex items-center gap-2 font-semibold">
-          <FileBadge size={16} className="text-slate-400" />
-          Сертификаты
-        </h2>
-        {certEarned ? (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50/60 p-4">
-            <div className="flex items-center gap-3">
-              <Trophy size={20} className="text-teal-600" />
-              <div>
-                <p className="text-sm font-medium">
-                  Сертификат педагога-профориентатора
-                </p>
-                <p className="font-mono text-xs text-slate-400">
-                  ID PRF-2026-GA-0417 · выдан 28.07.2026
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/teacher/certificate"
-              className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-teal-700"
-            >
-              Скачать
-            </Link>
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-slate-500">
-            Пока нет сертификатов. Пройдите все шаги в разделе{" "}
-            <Link
-              href="/teacher/certificate"
-              className="font-medium text-teal-600 hover:text-teal-700"
-            >
-              «Сертификат»
-            </Link>{" "}
-            — и получите именной сертификат с QR-проверкой.
-          </p>
-        )}
-      </section>
-
-      {/* Пройденные курсы */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="flex items-center gap-2 font-semibold">
-          <BookOpen size={16} className="text-slate-400" />
-          Пройденные курсы
-        </h2>
-        <ul className="mt-3 divide-y divide-slate-100">
-          {teacherCourses.map((c) => (
-            <li key={c.id} className="flex items-center justify-between py-3">
-              <p className="text-sm font-medium">{c.name}</p>
-              <p className="font-mono text-xs text-slate-400">
-                {c.date} · {c.hours} ч
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Достижения */}
+      {/* Достижения — сразу под блоком с фотографией и ФИО */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="flex items-center gap-2 font-semibold">
           <Award size={16} className="text-slate-400" />
@@ -146,18 +78,52 @@ export default function TeacherProfilePage() {
           {teacherBadges.map((b) => (
             <span
               key={b.id}
-              title={b.desc}
+              title={b.earned ? `${b.desc} · ${b.earnedAt}` : b.desc}
               className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs ${
                 b.earned
                   ? "bg-teal-50 text-teal-700"
-                  : "bg-slate-100 text-slate-400 line-through"
+                  : "bg-slate-100 text-slate-400 opacity-60"
               }`}
             >
-              <Award size={12} />
+              <span>{b.icon}</span>
               {b.name}
             </span>
           ))}
         </div>
+      </section>
+
+      {/* Пройденные модули — прогресс из раздела «Обучающий курс» */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <BookOpen size={16} className="text-slate-400" />
+            Пройденные модули · {doneModules.length} из {courseModules.length}
+          </h2>
+          <Link
+            href="/teacher/course"
+            className="text-sm font-medium text-teal-600 hover:text-teal-700"
+          >
+            К курсу →
+          </Link>
+        </div>
+        <ul className="mt-3 divide-y divide-slate-100">
+          {doneModules.map((m) => (
+            <li key={m.id} className="flex items-center justify-between py-3">
+              <p className="text-sm font-medium">{m.title}</p>
+              <p className="font-mono text-xs text-slate-400">
+                {moduleStatusLabels[m.status]} · {m.completedAt}
+              </p>
+            </li>
+          ))}
+          {inProgress.map((m) => (
+            <li key={m.id} className="flex items-center justify-between py-3">
+              <p className="text-sm font-medium text-slate-600">{m.title}</p>
+              <p className="font-mono text-xs text-amber-600">
+                {moduleStatusLabels[m.status]} · {m.progress}%
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

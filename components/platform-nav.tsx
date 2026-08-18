@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import ChecklistMenu from "@/components/checklist-menu";
 import { LogoMark } from "@/components/compass-marks";
 import { currentUser } from "@/lib/mock-data";
 
 const links = [
-  { href: "/dashboard", label: "Кабинет" },
+  { href: "/dashboard", label: "Главная" },
   { href: "/tests", label: "Тесты" },
-  { href: "/universities", label: "ВУЗы" },
+  { href: "/universities", label: "Навигатор" },
   { href: "/portfolio", label: "Портфолио" },
   { href: "/chat", label: "AI чат" },
 ];
@@ -40,7 +39,7 @@ export default function PlatformNav() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#faf8f5]/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#fcfbfd]/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3.5">
         <div className="flex items-center gap-8">
           <Link
@@ -70,7 +69,6 @@ export default function PlatformNav() {
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <ChecklistMenu />
           <Link
             href="/profile"
             className="group flex items-center gap-2.5"
@@ -79,7 +77,7 @@ export default function PlatformNav() {
             <span className="hidden text-sm font-medium transition group-hover:text-violet-700 sm:block">
               {name.firstName}
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white transition group-hover:bg-violet-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-violet-500 text-xs font-semibold text-white transition group-hover:bg-violet-600">
               {name.firstName[0]}
               {name.lastName[0]}
             </div>

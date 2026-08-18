@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReportButton from "@/components/report-button";
+import ReportPreview from "@/components/report-preview";
 import { schoolClasses, teacherStudents } from "@/lib/teacher-mock-data";
 
 export default async function ClassAnalyticsPage({
@@ -12,18 +13,16 @@ export default async function ClassAnalyticsPage({
   const cls = schoolClasses.find((c) => c.id === id);
   if (!cls) notFound();
 
-  // В демо детальный состав есть у 10 «Б»; для остальных классов показываем его же
-  const students = teacherStudents;
-  const avgTests =
-    students.reduce((s, x) => s + x.testsPassed, 0) / students.length;
+  const students = teacherStudents.filter((s) => s.classId === id);
+  const notStarted = students.filter((s) => s.testsPassed === 0).length;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <Link
-        href="/teacher/analytics"
+        href="/teacher/analytics/classes"
         className="text-sm text-slate-400 hover:text-slate-600"
       >
-        ← Аналитика школы
+        ← К списку классов
       </Link>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -34,18 +33,31 @@ export default async function ClassAnalyticsPage({
             Классный руководитель: Жанар Касымова
           </p>
         </div>
-        <ReportButton label={`Скачать отчёт по ${cls.name}`} />
+        <div className="flex flex-wrap gap-2">
+          <ReportPreview
+            title={`Отчёт по классу ${cls.name}`}
+            rows={[
+              { label: "Учеников в классе", value: String(cls.students) },
+              {
+                label: "Начали диагностику",
+                value: `${cls.tested} (${Math.round((cls.tested / cls.students) * 100)}%)`,
+              },
+              { label: "Полные профили (3/3)", value: String(cls.fullProfiles) },
+              { label: "Ведущее направление", value: cls.topDirection },
+            ]}
+          />
+          <ReportButton label={`Скачать отчёт по ${cls.name}`} />
+        </div>
       </div>
 
       {/* Средние показатели */}
-      <div className="grid gap-4 sm:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Stat value={cls.students} label="Учеников в классе" />
         <Stat
           value={`${Math.round((cls.tested / cls.students) * 100)}%`}
           label="Начали диагностику"
         />
         <Stat value={cls.fullProfiles} label="Полные профили (3/3)" />
-        <Stat value={avgTests.toFixed(1)} label="Тестов на ученика" />
       </div>
 
       <div className="rounded-xl border border-teal-200 bg-teal-50 px-5 py-3.5 text-sm text-teal-900">
@@ -115,15 +127,17 @@ export default async function ClassAnalyticsPage({
       </section>
 
       {/* Пустые данные: реакция системы */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3.5 text-sm text-amber-900">
-        ⚠ 1 ученик класса не начал диагностику.{" "}
-        <Link
-          href="/teacher/assistant"
-          className="font-medium underline underline-offset-2"
-        >
-          Спросить AI, как вовлечь
-        </Link>
-      </div>
+      {notStarted > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3.5 text-sm text-amber-900">
+          ⚠ Не начали диагностику: {notStarted} ·{" "}
+          <Link
+            href="/teacher/assistant"
+            className="font-medium underline underline-offset-2"
+          >
+            Спросить AI, как вовлечь
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

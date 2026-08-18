@@ -4,38 +4,43 @@ import {
   BarChart3,
   BookOpen,
   Bot,
+  FileText,
+  GraduationCap,
   LayoutDashboard,
-  Library,
+  LifeBuoy,
+  Sparkles,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import TeacherCertMenu from "@/components/teacher-cert-menu";
 import { teacher } from "@/lib/teacher-mock-data";
 
 const links = [
-  { href: "/teacher", label: "Главная", icon: LayoutDashboard },
-  { href: "/teacher/assistant", label: "AI-помощник", icon: Bot },
-  { href: "/teacher/analytics", label: "Аналитика", icon: BarChart3 },
-  { href: "/teacher/handbook", label: "Справочник образования", icon: BookOpen },
-  { href: "/teacher/library", label: "Библиотека", icon: Library },
-  { href: "/teacher/profile", label: "Личный кабинет", icon: UserRound },
+  { href: "/teacher", label: "Главная", icon: LayoutDashboard, tour: "home" },
+  { href: "/teacher/assistant", label: "AI-помощник", icon: Bot, tour: "assistant" },
+  { href: "/teacher/analytics", label: "Аналитика", icon: BarChart3, tour: "analytics" },
+  { href: "/teacher/handbook", label: "Справочник образования", icon: BookOpen, tour: "handbook" },
+  { href: "/teacher/reports", label: "Отчёты", icon: FileText, tour: "reports" },
+  { href: "/teacher/course", label: "Обучающий курс", icon: GraduationCap, tour: "course" },
+  { href: "/teacher/guide", label: "Руководство", icon: LifeBuoy, tour: "guide" },
+  { href: "/teacher/bonus", label: "Бонусная система", icon: Sparkles, tour: "bonus" },
+  { href: "/teacher/profile", label: "Личный кабинет", icon: UserRound, tour: "profile" },
 ];
 
 export default function TeacherNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col bg-slate-900 text-slate-300">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-slate-100 bg-white text-slate-600">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500 text-xs font-bold text-slate-950">
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-500 text-xs font-bold text-white">
           AI
         </span>
         <div>
-          <p className="font-display text-sm font-semibold leading-tight tracking-tight text-white">
-            профориентатор<span className="text-teal-400">.</span>
+          <p className="font-display text-sm leading-tight tracking-tight text-slate-800">
+            профориентатор<span className="text-teal-600">.</span>
           </p>
-          <p className="text-[11px] text-slate-500">Платформа педагога</p>
+          <p className="text-[11px] text-slate-400">Платформа педагога</p>
         </div>
       </div>
 
@@ -50,10 +55,11 @@ export default function TeacherNav() {
             <Link
               key={l.href}
               href={l.href}
-              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition ${
+              data-tour={l.tour}
+              className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition ${
                 active
-                  ? "bg-slate-800 font-medium text-teal-400"
-                  : "hover:bg-slate-800/60 hover:text-white"
+                  ? "bg-teal-50 font-semibold text-teal-700"
+                  : "hover:bg-slate-50 hover:text-slate-800"
               }`}
             >
               <Icon size={16} strokeWidth={2} />
@@ -61,29 +67,26 @@ export default function TeacherNav() {
             </Link>
           );
         })}
-
-        {/* Сертификат: прогресс и шаги — как чек-лист ученика, но в левом меню */}
-        <TeacherCertMenu />
       </nav>
 
-      <div className="border-t border-slate-800 p-4">
+      <div className="border-t border-slate-100 p-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-500/15 text-sm font-semibold text-teal-400">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-50 text-sm font-semibold text-teal-700">
             {teacher.firstName[0]}
             {teacher.lastName[0]}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-white">
+            <p className="truncate text-sm font-semibold text-slate-800">
               {teacher.firstName} {teacher.lastName}
             </p>
-            <p className="truncate text-[11px] text-slate-500">
+            <p className="truncate text-[11px] text-slate-400">
               {teacher.school}
             </p>
           </div>
         </div>
         <Link
           href="/teacher/login"
-          className="mt-3 block text-xs text-slate-500 hover:text-slate-300"
+          className="mt-3 block text-xs text-slate-400 hover:text-slate-600"
         >
           Выйти
         </Link>

@@ -42,11 +42,12 @@ export interface University {
   city: string;
   country: string;
   foreign: boolean;
+  kind?: "university" | "college"; // по умолчанию — университет
   description: string;
   address: string;
   phone: string;
   website: string;
-  minScore: number;
+  minScore: number; // для колледжей 0 — конкурс аттестатов
   priceFrom: number; // тг/год
   grants: boolean;
   dorm: boolean;
@@ -54,6 +55,25 @@ export interface University {
   mobility: boolean;
   perks: string[];
   programs: string[];
+}
+
+// Группа образовательных программ. Программы без ГОП выводятся в том же
+// списке (code: null) и оформляются так же.
+export interface Gop {
+  id: string;
+  code: string | null;
+  name: string;
+  level: "university" | "college";
+  description: string;
+  professions: string[];
+  entScore?: number; // проходной балл ЕНТ (только вузы)
+  entSubjects?: string[]; // профильные предметы ЕНТ
+  priceFrom: number; // тг/год
+  priceTo?: number;
+  languages: string[];
+  duration: string;
+  programs: string[]; // образовательные программы, входящие в ГОП
+  institutionIds: string[]; // вузы/колледжи, где ведётся обучение
 }
 
 export interface TestAttempt {

@@ -113,16 +113,16 @@ export default function ProfessionCarousel() {
   return (
     <div className="w-full max-w-md">
       <div
-        className="rounded-2xl border border-slate-600/50 bg-slate-900/85 p-5 shadow-[20px_20px_60px_rgba(0,0,0,0.5),_0_0_0_1px_rgba(255,255,255,0.08)_inset] backdrop-blur-xl"
+        className="rounded-3xl border border-stone-100 bg-white p-5 shadow-[0_24px_60px_rgba(38,36,89,0.14)]"
         style={{ transform: "perspective(1200px) rotateY(-7deg) rotateX(3deg)" }}
       >
         {/* Шапка «браузера» */}
-        <div className="mb-4 flex items-center gap-2 border-b border-slate-700/50 pb-3.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <div className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <div className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <div className="ml-3 flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-slate-500 uppercase">
-            <Sparkles size={10} className="text-cyan-400" />
+        <div className="mb-4 flex items-center gap-2 border-b border-stone-100 pb-3.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-stone-200" />
+          <div className="h-2.5 w-2.5 rounded-full bg-stone-200" />
+          <div className="h-2.5 w-2.5 rounded-full bg-stone-200" />
+          <div className="ml-3 flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-stone-400 uppercase">
+            <Sparkles size={10} className="text-orange-500" />
             комплексный отчёт
           </div>
         </div>
@@ -138,8 +138,8 @@ export default function ProfessionCarousel() {
                 onClick={() => setChartIdx(i)}
                 className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] transition-all duration-500 ${
                   active
-                    ? "bg-violet-500/20 font-medium text-violet-300"
-                    : "text-slate-500 hover:bg-slate-800 hover:text-slate-300"
+                    ? "bg-violet-100 font-semibold text-violet-700"
+                    : "text-stone-400 hover:bg-stone-100 hover:text-stone-600"
                 }`}
               >
                 <Icon size={11} />
@@ -166,7 +166,7 @@ export default function ProfessionCarousel() {
                     .join(" ")
                     .concat(" Z")}
                   fill="none"
-                  stroke="#334155"
+                  stroke="#dde0ea"
                   strokeWidth="0.7"
                 />
               ))}
@@ -180,7 +180,7 @@ export default function ProfessionCarousel() {
                     y1="40"
                     x2={x}
                     y2={y}
-                    stroke="#334155"
+                    stroke="#dde0ea"
                     strokeWidth="0.7"
                   />
                 );
@@ -189,14 +189,14 @@ export default function ProfessionCarousel() {
               <g className="lp-radar">
                 <path
                   d={radarPath(1)}
-                  fill="rgba(139,92,246,0.28)"
-                  stroke="#a78bfa"
+                  fill="rgba(90,95,232,0.28)"
+                  stroke="#7480f5"
                   strokeWidth="1.6"
                   strokeLinejoin="round"
                 />
                 {radar.map((d, i) => {
                   const [x, y] = radarPoint(i, d.v);
-                  return <circle key={i} cx={x} cy={y} r="1.7" fill="#22d3ee" />;
+                  return <circle key={i} cx={x} cy={y} r="1.7" fill="#ff7a4d" />;
                 })}
               </g>
               {/* Подписи осей */}
@@ -210,7 +210,7 @@ export default function ProfessionCarousel() {
                     textAnchor="middle"
                     fontSize="6"
                     fontFamily="monospace"
-                    fill="#64748b"
+                    fill="#9aa1b4"
                   >
                     {d.label}
                   </text>
@@ -224,19 +224,19 @@ export default function ProfessionCarousel() {
             <div className="flex h-full flex-col justify-center space-y-2.5">
               {skills.map((s, i) => (
                 <div key={s.name} className="flex items-center gap-2.5">
-                  <span className="w-24 truncate text-xs text-slate-400">
+                  <span className="w-24 truncate text-xs text-stone-500">
                     {s.name}
                   </span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200">
                     <div
-                      className="h-full origin-left rounded-full bg-gradient-to-r from-violet-500 to-cyan-400"
+                      className="h-full origin-left rounded-2xl bg-violet-500"
                       style={{
                         width: `${s.v}%`,
                         animation: `lp-bar-grow ${CHART_MS}ms ease-in-out ${i * 0.25}s infinite`,
                       }}
                     />
                   </div>
-                  <span className="w-6 text-right font-mono text-[10px] text-slate-500">
+                  <span className="w-6 text-right font-mono text-[10px] text-stone-400">
                     {s.v}
                   </span>
                 </div>
@@ -250,7 +250,7 @@ export default function ProfessionCarousel() {
               {values.map((v, i) => (
                 <div
                   key={i}
-                  className="w-7 origin-bottom rounded-t-md bg-gradient-to-t from-violet-600 to-cyan-400"
+                  className="w-7 origin-bottom rounded-t-md bg-violet-500"
                   style={{
                     height: `${v}%`,
                     animation: `lp-col-grow ${CHART_MS}ms ease-in-out ${i * 0.15}s infinite`,
@@ -262,8 +262,8 @@ export default function ProfessionCarousel() {
         </div>
 
         {/* Лента карточек профессий: 3D-барабан с перетаскиванием */}
-        <div className="mt-4 border-t border-slate-700/50 pt-3">
-          <p className="text-[10px] tracking-wider text-slate-500 uppercase">
+        <div className="mt-4 border-t border-stone-100 pt-3">
+          <p className="text-[10px] tracking-wider text-stone-400 uppercase">
             Подходящие профессии
           </p>
           <div
@@ -303,8 +303,8 @@ export default function ProfessionCarousel() {
                     drag ? "duration-0" : "transition-all duration-700"
                   } ${
                     active
-                      ? "border-violet-500/50 bg-slate-800/95 shadow-[0_0_25px_rgba(124,58,237,0.2)]"
-                      : "border-slate-700/50 bg-slate-800/50"
+                      ? "border-violet-200 bg-white shadow-[0_12px_30px_rgba(74,71,209,0.16)]"
+                      : "border-stone-100 bg-stone-50"
                   }`}
                   style={{
                     top: "50%",
@@ -315,15 +315,15 @@ export default function ProfessionCarousel() {
                   <span
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors ${
                       active
-                        ? "bg-violet-500/20 text-violet-300"
-                        : "bg-slate-700/60 text-slate-500"
+                        ? "bg-violet-100 text-violet-600"
+                        : "bg-stone-100 text-stone-400"
                     }`}
                   >
                     <Icon size={14} />
                   </span>
                   <span
                     className={`flex-1 truncate text-sm transition-colors ${
-                      active ? "font-medium text-white" : "text-slate-400"
+                      active ? "font-semibold text-stone-800" : "text-stone-500"
                     }`}
                   >
                     {p.name}
@@ -331,8 +331,8 @@ export default function ProfessionCarousel() {
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[11px] transition-colors ${
                       active
-                        ? "bg-violet-500/20 text-violet-300"
-                        : "text-slate-600"
+                        ? "bg-violet-100 text-violet-700"
+                        : "text-stone-400"
                     }`}
                   >
                     {p.match}%
@@ -357,7 +357,7 @@ function ChartPane({
 }) {
   return (
     <div
-      className="absolute inset-0 rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 transition-all duration-700 ease-in-out"
+      className="absolute inset-0 rounded-2xl border border-stone-100 bg-stone-50 p-3 transition-all duration-700 ease-in-out"
       style={{
         transform: active ? "rotateX(0deg)" : "rotateX(-82deg)",
         transformOrigin: "center 60%",

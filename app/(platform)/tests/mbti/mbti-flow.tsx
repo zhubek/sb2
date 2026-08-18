@@ -36,7 +36,7 @@ export default function MbtiFlow({ initialStage }: { initialStage: Stage }) {
         </div>
         <button
           onClick={() => setStage("quiz")}
-          className="mt-8 rounded-full bg-stone-900 px-8 py-3 font-medium text-white transition hover:bg-violet-700"
+          className="mt-8 rounded-2xl bg-violet-500 px-8 py-3 font-medium text-white transition hover:bg-violet-600"
         >
           Начать тест
         </button>
@@ -103,7 +103,7 @@ export default function MbtiFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mt-6 flex justify-center gap-3">
         <Link
           href="/tests/holland"
-          className="rounded-full bg-stone-900 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+          className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
           Пройти тест Голланда
         </Link>

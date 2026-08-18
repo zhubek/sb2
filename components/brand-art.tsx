@@ -4,13 +4,13 @@
 
 export { CertificateArt } from "./compass-marks";
 
-const INK = "#1c1917"; // stone-900
-const VIOLET = "#7c3aed"; // violet-600
-const VIOLET_SOFT = "#a78bfa"; // violet-400 (для тёмных поверхностей)
-const TEAL = "#0d9488"; // teal-600
-const CYAN = "#22d3ee";
-const AMBER = "#fbbf24";
-const MUTED = "#d6d3d1"; // stone-300
+const INK = "#2a2e3b"; // stone-900
+const VIOLET = "#4a47d1"; // violet-600
+const VIOLET_SOFT = "#7480f5"; // violet-400 (для тёмных поверхностей)
+const TEAL = "#12a465"; // teal-600
+const CYAN = "#ff7a4d";
+const AMBER = "#ffc53d";
+const MUTED = "#c3c8d6"; // stone-300
 const SW = 4;
 
 type Tone = "violet" | "teal";
@@ -69,7 +69,7 @@ export function CompassArt({
         cy="88"
         r="72"
         fill="none"
-        stroke={dark ? "#475569" : MUTED}
+        stroke={dark ? "#5a6174" : MUTED}
         strokeWidth="3"
         strokeDasharray="5 12"
         strokeLinecap="round"
@@ -166,13 +166,13 @@ export function RobotArt({
           width="52"
           height="40"
           rx="12"
-          fill={dark ? "#1e293b" : "#fff"}
+          fill={dark ? "#2a2e3b" : "#fff"}
           stroke={ink(dark)}
           strokeWidth={SW - 1}
         />
         <polygon
           points="150,64 146,76 162,66"
-          fill={dark ? "#1e293b" : "#fff"}
+          fill={dark ? "#2a2e3b" : "#fff"}
           stroke={ink(dark)}
           strokeWidth={SW - 1.5}
         />
@@ -227,7 +227,7 @@ export function ReportArt({
             y1={y}
             x2="128"
             y2={y}
-            stroke={dark ? "#475569" : MUTED}
+            stroke={dark ? "#5a6174" : MUTED}
             strokeWidth={SW}
             strokeLinecap="round"
           />
@@ -243,7 +243,7 @@ export function ReportArt({
           />
         </g>
       ))}
-      <line x1="46" y1="118" x2="96" y2="118" stroke={dark ? "#475569" : MUTED} strokeWidth={SW - 1} strokeLinecap="round" />
+      <line x1="46" y1="118" x2="96" y2="118" stroke={dark ? "#5a6174" : MUTED} strokeWidth={SW - 1} strokeLinecap="round" />
       {/* AI-звезда над углом документа */}
       <g className="c-wobble">
         <g transform="translate(158 44)">
@@ -332,7 +332,7 @@ export function PathArt({
       <path
         d="M20,138 C60,132 48,92 92,86 C136,80 138,54 168,40"
         fill="none"
-        stroke={dark ? "#475569" : MUTED}
+        stroke={dark ? "#5a6174" : MUTED}
         strokeWidth={SW - 0.5}
         strokeDasharray="7 9"
         strokeLinecap="round"

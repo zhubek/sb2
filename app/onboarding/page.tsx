@@ -68,7 +68,7 @@ export default function OnboardingPage() {
             onClick={() =>
               last ? router.push("/dashboard") : setStep(step + 1)
             }
-            className="mt-8 w-full rounded-full bg-stone-900 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+            className="mt-8 w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
           >
             {last ? "Перейти в личный кабинет" : "Далее"}
           </button>

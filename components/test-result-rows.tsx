@@ -36,38 +36,31 @@ export default function TestResultRows() {
         </p>
       ),
       expanded: (
-        <div className="space-y-2.5">
-          {skills.map((s, i) => (
-            <div key={s.id} className="flex items-center gap-3">
-              <span
-                className={`w-6 font-mono text-xs ${
-                  i < 3 ? "font-semibold text-violet-600" : "text-stone-400"
-                }`}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="w-44 text-sm">{s.name}</span>
-              <div className="h-1 flex-1 overflow-hidden rounded-full bg-stone-200">
-                <div
-                  className={`h-full rounded-full ${i < 3 ? "bg-violet-600" : "bg-stone-400"}`}
-                  style={{ width: `${s.score}%` }}
-                />
+        <div>
+          {/* Только топ-3 навыка, без процентов — остальные в полном результате */}
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            {skills.slice(0, 3).map((s, i) => (
+              <div key={s.id} className="rounded-2xl bg-violet-50 px-4 py-3.5">
+                <span className="font-mono text-xs font-semibold text-violet-600">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p className="mt-1 text-sm font-semibold text-violet-800">{s.name}</p>
               </div>
-              <span className="w-7 text-right font-mono text-xs text-stone-500">
-                {s.score}
-              </span>
-            </div>
-          ))}
-          <div className="flex items-center justify-between pt-4">
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-stone-400">
+            Полный рейтинг всех навыков — в подробном результате
+          </p>
+          <div className="flex items-center gap-3 pt-4">
             <Link
               href="/tests/debruce?view=result"
-              className="text-sm font-medium underline decoration-stone-300 underline-offset-4 hover:decoration-violet-600"
+              className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
               Полный результат и рекомендации
             </Link>
             <Link
               href="/tests/debruce"
-              className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+              className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
             >
               Перепройти тест
             </Link>
@@ -89,31 +82,35 @@ export default function TestResultRows() {
         </p>
       ),
       expanded: (
-        <div className="space-y-4">
+        <div className="space-y-5">
+          {/* Диаграмма шкал — как в отчёте */}
           {mbtiScales.map((s) => (
             <div key={s.left}>
-              <div className="flex justify-between font-mono text-[11px] text-stone-500">
+              <div className="flex justify-between text-xs font-medium text-stone-500">
                 <span>{s.left}</span>
                 <span>{s.right}</span>
               </div>
-              <div className="relative mt-1.5 h-1 rounded-full bg-stone-200">
+              <div className="relative mt-1.5 h-2 rounded-full bg-stone-100">
                 <div
-                  className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600"
+                  className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-violet-600 shadow"
                   style={{ left: `${s.value}%` }}
                 />
               </div>
+              <p className="mt-1.5 text-right text-xs text-violet-600">
+                {s.value}% · {s.winner}
+              </p>
             </div>
           ))}
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center gap-3 pt-1">
             <Link
               href="/tests/mbti?view=result"
-              className="text-sm font-medium underline decoration-stone-300 underline-offset-4 hover:decoration-violet-600"
+              className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Полный результат
+              Полный результат и рекомендации
             </Link>
             <Link
               href="/tests/mbti"
-              className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+              className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
             >
               Перепройти тест
             </Link>
@@ -134,13 +131,14 @@ export default function TestResultRows() {
       expanded: (
         <div>
           <p className="max-w-lg text-sm leading-relaxed text-stone-600">
-            Последний шаг диагностики (≈ 8 минут). Профиль интересов по шкалам:{" "}
+            Последний шаг диагностики (≈ 8 минут). В результате вы получите свой
+            код RIASEC — профиль интересов по шкалам:{" "}
             {hollandScales.map((s) => s.name.toLowerCase()).join(", ")}. После
             прохождения откроется комплексный отчёт ИИ.
           </p>
           <Link
             href="/tests/holland"
-            className="mt-4 inline-block rounded-full bg-stone-900 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700"
+            className="mt-4 inline-block rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
           >
             Пройти тест
           </Link>
@@ -185,7 +183,7 @@ export default function TestResultRows() {
                 aria-label={isOpen ? "Свернуть" : "Подробнее"}
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                   isOpen
-                    ? "border-stone-900 bg-stone-900 text-white"
+                    ? "border-violet-500 bg-violet-500 text-white"
                     : "border-stone-300 text-stone-500 hover:border-stone-900 hover:text-stone-900"
                 }`}
               >

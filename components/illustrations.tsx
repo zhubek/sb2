@@ -2,12 +2,12 @@
 // Анимации — CSS-классы illu-* из globals.css; уважают prefers-reduced-motion.
 
 const C = {
-  blob: "#eef2ff", // indigo-50
-  light: "#a5b4fc", // indigo-300
-  mid: "#6366f1", // indigo-500
-  primary: "#4f46e5", // indigo-600
-  dark: "#312e81", // indigo-900
-  accent: "#fbbf24", // amber-400
+  blob: "#eef0ff", // indigo-50
+  light: "#97a2fd", // indigo-300
+  mid: "#5a5fe8", // indigo-500
+  primary: "#4a47d1", // indigo-600
+  dark: "#262459", // indigo-900
+  accent: "#ffc53d", // amber-400
   white: "#ffffff",
 };
 

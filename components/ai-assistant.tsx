@@ -43,16 +43,16 @@ export default function AiAssistant() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="ИИ-ассистент"
-        className="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-stone-900 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-700"
+        className="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600"
       >
         {open ? <X className="h-5 w-5" /> : <Bot className="h-6 w-6" />}
       </button>
 
       {open && (
         <div className="fixed right-5 bottom-24 z-50 flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
-          <div className="border-b border-stone-800 bg-stone-900 px-4 py-3 text-white">
-            <p className="font-display text-sm font-medium">ИИ-ассистент</p>
-            <p className="text-xs text-stone-400">
+          <div className="bg-violet-50 px-4 py-3">
+            <p className="font-display text-sm text-violet-800">ИИ-ассистент</p>
+            <p className="text-xs text-violet-800/60">
               Помогу с тестами, профессиями и выбором ВУЗа
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function AiAssistant() {
                 className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                   m.role === "ai"
                     ? "bg-stone-100 text-stone-800"
-                    : "ml-auto bg-stone-900 text-white"
+                    : "ml-auto bg-violet-500 text-white"
                 }`}
               >
                 {m.text}
@@ -110,7 +110,7 @@ export default function AiAssistant() {
             />
             <button
               type="submit"
-              className="flex items-center justify-center rounded-xl bg-stone-900 px-4 text-white transition hover:bg-violet-700"
+              className="flex items-center justify-center rounded-xl bg-violet-500 px-4 text-white transition hover:bg-violet-600"
             >
               <Send size={15} />
             </button>

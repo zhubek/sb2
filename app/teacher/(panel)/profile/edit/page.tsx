@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Camera, Check } from "lucide-react";
+import { ArrowLeft, Camera, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { teacher } from "@/lib/teacher-mock-data";
@@ -11,27 +11,26 @@ type Profile = {
   firstName: string;
   lastName: string;
   role: string;
-  school: string;
-  city: string;
-  email: string;
   phone: string;
-  about: string;
 };
 
 const defaults: Profile = {
   firstName: teacher.firstName,
   lastName: teacher.lastName,
   role: teacher.role,
-  school: teacher.school,
-  city: teacher.city,
-  email: teacher.email,
   phone: "+7 701 245 18 90",
-  about:
-    "Помогаю ученикам 8–11 классов осознанно выбирать профессию. Веду профориентационные консультации с 2018 года.",
 };
 
 const fieldCls =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-teal-400";
+
+// Школа, город и e-mail закреплены за учётной записью —
+// их меняет только администратор платформы
+const lockedFields = [
+  { label: "Школа", value: teacher.school },
+  { label: "Город", value: teacher.city },
+  { label: "Email", value: teacher.email },
+];
 
 export default function ProfileEditPage() {
   const [form, setForm] = useState<Profile>(defaults);
@@ -92,7 +91,7 @@ export default function ProfileEditPage() {
           </div>
         </div>
 
-        {/* Поля */}
+        {/* Редактируемые поля */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="text-xs font-medium text-slate-500">Имя</span>
@@ -121,22 +120,6 @@ export default function ProfileEditPage() {
             />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-slate-500">Школа</span>
-            <input
-              value={form.school}
-              onChange={(e) => set("school", e.target.value)}
-              className={`mt-1.5 ${fieldCls}`}
-            />
-          </label>
-          <label className="block">
-            <span className="text-xs font-medium text-slate-500">Город</span>
-            <input
-              value={form.city}
-              onChange={(e) => set("city", e.target.value)}
-              className={`mt-1.5 ${fieldCls}`}
-            />
-          </label>
-          <label className="block">
             <span className="text-xs font-medium text-slate-500">Телефон</span>
             <input
               value={form.phone}
@@ -144,24 +127,28 @@ export default function ProfileEditPage() {
               className={`mt-1.5 ${fieldCls}`}
             />
           </label>
-          <label className="block sm:col-span-2">
-            <span className="text-xs font-medium text-slate-500">Email</span>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-              className={`mt-1.5 ${fieldCls}`}
-            />
-          </label>
-          <label className="block sm:col-span-2">
-            <span className="text-xs font-medium text-slate-500">О себе</span>
-            <textarea
-              value={form.about}
-              onChange={(e) => set("about", e.target.value)}
-              rows={3}
-              className={`mt-1.5 resize-none ${fieldCls}`}
-            />
-          </label>
+        </div>
+
+        {/* Поля, закреплённые за школой: редактирует администратор */}
+        <div className="mt-6 rounded-xl bg-slate-50 p-4">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            <Lock size={12} />
+            Данные учётной записи — изменяются администратором платформы
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-3">
+            {lockedFields.map((f) => (
+              <label key={f.label} className="block">
+                <span className="text-xs font-medium text-slate-400">
+                  {f.label}
+                </span>
+                <input
+                  value={f.value}
+                  disabled
+                  className="mt-1.5 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm text-slate-500"
+                />
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">

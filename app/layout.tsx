@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Golos_Text, Unbounded } from "next/font/google";
+import { Golos_Text } from "next/font/google";
 import "./globals.css";
 
 const golos = Golos_Text({
   subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-golos",
-});
-
-const unbounded = Unbounded({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-unbounded",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`${golos.variable} ${unbounded.variable} min-h-screen bg-[#faf8f5] font-sans text-stone-900 antialiased`}
+        className={`${golos.variable} min-h-screen bg-[#fcfbfd] font-sans text-stone-800 antialiased`}
       >
         {children}
       </body>

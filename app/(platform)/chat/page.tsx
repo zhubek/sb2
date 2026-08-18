@@ -83,7 +83,7 @@ export default function ChatPage() {
             className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
               m.role === "ai"
                 ? "bg-white text-stone-800 shadow-sm"
-                : "ml-auto bg-stone-900 text-white"
+                : "ml-auto bg-violet-500 text-white"
             }`}
           >
             {m.text}
@@ -150,7 +150,7 @@ export default function ChatPage() {
             e.preventDefault();
             send(input);
           }}
-          className="flex gap-2 bg-[#faf8f5] pb-1"
+          className="flex gap-2 bg-[#fcfbfd] pb-1"
         >
           <input
             value={input}
@@ -160,7 +160,7 @@ export default function ChatPage() {
           />
           <button
             type="submit"
-            className="flex items-center justify-center rounded-2xl bg-stone-900 px-5 text-white transition hover:bg-violet-700"
+            className="flex items-center justify-center rounded-2xl bg-violet-500 px-5 text-white transition hover:bg-violet-600"
           >
             <Send size={17} />
           </button>

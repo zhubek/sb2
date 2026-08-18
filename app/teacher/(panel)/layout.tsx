@@ -1,5 +1,6 @@
 ﻿import TeacherAiButton from "@/components/teacher-ai-button";
 import TeacherNav from "@/components/teacher-nav";
+import TeacherOnboarding from "@/components/teacher-onboarding";
 
 export default function TeacherLayout({
   children,
@@ -9,6 +10,7 @@ export default function TeacherLayout({
       <TeacherNav />
       <main className="min-w-0 flex-1 px-8 py-8 pb-24">{children}</main>
       <TeacherAiButton />
+      <TeacherOnboarding />
     </div>
   );
 }

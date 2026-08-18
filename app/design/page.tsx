@@ -32,7 +32,7 @@ const systems = {
     subtitle:
       "Редакционный тёплый стиль: бумажный фон, шрифт Unbounded в заголовках, чернильные кнопки, violet-акцент, янтарные стикеры.",
     accentName: "violet + amber (стикеры)",
-    neutralName: "stone, фон #faf8f5",
+    neutralName: "нейтральные, фон #fcfbfd",
     radiusName: "rounded-full (кнопки) / rounded-2xl (карточки)",
     navNote: "Словомарка + подчёркивание активного пункта, чек-лист у имени",
     card: "rounded-2xl border border-stone-200 bg-white p-6",
@@ -40,7 +40,7 @@ const systems = {
     cardDashed:
       "rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center",
     btnPrimary:
-      "rounded-full bg-stone-900 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700",
+      "rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600",
     btnSecondary:
       "rounded-full border border-stone-300 bg-white px-6 py-2.5 text-sm font-medium text-stone-700 transition hover:border-stone-900",
     btnPill:
@@ -68,7 +68,7 @@ const systems = {
       ["stone-900", "bg-stone-900", "кнопки, тёмные карты, аватар"],
     ],
     neutrals: [
-      ["#faf8f5", "bg-[#faf8f5] border border-stone-200", "бумажный фон страниц"],
+      ["#fcfbfd", "bg-[#fcfbfd] border border-stone-200", "фон страниц"],
       ["white", "bg-white border border-stone-200", "карточки, поля"],
       ["stone-200", "bg-stone-200", "границы, треки, разделители"],
       ["stone-400", "bg-stone-400", "подписи, брови-лейблы"],

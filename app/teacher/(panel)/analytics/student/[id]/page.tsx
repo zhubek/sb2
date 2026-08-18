@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CompassArt } from "@/components/brand-art";
 import ReportButton from "@/components/report-button";
+import ReportPreview from "@/components/report-preview";
 import { skills, universities } from "@/lib/mock-data";
-import { teacherStudents } from "@/lib/teacher-mock-data";
+import { eduPrograms, teacherStudents } from "@/lib/teacher-mock-data";
 
 export default async function StudentCardPage({
   params,
@@ -21,7 +22,13 @@ export default async function StudentCardPage({
         .map((name) => skills.find((s) => s.name === name))
         .filter(Boolean)
     : [];
-  const recommendedUnis = universities.filter((u) => !u.foreign).slice(0, 3);
+  // Избранное ученика: вузы и образовательные программы из его профиля
+  const favoriteUnis = st.favoriteUniversities
+    .map((uid) => universities.find((u) => u.id === uid))
+    .filter(Boolean);
+  const favoritePrograms = st.favoritePrograms
+    .map((pid) => eduPrograms.find((p) => p.id === pid))
+    .filter(Boolean);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -56,13 +63,23 @@ export default async function StudentCardPage({
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href="/teacher/assistant"
             className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
             🤖 Спросить AI об ученике
           </Link>
+          <ReportPreview
+            title={`Отчёт по ученику · ${st.name}`}
+            rows={[
+              { label: "Класс", value: st.className },
+              { label: "Пройдено тестов", value: `${st.testsPassed}/3` },
+              { label: "MBTI", value: st.mbti ?? "—" },
+              { label: "Ведущая отрасль", value: st.topIndustry ?? "—" },
+              { label: "Последняя активность", value: st.lastActive },
+            ]}
+          />
           <ReportButton label="Скачать отчёт" />
         </div>
       </div>
@@ -74,7 +91,7 @@ export default async function StudentCardPage({
           <h2 className="mt-3 font-semibold">Диагностика не начата</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
             Ученик зарегистрирован, но ещё не прошёл ни одного теста.
-            Порекомендуйте начать с флагманского теста DeBruce — уже после него
+            Порекомендуйте начать с теста DeBruce — уже после него
             появятся первые результаты и рекомендации.
           </p>
           <Link
@@ -178,27 +195,66 @@ export default async function StudentCardPage({
               </div>
             </section>
 
-            {/* Рекомендованные вузы */}
+            {/* Вузы, добавленные учеником в Избранное */}
             <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <h2 className="font-semibold">Рекомендованные вузы</h2>
-              <ul className="mt-4 space-y-2.5">
-                {recommendedUnis.map((u) => (
-                  <li key={u.id}>
-                    <Link
-                      href={`/teacher/handbook/university/${u.id}`}
-                      className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
+              <h2 className="font-semibold">Избранные учеником</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Вузы, которые ученик добавил в Избранное на своей платформе
+              </p>
+              {favoriteUnis.length > 0 ? (
+                <ul className="mt-4 space-y-2.5">
+                  {favoriteUnis.map((u) => (
+                    <li key={u!.id}>
+                      <Link
+                        href={`/teacher/handbook/university/${u!.id}`}
+                        className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3 transition hover:border-teal-200 hover:bg-teal-50/40"
+                      >
+                        <div>
+                          <p className="text-sm font-medium">{u!.name}</p>
+                          <p className="text-xs text-slate-400">
+                            {u!.city} · балл от {u!.minScore}
+                          </p>
+                        </div>
+                        <span className="text-slate-300">→</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-slate-400">
+                  Ученик пока не добавил вузы в Избранное
+                </p>
+              )}
+            </section>
+
+            {/* Избранные образовательные программы */}
+            <section className="rounded-xl border border-slate-200 bg-white p-6">
+              <h2 className="font-semibold">Избранные ОП</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Образовательные программы из Избранного ученика
+              </p>
+              {favoritePrograms.length > 0 ? (
+                <ul className="mt-4 space-y-2.5">
+                  {favoritePrograms.map((p) => (
+                    <li
+                      key={p!.id}
+                      className="flex items-center gap-3 rounded-xl border border-slate-100 px-4 py-3"
                     >
+                      <span className="rounded-lg bg-teal-50 px-2.5 py-1 font-mono text-xs font-medium text-teal-700">
+                        {p!.code}
+                      </span>
                       <div>
-                        <p className="text-sm font-medium">{u.name}</p>
-                        <p className="text-xs text-slate-400">
-                          {u.city} · балл от {u.minScore}
-                        </p>
+                        <p className="text-sm font-medium">{p!.name}</p>
+                        <p className="text-xs text-slate-400">{p!.direction}</p>
                       </div>
-                      <span className="text-slate-300">→</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-slate-400">
+                  Ученик пока не добавил программы в Избранное
+                </p>
+              )}
             </section>
           </div>
 
@@ -231,30 +287,6 @@ export default async function StudentCardPage({
                     <span className="text-slate-400">16.07.2026</span>
                   </li>
                 )}
-              </ul>
-            </section>
-
-            {/* История консультаций */}
-            <section className="rounded-xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="font-semibold">Консультации</h2>
-                <button className="text-sm font-medium text-teal-600 hover:text-teal-700">
-                  + Записать
-                </button>
-              </div>
-              <ul className="mt-4 space-y-3 text-sm">
-                <li>
-                  <p className="font-medium">Первичная беседа</p>
-                  <p className="text-xs text-slate-400">
-                    15.07.2026 · обсудили результаты DeBruce
-                  </p>
-                </li>
-                <li>
-                  <p className="font-medium">Встреча с родителями</p>
-                  <p className="text-xs text-slate-400">
-                    запланирована · 25.07.2026
-                  </p>
-                </li>
               </ul>
             </section>
 

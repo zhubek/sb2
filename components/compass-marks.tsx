@@ -2,11 +2,11 @@
 // Штрих ромба = штриху круга (3.5). Одна форма — разные анимации.
 // Плюс семейство иконок в том же языке.
 
-const INK = "#1c1917"; // stone-900
-const VIOLET = "#7c3aed"; // violet-600
-const CYAN = "#22d3ee"; // cyan-400
-const AMBER = "#fbbf24"; // amber-400
-const MUTED = "#d6d3d1"; // stone-300
+const INK = "#2a2e3b"; // stone-900
+const VIOLET = "#4a47d1"; // violet-600
+const CYAN = "#ff7a4d"; // cyan-400
+const AMBER = "#ffc53d"; // amber-400
+const MUTED = "#c3c8d6"; // stone-300
 const SW = 3.5; // единая толщина штриха
 
 // Узкий ромб (ширина 18) и стрелка: вершина фиксирована, боковые стороны
@@ -161,7 +161,7 @@ export function LogoMark({
         <polygon
           points={RHOMBUS}
           fill="none"
-          stroke={dark ? "#a78bfa" : VIOLET}
+          stroke={dark ? "#7480f5" : VIOLET}
           strokeWidth={SW + 1}
           strokeLinejoin="round"
         />
@@ -390,7 +390,7 @@ export function IconRobot({ className, dark = false }: { className?: string; dar
           <polygon
             points="32,24 39,38 32,52 25,38"
             fill="none"
-            stroke={dark ? "#a78bfa" : VIOLET}
+            stroke={dark ? "#7480f5" : VIOLET}
             strokeWidth={SW}
             strokeLinejoin="round"
           />

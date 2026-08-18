@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatPrice, universities } from "@/lib/mock-data";
+import { colleges, formatPrice, universities } from "@/lib/mock-data";
 import SaveButton from "./save-button";
 
 export default async function UniversityPage({
@@ -20,7 +20,7 @@ export default async function UniversityPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const u = universities.find((x) => x.id === id);
+  const u = [...universities, ...colleges].find((x) => x.id === id);
   if (!u) notFound();
 
   return (

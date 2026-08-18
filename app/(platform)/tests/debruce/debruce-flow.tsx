@@ -30,8 +30,8 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
     return (
       <div className="mx-auto max-w-xl text-center">
         <SkillsArt className="mx-auto h-44 w-56" />
-        <span className="-rotate-1 mt-2 inline-block rounded bg-amber-300 px-2.5 py-1 text-xs font-semibold text-stone-900">
-          флагманский тест
+        <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600">
+          Методика НАО им. Ы. Алтынсарина
         </span>
         <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Тест DeBruce</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
@@ -52,7 +52,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
         </div>
         <button
           onClick={() => setStage("quiz")}
-          className="mt-8 rounded-full bg-stone-900 px-8 py-3 font-medium text-white transition hover:bg-violet-700"
+          className="mt-8 rounded-2xl bg-violet-500 px-8 py-3 font-medium text-white transition hover:bg-violet-600"
         >
           Начать тест
         </button>
@@ -138,7 +138,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
         <div className="mt-8 text-center">
           <button
             onClick={() => setStage("industry")}
-            className="rounded-full bg-stone-900 px-8 py-3 font-medium text-white transition hover:bg-violet-700"
+            className="rounded-2xl bg-violet-500 px-8 py-3 font-medium text-white transition hover:bg-violet-600"
           >
             Перейти к рекомендациям по отраслям
           </button>
@@ -163,7 +163,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
       step: 1,
       title: "Выберите отрасль",
       subtitle:
-        "На основе ваших топ-3 навыков (Креативность, Коммуникация, Эмпатия) мы подобрали 3 отрасли из 16.",
+        "На основе ваших топ-3 навыков (Креативность, Коммуникация, Эмпатия) мы подобрали 3 отрасли из 16. Этого достаточно: навигатор сразу отфильтрует программы и заведения. Углубляться в направления — по желанию.",
     },
     direction: {
       step: 2,
@@ -187,7 +187,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
     <div className="mx-auto max-w-2xl">
       <div className="text-center">
         <p className="text-sm font-medium text-violet-600">
-          Рекомендации · шаг {meta.step} из 4
+          Рекомендации{meta.step > 1 ? ` · уточнение ${meta.step - 1} из 3` : ""}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">{meta.title}</h1>
         <p className="mt-2 text-stone-500">{meta.subtitle}</p>
@@ -198,20 +198,58 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
 
       <div className="mt-8 space-y-3">
         {stage === "industry" &&
-          recommendedIndustries.map((it) => (
-            <ChoiceCard
-              key={it.id}
-              name={it.name}
-              description={it.description}
-              onClick={() => {
-                setIndustry(it);
-                setDirection(null);
-                setProfile(null);
-                setProgram(null);
-                setStage("direction");
-              }}
-            />
-          ))}
+          !industry &&
+          recommendedIndustries.map((it) => {
+            // Примеры профессий отрасли — по входящим в неё программам
+            const professions = [
+              ...new Set(
+                it.directions
+                  .flatMap((d) => d.profiles)
+                  .flatMap((p) => p.programs)
+                  .flatMap((pr) => pr.professions)
+              ),
+            ].slice(0, 4);
+            return (
+              <ChoiceCard
+                key={it.id}
+                name={it.name}
+                description={it.description}
+                extra={`Профессии: ${professions.join(", ")}`}
+                onClick={() => {
+                  setIndustry(it);
+                  setDirection(null);
+                  setProfile(null);
+                  setProgram(null);
+                }}
+              />
+            );
+          })}
+
+        {/* Отрасль выбрана — этого достаточно для предфильтра навигатора */}
+        {stage === "industry" && industry && (
+          <div className="rounded-2xl border border-violet-200 bg-violet-50 p-6 text-center">
+            <p className="text-sm font-medium text-violet-600">Ваша отрасль</p>
+            <h2 className="mt-1 text-xl font-bold">{industry.name}</h2>
+            <p className="mt-2 text-sm text-stone-600">{industry.description}</p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <Link
+                href={`/universities?industry=${encodeURIComponent(industry.name)}`}
+                className="rounded-2xl bg-violet-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-violet-600"
+              >
+                Открыть навигатор с этой отраслью →
+              </Link>
+              <button
+                onClick={() => setStage("direction")}
+                className="rounded-2xl border border-violet-200 bg-white px-6 py-3 text-sm font-medium text-violet-700 transition hover:bg-violet-100"
+              >
+                Уточнить направление
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-stone-400">
+              Навигатор откроется с преднастроенным фильтром по отрасли
+            </p>
+          </div>
+        )}
 
         {stage === "direction" &&
           industry?.directions.map((d) => (
@@ -261,7 +299,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
             </p>
             <Link
               href={`/universities?program=${encodeURIComponent(program.name)}`}
-              className="mt-5 inline-block rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-violet-700"
+              className="mt-5 inline-block rounded-2xl bg-violet-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-violet-600"
             >
               Найти ВУЗы с этой программой →
             </Link>
@@ -280,6 +318,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
             else if (stage === "program") setStage("profile");
             else if (stage === "profile") setStage("direction");
             else if (stage === "direction") setStage("industry");
+            else if (stage === "industry" && industry) setIndustry(null);
             else setStage("result");
           }}
           className="text-sm text-stone-400 hover:text-stone-600"
