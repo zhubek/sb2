@@ -3,12 +3,8 @@
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  currentUser,
-  hollandScales,
-  mbtiScales,
-  skills,
-} from "@/lib/mock-data";
+import { MbtiBars } from "@/components/report-blocks";
+import { currentUser, hollandScales, skills } from "@/lib/mock-data";
 
 // Раскрывающиеся строки с результатами тестов — редакционный список
 export default function TestResultRows() {
@@ -40,7 +36,7 @@ export default function TestResultRows() {
           {/* Только топ-3 навыка, без процентов — остальные в полном результате */}
           <div className="grid gap-2.5 sm:grid-cols-3">
             {skills.slice(0, 3).map((s, i) => (
-              <div key={s.id} className="rounded-2xl bg-violet-50 px-4 py-3.5">
+              <div key={s.id} className="rounded-2xl bg-violet-100 px-4 py-3.5">
                 <span className="font-mono text-xs font-semibold text-violet-600">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -49,14 +45,14 @@ export default function TestResultRows() {
             ))}
           </div>
           <p className="mt-3 text-xs text-stone-400">
-            Полный рейтинг всех навыков — в подробном результате
+            Полный рейтинг всех навыков — в отчёте
           </p>
           <div className="flex items-center gap-3 pt-4">
             <Link
-              href="/tests/debruce?view=result"
+              href="/tests/debruce/report"
               className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Полный результат и рекомендации
+              Открыть отчёт
             </Link>
             <Link
               href="/tests/debruce"
@@ -83,30 +79,14 @@ export default function TestResultRows() {
       ),
       expanded: (
         <div className="space-y-5">
-          {/* Диаграмма шкал — как в отчёте */}
-          {mbtiScales.map((s) => (
-            <div key={s.left}>
-              <div className="flex justify-between text-xs font-medium text-stone-500">
-                <span>{s.left}</span>
-                <span>{s.right}</span>
-              </div>
-              <div className="relative mt-1.5 h-2 rounded-full bg-stone-100">
-                <div
-                  className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-violet-600 shadow"
-                  style={{ left: `${s.value}%` }}
-                />
-              </div>
-              <p className="mt-1.5 text-right text-xs text-violet-600">
-                {s.value}% · {s.winner}
-              </p>
-            </div>
-          ))}
+          {/* Шкалы от центра — как в отчёте */}
+          <MbtiBars />
           <div className="flex items-center gap-3 pt-1">
             <Link
-              href="/tests/mbti?view=result"
+              href="/tests/mbti/report"
               className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Полный результат и рекомендации
+              Открыть отчёт
             </Link>
             <Link
               href="/tests/mbti"
@@ -122,26 +102,55 @@ export default function TestResultRows() {
       id: "holland",
       n: "03",
       name: "Тест Голланда",
-      passed: false,
+      passed: true,
       preview: (
         <p className="text-sm text-stone-500">
-          Определит профессиональные интересы по 6 типам
+          Код{" "}
+          <span className="font-mono font-semibold tracking-[0.15em] text-violet-600">
+            {[...hollandScales]
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 3)
+              .map((s) => s.code)
+              .join("")}
+          </span>{" "}
+          <span className="text-stone-800">
+            ·{" "}
+            {[...hollandScales].sort((a, b) => b.score - a.score)[0].name} тип
+          </span>
         </p>
       ),
       expanded: (
         <div>
-          <p className="max-w-lg text-sm leading-relaxed text-stone-600">
-            Последний шаг диагностики (≈ 8 минут). В результате вы получите свой
-            код RIASEC — профиль интересов по шкалам:{" "}
-            {hollandScales.map((s) => s.name.toLowerCase()).join(", ")}. После
-            прохождения откроется комплексный отчёт ИИ.
-          </p>
-          <Link
-            href="/tests/holland"
-            className="mt-4 inline-block rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
-          >
-            Пройти тест
-          </Link>
+          {/* Топ-3 типа интересов — как в отчёте */}
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            {[...hollandScales]
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 3)
+              .map((s, i) => (
+                <div key={s.code} className="rounded-2xl bg-violet-100 px-4 py-3.5">
+                  <span className="font-mono text-xs font-semibold text-violet-600">
+                    {s.code} · топ {i + 1}
+                  </span>
+                  <p className="mt-1 text-sm font-semibold text-violet-800">
+                    {s.name} · {s.score}%
+                  </p>
+                </div>
+              ))}
+          </div>
+          <div className="flex items-center gap-3 pt-4">
+            <Link
+              href="/tests/holland/report"
+              className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
+            >
+              Открыть отчёт
+            </Link>
+            <Link
+              href="/tests/holland"
+              className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
+            >
+              Перепройти тест
+            </Link>
+          </div>
         </div>
       ),
     },

@@ -28,7 +28,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Комплексный отчёт ИИ — индиговая пастельная подложка */}
-      <section className="mt-10 overflow-hidden rounded-[28px] bg-violet-50 p-8">
+      <section className="mt-10 overflow-hidden rounded-[28px] border border-violet-200/70 bg-violet-100 p-8">
         <div className="flex items-start justify-between gap-6">
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] text-violet-600 uppercase">
@@ -45,7 +45,7 @@ export default function DashboardPage() {
                 : "Пройдите тест Голланда — и ИИ соберёт подробный анализ вашей личности и карьерных перспектив."}
             </p>
             <Link
-              href={allPassed ? "#" : "/tests/holland"}
+              href={allPassed ? "/tests/report" : "/tests/holland"}
               className="group mt-6 inline-flex items-center gap-2 rounded-2xl bg-white py-2.5 pr-5 pl-6 text-sm font-semibold text-violet-700 transition hover:text-violet-800"
             >
               {allPassed ? "Открыть отчёт" : "Пройти тест Голланда"}

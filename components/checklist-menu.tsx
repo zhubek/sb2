@@ -77,8 +77,8 @@ export default function ChecklistMenu() {
         aria-label="Чек-лист и прогресс"
         className={`flex items-center gap-2 rounded-full border py-1.5 pr-3 pl-2 text-sm transition ${
           open
-            ? "border-violet-300 bg-violet-50"
-            : "border-stone-200 bg-white hover:border-violet-200 hover:bg-violet-50/50"
+            ? "border-violet-300 bg-violet-100"
+            : "border-stone-200 bg-white hover:border-violet-200 hover:bg-violet-100/50"
         }`}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" className="-rotate-90">
@@ -154,7 +154,7 @@ export default function ChecklistMenu() {
                     <Link
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-violet-50"
+                      className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-violet-100"
                     >
                       {inner}
                     </Link>

@@ -19,7 +19,7 @@ export default function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      text: "Привет, Айгерим! Я ваш ИИ-ассистент по профориентации. Помогу разобраться в результатах тестов, расскажу о профессиях и подскажу следующий шаг. Кстати, вам остался всего один тест — Голланда — до комплексного отчёта!",
+      text: "Привет, Айгерим! Я ваш ИИ-ассистент по профориентации. Помогу разобраться в результатах тестов, расскажу о профессиях и подскажу следующий шаг. Все три теста пройдены — ваш комплексный отчёт готов, загляните в раздел «Тесты»!",
     },
   ]);
 
@@ -43,14 +43,14 @@ export default function AiAssistant() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="ИИ-ассистент"
-        className="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600"
+        className="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600 print:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Bot className="h-6 w-6" />}
       </button>
 
       {open && (
-        <div className="fixed right-5 bottom-24 z-50 flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl">
-          <div className="bg-violet-50 px-4 py-3">
+        <div className="fixed right-5 bottom-24 z-50 flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl print:hidden">
+          <div className="bg-violet-100 px-4 py-3">
             <p className="font-display text-sm text-violet-800">ИИ-ассистент</p>
             <p className="text-xs text-violet-800/60">
               Помогу с тестами, профессиями и выбором ВУЗа
@@ -86,7 +86,7 @@ export default function AiAssistant() {
                   <button
                     key={q}
                     onClick={() => send(q)}
-                    className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs text-violet-700 transition hover:bg-violet-100"
+                    className="rounded-full border border-violet-200 bg-violet-100 px-3 py-1.5 text-xs text-violet-700 transition hover:bg-violet-200"
                   >
                     {q}
                   </button>

@@ -72,7 +72,7 @@ export default function DownloadReport() {
   return (
     <button
       onClick={download}
-      className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 transition hover:text-violet-800"
+      className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 transition hover:border-violet-300 hover:text-violet-800"
     >
       <Download size={15} />
       Скачать отчёт

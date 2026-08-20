@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/compass-marks";
@@ -568,8 +568,7 @@ function NavRow({
 export default function WelcomePage() {
   const [lang, setLang] = useState<Lang>("ru");
   const [pane, setPane] = useState(0);
-  const pinRef = useRef<HTMLDivElement>(null);
-  const lockRef = useRef(0);
+  const dragX = useRef<number | null>(null);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -600,35 +599,21 @@ export default function WelcomePage() {
     return () => io.disconnect();
   }, []);
 
-  // Секция «Что тут есть» закрепляется и пролистывает карточки скроллом
-  useEffect(() => {
-    let ticking = false;
-    function sync() {
-      ticking = false;
-      const el = pinRef.current;
-      if (!el || window.innerWidth < 1024 || Date.now() < lockRef.current) return;
-      const total = el.offsetHeight - window.innerHeight;
-      if (total <= 0) return;
-      let p = -el.getBoundingClientRect().top / total;
-      p = Math.max(0, Math.min(0.999, p));
-      setPane(Math.floor(p * panes.length));
-    }
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(sync);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", sync);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", sync);
-    };
-  }, []);
-
+  // Карусель «Что тут есть»: стрелки, точки и перетаскивание
   function pickPane(i: number) {
-    lockRef.current = Date.now() + 1200;
-    setPane(i);
+    setPane((i + panes.length) % panes.length);
+  }
+
+  function onDragStart(e: React.PointerEvent) {
+    dragX.current = e.clientX;
+  }
+
+  function onDragEnd(e: React.PointerEvent) {
+    if (dragX.current === null) return;
+    const delta = e.clientX - dragX.current;
+    dragX.current = null;
+    if (Math.abs(delta) < 50) return; // короткое движение — это клик
+    pickPane(delta < 0 ? pane + 1 : pane - 1);
   }
 
   // Экраны телефона для колоды (по индексу карточки); active оживляет контент
@@ -645,7 +630,7 @@ export default function WelcomePage() {
             <p className="mb-2 text-[11px] tracking-wider text-stone-400 uppercase">{s.p1[lang]}</p>
             <div className="flex flex-wrap gap-1.5">
               {s.p1chips.map((c) => (
-                <span key={c.ru} className="rounded-full bg-violet-50 px-2.5 py-1 text-xs text-violet-700">
+                <span key={c.ru} className="rounded-full bg-violet-100 px-2.5 py-1 text-xs text-violet-700">
                   {c[lang]}
                 </span>
               ))}
@@ -697,7 +682,7 @@ export default function WelcomePage() {
           <p className="font-display mt-3 text-[17px] text-stone-800">{s.h[lang]}</p>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {s.chips.map((c) => (
-              <span key={c.ru} className="rounded-full bg-violet-50 px-2.5 py-1 text-xs text-violet-700">
+              <span key={c.ru} className="rounded-full bg-violet-100 px-2.5 py-1 text-xs text-violet-700">
                 {c[lang]}
               </span>
             ))}
@@ -793,7 +778,7 @@ export default function WelcomePage() {
 
       {/* Герой — индиговая пастельная подложка, один насыщенный акцент: коралловая кнопка */}
       <section className="px-4 pt-6 pb-6 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-violet-50 px-6 py-14 md:px-14 md:py-16">
+        <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-14 md:px-14 md:py-16">
           <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <p className="text-xs font-semibold tracking-[0.11em] text-violet-600 uppercase">
@@ -849,7 +834,7 @@ export default function WelcomePage() {
           </div>
 
           {/* Главный тест */}
-          <div className="rv grid items-center gap-10 rounded-[28px] bg-violet-50 p-8 md:grid-cols-[1fr_auto] md:p-10">
+          <div className="rv grid items-center gap-10 rounded-[28px] border border-violet-200/70 bg-violet-100 p-8 md:grid-cols-[1fr_auto] md:p-10">
             <div>
               <div className="mb-4 flex gap-2">
                 {how.pills.map((p) => (
@@ -862,10 +847,10 @@ export default function WelcomePage() {
                 ))}
               </div>
               <h3 className="font-display text-3xl text-violet-800">{how.mainTitle[lang]}</h3>
-              <p className="mt-2 text-[13px] tracking-wide text-violet-800/50">
+              <p className="mt-2 text-[13px] tracking-wide text-violet-800/60">
                 {how.mainMeth[lang]}
               </p>
-              <p className="mt-3.5 max-w-xl leading-relaxed text-violet-800/70">
+              <p className="mt-3.5 max-w-xl leading-relaxed text-violet-900/80">
                 {how.mainDesc[lang]}
               </p>
             </div>
@@ -912,7 +897,7 @@ export default function WelcomePage() {
         </div>
       </section>
 
-      {/* Что тут есть — закреплённая колода карточек */}
+      {/* Что тут есть — карусель карточек */}
       <section id="what" className="pt-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="rv max-w-2xl">
@@ -925,50 +910,69 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Десктоп: секция прилипает и пролистывает карточки */}
-        <div ref={pinRef} className="hidden lg:block" style={{ height: "calc(100vh + 210vh)" }}>
-          <div className="sticky top-0 flex min-h-screen flex-col justify-center py-10">
-            <div className="mx-auto w-full max-w-6xl px-6">
-              <div className="relative min-h-[560px]">
-                {panes.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`absolute inset-x-0 top-0 transition-all duration-500 ease-out ${
-                      i === pane
-                        ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-                        : `pointer-events-none opacity-0 ${
-                            i < pane ? "-translate-y-7 scale-[.985]" : "translate-y-7 scale-[.985]"
-                          }`
-                    }`}
-                  >
-                    <div className="grid items-center gap-16 lg:grid-cols-[1fr_372px]">
-                      {paneText(i)}
-                      <div className="flex justify-center">
-                        <Tilt>
-                          <Phone>{paneScreen(i, i === pane)}</Phone>
-                        </Tilt>
-                      </div>
-                    </div>
+        {/* Десктоп: обычная карусель — стрелки, точки и перетаскивание */}
+        <div className="mx-auto mt-12 hidden w-full max-w-6xl px-6 pb-24 lg:block">
+          <div
+            onPointerDown={onDragStart}
+            onPointerUp={onDragEnd}
+            onPointerCancel={() => (dragX.current = null)}
+            className="relative min-h-[560px] cursor-grab touch-pan-y select-none active:cursor-grabbing"
+          >
+            {panes.map((_, i) => (
+              <div
+                key={i}
+                className={`absolute inset-x-0 top-0 transition-all duration-500 ease-out ${
+                  i === pane
+                    ? "pointer-events-auto translate-x-0 scale-100 opacity-100"
+                    : `pointer-events-none opacity-0 ${
+                        i < pane ? "-translate-x-10 scale-[.985]" : "translate-x-10 scale-[.985]"
+                      }`
+                }`}
+              >
+                <div className="grid items-center gap-16 lg:grid-cols-[1fr_372px]">
+                  {paneText(i)}
+                  <div className="flex justify-center">
+                    <Tilt>
+                      <Phone>{paneScreen(i, i === pane)}</Phone>
+                    </Tilt>
                   </div>
-                ))}
+                </div>
               </div>
+            ))}
+          </div>
 
-              {/* Точки навигации */}
-              <div className="mt-10 flex items-center gap-2.5">
-                {panes.map((_, i) => (
-                  <button
-                    key={i}
-                    aria-label={`Карточка ${i + 1}`}
-                    onClick={() => pickPane(i)}
-                    className={`h-2.5 rounded-full transition-all duration-300 ${
-                      i === pane ? "w-8 bg-violet-500" : "w-2.5 bg-stone-300 hover:bg-stone-400"
-                    }`}
-                  />
-                ))}
-                <span className="ml-3 font-mono text-[13px] text-stone-400 tabular-nums">
-                  {pane + 1} / {panes.length}
-                </span>
-              </div>
+          {/* Управление: точки слева, стрелки справа */}
+          <div className="mt-10 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              {panes.map((_, i) => (
+                <button
+                  key={i}
+                  aria-label={`Карточка ${i + 1}`}
+                  onClick={() => pickPane(i)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    i === pane ? "w-8 bg-violet-500" : "w-2.5 bg-stone-300 hover:bg-stone-400"
+                  }`}
+                />
+              ))}
+              <span className="ml-3 font-mono text-[13px] text-stone-400 tabular-nums">
+                {pane + 1} / {panes.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                aria-label="Предыдущая карточка"
+                onClick={() => pickPane(pane - 1)}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                aria-label="Следующая карточка"
+                onClick={() => pickPane(pane + 1)}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -1071,7 +1075,7 @@ export default function WelcomePage() {
 
       {/* Финальный CTA */}
       <section className="px-4 pb-24 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-violet-50 px-6 py-16 text-center md:py-20">
+        <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-16 text-center md:py-20">
           <div className="mx-auto max-w-2xl space-y-6">
             <h2 className="rv font-display text-3xl text-violet-800 md:text-5xl">
               {finalCta.h2[lang]}

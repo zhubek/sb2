@@ -30,7 +30,7 @@ export default function UniversityList({
       </div>
 
       {showPreset && (
-        <div className="flex items-center justify-between rounded-2xl border border-violet-200 bg-violet-50 px-5 py-3.5 text-sm">
+        <div className="flex items-center justify-between rounded-2xl border border-violet-200 bg-violet-100 px-5 py-3.5 text-sm">
           <span>
             <Target
               size={15}

@@ -67,7 +67,7 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
           {top.map((t) => t.name).join(" + ")} тип
         </h1>
-        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1.5 text-sm font-medium text-violet-700">
+        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700">
           Код RIASEC:
           <span className="font-mono text-base font-bold tracking-[0.2em] text-violet-800">
             {sorted
@@ -117,12 +117,18 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
         </p>
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-6 flex justify-center gap-3">
         <Link
-          href="/dashboard"
+          href="/tests/holland/report"
           className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
-          Перейти в личный кабинет
+          Открыть полный отчёт
+        </Link>
+        <Link
+          href="/tests/report"
+          className="rounded-xl border border-stone-200 px-6 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+        >
+          Комплексный отчёт
         </Link>
       </div>
     </div>

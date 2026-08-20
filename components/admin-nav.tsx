@@ -44,7 +44,7 @@ export default function AdminNav() {
               href={l.href}
               className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
                 active
-                  ? "bg-violet-50 font-semibold text-violet-700"
+                  ? "bg-violet-100 font-semibold text-violet-700"
                   : "hover:bg-stone-50 hover:text-stone-800"
               }`}
             >

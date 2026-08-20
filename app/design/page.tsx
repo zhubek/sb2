@@ -59,9 +59,9 @@ const systems = {
     aiBubble: "rounded-2xl bg-white px-4 py-3 text-sm text-stone-800 shadow-sm",
     userBubble: "rounded-2xl bg-stone-900 px-4 py-3 text-sm text-white",
     hintChip:
-      "rounded-full border border-violet-200 bg-violet-50 px-3.5 py-1.5 text-xs text-violet-700 hover:bg-violet-100",
+      "rounded-full border border-violet-200 bg-violet-100 px-3.5 py-1.5 text-xs text-violet-700 hover:bg-violet-200",
     accents: [
-      ["violet-50", "bg-violet-50", "фоны-подложки, ховеры подсказок"],
+      ["violet-100", "bg-violet-100", "фоны-подложки, ховеры подсказок"],
       ["violet-600", "bg-violet-600", "акцент: активные состояния, бары, ссылки"],
       ["violet-700", "bg-violet-700", "ховер чернильных кнопок"],
       ["amber-300", "bg-amber-300", "стикеры, выделения (повёрнутые бейджи)"],

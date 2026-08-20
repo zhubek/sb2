@@ -39,7 +39,7 @@ export default function PlatformNav() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#fcfbfd]/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#fcfbfd]/90 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3.5">
         <div className="flex items-center gap-8">
           <Link

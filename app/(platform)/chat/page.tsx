@@ -138,7 +138,7 @@ export default function ChatPage() {
               key={hintIdx}
               onClick={() => send(aiTemplateQuestions[hintIdx])}
               style={{ animation: `hint-cycle ${HINT_CYCLE_MS}ms ease-in-out` }}
-              className="rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm text-violet-700 transition hover:bg-violet-100"
+              className="rounded-full border border-violet-200 bg-violet-100 px-4 py-2 text-sm text-violet-700 transition hover:bg-violet-200"
             >
               {aiTemplateQuestions[hintIdx]}
             </button>

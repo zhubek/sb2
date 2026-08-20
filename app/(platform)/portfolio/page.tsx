@@ -74,7 +74,7 @@ export default function PortfolioPage() {
             onClick={() => setOpenItem(p.id)}
             className="group rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-violet-300"
           >
-            <div className="rounded-xl bg-stone-50 px-6 py-4 transition group-hover:bg-violet-50/50">
+            <div className="rounded-xl bg-stone-50 px-6 py-4 transition group-hover:bg-violet-100/50">
               <CertificateArt className="mx-auto w-40" />
             </div>
             <div className="mt-3 flex items-start justify-between gap-2">

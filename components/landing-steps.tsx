@@ -119,7 +119,7 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
           </p>
         </div>
 
-        <div className="rounded-2xl bg-violet-50 p-4">
+        <div className="rounded-2xl bg-violet-100 p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="flex items-center gap-2 text-sm font-semibold text-violet-800">
               <FileCheck2 size={14} className="text-violet-600" />
@@ -248,7 +248,7 @@ function ChatMockup({ isActive }: { isActive: boolean }) {
           {["Показать вузы", "Почему именно PR?", "А что ещё?"].map((c) => (
             <span
               key={c}
-              className="rounded-full bg-violet-50 px-2.5 py-1 text-[11px] font-medium text-violet-700"
+              className="rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-medium text-violet-700"
             >
               {c}
             </span>
@@ -325,7 +325,7 @@ export default function LandingSteps() {
       <div className="mx-auto max-w-6xl">
         {/* Заголовок секции */}
         <div className="mb-16 md:text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1.5 text-xs font-semibold tracking-wider text-violet-700 uppercase">
+          <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-xs font-semibold tracking-wider text-violet-700 uppercase">
             <span className="h-1.5 w-1.5 rounded-2xl bg-violet-500" />
             Твоё нечестное преимущество
           </span>
@@ -353,7 +353,7 @@ export default function LandingSteps() {
                   onClick={() => setActiveStep(idx)}
                   className={`w-full rounded-3xl border p-6 text-left transition-all duration-300 ${
                     isActive
-                      ? "border-violet-100 bg-violet-50"
+                      ? "border-violet-200 bg-violet-100"
                       : "border-stone-100 bg-white hover:border-stone-200"
                   }`}
                 >

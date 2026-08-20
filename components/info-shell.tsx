@@ -44,7 +44,7 @@ export default function InfoShell({
                 href={p.href}
                 className={`rounded-xl px-3.5 py-2 text-sm transition ${
                   p.href === active
-                    ? "bg-violet-50 font-semibold text-violet-700"
+                    ? "bg-violet-100 font-semibold text-violet-700"
                     : "text-stone-500 hover:text-stone-800"
                 }`}
               >
@@ -82,7 +82,7 @@ export default function InfoShell({
 
       {/* CTA + футер */}
       <section className="px-4 pb-16 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-violet-50 px-6 py-14 text-center">
+        <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-14 text-center">
           <h2 className="font-display text-2xl text-violet-800 md:text-4xl">
             Не знаешь, что выбрать?
           </h2>

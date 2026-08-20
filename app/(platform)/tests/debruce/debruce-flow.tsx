@@ -102,7 +102,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
                 onClick={() => setOpenSkill(open ? null : s.id)}
                 className={`w-full rounded-xl border p-4 text-left transition ${
                   top
-                    ? "border-violet-200 bg-violet-50/60 hover:bg-violet-50"
+                    ? "border-violet-200 bg-violet-100/60 hover:bg-violet-100"
                     : "border-stone-200 bg-white hover:bg-stone-50"
                 }`}
               >
@@ -227,7 +227,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
 
         {/* Отрасль выбрана — этого достаточно для предфильтра навигатора */}
         {stage === "industry" && industry && (
-          <div className="rounded-2xl border border-violet-200 bg-violet-50 p-6 text-center">
+          <div className="rounded-2xl border border-violet-200 bg-violet-100 p-6 text-center">
             <p className="text-sm font-medium text-violet-600">Ваша отрасль</p>
             <h2 className="mt-1 text-xl font-bold">{industry.name}</h2>
             <p className="mt-2 text-sm text-stone-600">{industry.description}</p>
@@ -290,7 +290,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
           ))}
 
         {stage === "program" && program && (
-          <div className="rounded-2xl border border-violet-200 bg-violet-50 p-6 text-center">
+          <div className="rounded-2xl border border-violet-200 bg-violet-100 p-6 text-center">
             <p className="text-sm font-medium text-violet-600">Ваш выбор</p>
             <h2 className="mt-1 text-xl font-bold">{program.name}</h2>
             <p className="mt-2 text-sm text-stone-600">{program.description}</p>
@@ -344,7 +344,7 @@ function ChoiceCard({
   return (
     <button
       onClick={onClick}
-      className="w-full rounded-2xl border border-stone-200 bg-white p-5 text-left transition hover:border-violet-300 hover:bg-violet-50/40"
+      className="w-full rounded-2xl border border-stone-200 bg-white p-5 text-left transition hover:border-violet-300 hover:bg-violet-100/40"
     >
       <div className="flex items-center justify-between gap-4">
         <div>

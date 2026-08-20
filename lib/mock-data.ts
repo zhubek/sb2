@@ -21,7 +21,7 @@ export const currentUser = {
   email: "aigerim.s@example.com",
   mbtiType: "ENFJ",
   mbtiTitle: "Протагонист",
-  hollandTop: null as string | null, // Голланд не пройден
+  hollandTop: "Артистичный" as string | null, // топ-тип по Голланду (код ASE)
 };
 
 // ─── Навыки DeBruce (результат теста) ────────────────────────────────────────
@@ -355,7 +355,7 @@ export const tests: TestMeta[] = [
     tagline: "Профессиональные интересы: 6 типов профессиональной направленности.",
     duration: "≈ 8 минут",
     questions: 24,
-    passed: false,
+    passed: true,
   },
 ];
 
@@ -568,6 +568,7 @@ export const gops: Gop[] = [
 ];
 
 export const testHistory: TestAttempt[] = [
+  { id: "a4", testId: "holland", date: "16 июля 2026", time: "18:05", summary: "Код ASE · Артистичный тип" },
   { id: "a3", testId: "mbti", date: "14 июля 2026", time: "16:42", summary: "ENFJ · Протагонист" },
   { id: "a2", testId: "debruce", date: "12 июля 2026", time: "10:15", summary: "Топ-3: Креативность, Коммуникация, Эмпатия" },
   { id: "a1", testId: "debruce", date: "3 марта 2026", time: "14:30", summary: "Топ-3: Коммуникация, Креативность, Лидерство" },
@@ -579,8 +580,8 @@ export const checklist: ChecklistItem[] = [
   { id: "c3", label: "Пройти тест DeBruce", done: true, href: "/tests/debruce" },
   { id: "c4", label: "Изучить свои 10 навыков", done: true, href: "/tests/debruce?view=result" },
   { id: "c5", label: "Пройти тест MBTI", done: true, href: "/tests/mbti" },
-  { id: "c6", label: "Пройти тест Голланда", done: false, href: "/tests/holland" },
-  { id: "c7", label: "Получить комплексный отчёт ИИ", done: false, href: "/dashboard" },
+  { id: "c6", label: "Пройти тест Голланда", done: true, href: "/tests/holland" },
+  { id: "c7", label: "Получить комплексный отчёт ИИ", done: true, href: "/tests/report" },
   { id: "c8", label: "Выбрать образовательную программу", done: false, href: "/tests/debruce?view=result" },
   { id: "c9", label: "Сохранить ВУЗы в избранное", done: false, href: "/universities" },
 ];
@@ -750,11 +751,12 @@ export const hollandScales = [
   { code: "C", name: "Конвенциональный", score: 30 },
 ];
 
+// Шкалы MBTI: бар растёт от центра к выигравшему полюсу (side)
 export const mbtiScales = [
-  { left: "Интроверсия (I)", right: "Экстраверсия (E)", value: 72, winner: "E" },
-  { left: "Сенсорика (S)", right: "Интуиция (N)", value: 64, winner: "N" },
-  { left: "Логика (T)", right: "Чувства (F)", value: 70, winner: "F" },
-  { left: "Восприятие (P)", right: "Суждение (J)", value: 58, winner: "J" },
+  { left: "Экстраверсия (E)", right: "Интроверсия (I)", value: 72, winner: "E", side: "left" as const },
+  { left: "Сенсорика (S)", right: "Интуиция (N)", value: 64, winner: "N", side: "right" as const },
+  { left: "Мышление (T)", right: "Чувство (F)", value: 70, winner: "F", side: "right" as const },
+  { left: "Суждение (J)", right: "Восприятие (P)", value: 58, winner: "J", side: "left" as const },
 ];
 
 // ─── ИИ-ассистент ────────────────────────────────────────────────────────────

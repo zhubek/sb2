@@ -39,7 +39,7 @@ export default async function UniversityPage({
             key={i}
             className={`flex items-center justify-center rounded-2xl bg-gradient-to-br text-stone-300 ${
               i === 0
-                ? "col-span-2 row-span-1 h-44 from-violet-100 to-violet-50"
+                ? "col-span-2 row-span-1 h-44 from-violet-200 to-violet-100"
                 : "h-44 from-stone-100 to-stone-50"
             }`}
           >
@@ -107,7 +107,7 @@ export default async function UniversityPage({
               {u.perks.map((p) => (
                 <li
                   key={p}
-                  className="rounded-full bg-violet-50 px-3 py-1 text-xs text-violet-700"
+                  className="rounded-full bg-violet-100 px-3 py-1 text-xs text-violet-700"
                 >
                   {p}
                 </li>

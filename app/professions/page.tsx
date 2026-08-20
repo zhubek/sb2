@@ -32,7 +32,7 @@ export default function ProfessionsPage() {
                 onClick={() => setOpen(isOpen ? null : s.id)}
                 className="flex w-full items-center gap-4 p-6 text-left"
               >
-                <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-violet-50 text-2xl">
+                <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-violet-100 text-2xl">
                   {s.icon}
                 </span>
                 <span className="min-w-0 flex-1">
