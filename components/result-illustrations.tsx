@@ -36,37 +36,41 @@ export function NoExamArt({ className }: P) {
   );
 }
 
-// «Твой профориентатор видит твой отчёт»: педагог читает отчёт —
-// строки появляются одна за другой, затем педагог «отвечает» пузырём-галочкой
+// «Твой профориентатор видит твой отчёт»: карточка педагога (бейдж с
+// академической шапочкой) получает отчёт — строки «печатаются», затем
+// на бейдже появляется галочка «просмотрено»
 export function TeacherSeesArt({ className }: P) {
   return (
     <svg viewBox="0 0 160 110" className={className} aria-hidden="true">
-      {/* Педагог */}
-      <circle cx="42" cy="44" r="16" fill={AMBER} />
-      {/* Причёска — шапочка по верху головы */}
-      <path d="M26 44a16 16 0 0 1 32 0c-4-4-8-6-16-6s-12 2-16 6z" fill={INK} />
-      {/* Лицо: глаза и улыбка */}
-      <circle cx="36.5" cy="47" r="1.8" fill={INK} />
-      <circle cx="47.5" cy="47" r="1.8" fill={INK} />
-      <path d="M37 53c2.5 2.5 7.5 2.5 10 0" fill="none" stroke={INK} strokeWidth="1.8" strokeLinecap="round" />
-      {/* Шея и плечи — вплотную к голове */}
-      <rect x="37" y="56" width="10" height="10" rx="3" fill={AMBER} />
-      <path d="M18 100c0-20 11-36 24-36s24 16 24 36" fill={INDIGO} />
-      <rect x="34" y="68" width="16" height="8" rx="4" fill="#fff" opacity="0.9" />
-      {/* Пузырь-реакция педагога */}
-      <g className="illu-pop">
-        <path d="M54 22a9 9 0 0 1 9-9h20a9 9 0 0 1 9 9v10a9 9 0 0 1-9 9H66l-8 7v-7h-4a9 9 0 0 1-9-9z" fill={MINT} />
-        <path d="M66 27l5 5 9-10" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Бейдж педагога на шнурке */}
+      <path d="M36 6v14" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+      <g className="illu-float">
+        <rect x="10" y="20" width="52" height="66" rx="10" fill={INDIGO} />
+        <rect x="30" y="20" width="12" height="6" rx="3" fill="#fff" opacity="0.9" />
+        {/* Академическая шапочка */}
+        <g transform="translate(21 31) scale(1.25)">
+          <path d="M22 8 12 3 2 8l10 5 10-5Z" fill="#fff" />
+          <path d="M6 10v5c3 2.5 9 2.5 12 0v-5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+        </g>
+        <rect x="19" y="62" width="34" height="4" rx="2" fill="#fff" opacity="0.9" />
+        <rect x="24" y="71" width="24" height="4" rx="2" fill="#fff" opacity="0.5" />
       </g>
+      {/* Галочка «просмотрено» на бейдже */}
+      <g className="illu-pop">
+        <circle cx="60" cy="24" r="11" fill={MINT} />
+        <path d="M54 24l4 4 8-8" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      {/* Связь отчёт → педагог */}
+      <path d="M66 54h24" stroke={CORAL} strokeWidth="3" strokeLinecap="round" strokeDasharray="5 5" className="illu-dash" />
       {/* Отчёт — строки «печатаются» по очереди */}
-      <rect x="92" y="14" width="58" height="82" rx="9" fill="#fff" stroke={INK} strokeWidth="3" />
-      <rect x="102" y="26" width="24" height="6" rx="3" fill={INDIGO} className="illu-type" />
-      <rect x="102" y="40" width="38" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "0.35s" }} />
-      <rect x="102" y="50" width="30" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "0.7s" }} />
-      <rect x="102" y="60" width="36" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "1.05s" }} />
-      <rect x="102" y="72" width="38" height="8" rx="4" fill="#eceef4" />
-      <rect x="102" y="72" width="28" height="8" rx="4" fill={CORAL} className="illu-type" style={{ animationDelay: "1.4s" }} />
-      <rect x="102" y="84" width="20" height="4" rx="2" fill={MINT} className="illu-type" style={{ animationDelay: "1.75s" }} />
+      <rect x="94" y="14" width="56" height="82" rx="9" fill="#fff" stroke={INK} strokeWidth="3" />
+      <rect x="104" y="26" width="24" height="6" rx="3" fill={INDIGO} className="illu-type" />
+      <rect x="104" y="40" width="36" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "0.35s" }} />
+      <rect x="104" y="50" width="28" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "0.7s" }} />
+      <rect x="104" y="60" width="34" height="4" rx="2" fill="#c3c8d6" className="illu-type" style={{ animationDelay: "1.05s" }} />
+      <rect x="104" y="72" width="36" height="8" rx="4" fill="#eceef4" />
+      <rect x="104" y="72" width="26" height="8" rx="4" fill={CORAL} className="illu-type" style={{ animationDelay: "1.4s" }} />
+      <rect x="104" y="84" width="20" height="4" rx="2" fill={MINT} className="illu-type" style={{ animationDelay: "1.75s" }} />
     </svg>
   );
 }
