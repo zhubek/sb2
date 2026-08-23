@@ -3,6 +3,7 @@ export type TestId = "debruce" | "mbti" | "holland";
 export interface Skill {
   id: string;
   name: string;
+  en?: string; // английское название способности (как в отчёте)
   score: number; // 0–100
   description: string;
 }
@@ -74,6 +75,12 @@ export interface Gop {
   duration: string;
   programs: string[]; // образовательные программы, входящие в ГОП
   institutionIds: string[]; // вузы/колледжи, где ведётся обучение
+  // Подробности для раскрытия карточки ГОП (как в прототипе)
+  about?: string; // «О чём эта группа»
+  lookIf?: string[]; // «Стоит присмотреться, если»
+  learn?: string; // «Чему конкретно научат»
+  format?: string; // «Формат работы»
+  notFor?: string; // «Кому точно не подойдёт»
 }
 
 export interface TestAttempt {
@@ -87,6 +94,7 @@ export interface TestAttempt {
 export interface TestMeta {
   id: TestId;
   name: string;
+  method: string; // название методики (как на лендинге)
   tagline: string;
   duration: string;
   questions: number;

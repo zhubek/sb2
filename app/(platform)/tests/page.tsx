@@ -1,11 +1,15 @@
 import { BarChart3, BookOpen, Compass, History, UserRound } from "lucide-react";
 import Link from "next/link";
 import DownloadReport from "@/components/download-report";
-import { MbtiBars } from "@/components/report-blocks";
+import {
+  HollandBars,
+  HollandTopTiles,
+  MbtiBars,
+  TopSkillCards,
+} from "@/components/report-blocks";
 import {
   currentUser,
   hollandScales,
-  skills,
   testHistory,
   tests,
 } from "@/lib/mock-data";
@@ -33,13 +37,13 @@ export default function TestsPage() {
         </p>
       </div>
 
-      {/* Баннер: комплексная диагностика по трём тестам */}
-      <section className="flex flex-wrap items-center justify-between gap-5 rounded-[28px] border border-violet-200/70 bg-violet-100 px-7 py-6">
+      {/* Баннер: комплексная диагностика — главный акцент экрана */}
+      <section className="flex flex-wrap items-center justify-between gap-5 rounded-[28px] bg-gradient-to-br from-violet-500 to-violet-700 px-7 py-6">
         <div className="max-w-xl">
-          <h2 className="font-display text-lg text-violet-800">
+          <h2 className="font-display text-lg text-white">
             Комплексная диагностика
           </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-violet-800/70">
+          <p className="mt-1.5 text-sm leading-relaxed text-violet-100">
             {passedCount === 3
               ? "Все три теста пройдены — ИИ собрал навыки, тип личности и интересы в единый портрет с рекомендациями."
               : "Чтобы получить комплексную диагностику, пройдите все три теста — ИИ соберёт навыки, тип личности и интересы в единый портрет с рекомендациями."}
@@ -48,10 +52,10 @@ export default function TestsPage() {
             {tests.map((t) => (
               <span
                 key={t.id}
-                className={`h-1.5 w-16 rounded-full ${t.passed ? "bg-violet-500" : "bg-violet-200"}`}
+                className={`h-1.5 w-16 rounded-full ${t.passed ? "bg-white" : "bg-white/30"}`}
               />
             ))}
-            <span className="ml-1 font-mono text-xs text-violet-800/60">
+            <span className="ml-1 font-mono text-xs text-violet-100">
               {passedCount}/3
             </span>
           </div>
@@ -59,7 +63,7 @@ export default function TestsPage() {
         {passedCount === 3 ? (
           <Link
             href="/tests/report"
-            className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 transition hover:text-violet-800"
+            className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-100"
           >
             Открыть комплексный отчёт →
           </Link>
@@ -90,7 +94,7 @@ export default function TestsPage() {
             )}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[11px] font-medium text-stone-600">
               <BookOpen size={12} className="text-violet-600" />
-              Методика НАО им. Ы. Алтынсарина
+              {debruce.method}
             </span>
           </div>
         </div>
@@ -100,30 +104,10 @@ export default function TestsPage() {
           навигатор сразу отфильтрует подходящие программы и заведения.
         </p>
 
-        {/* Краткий результат: топ-3 навыка с рейтингом */}
+        {/* Краткий результат: топ-3 способности — как в отчёте */}
         {debruce.passed && (
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
-            {skills.slice(0, 3).map((s, i) => (
-              <div key={s.id} className="rounded-2xl bg-violet-100 px-4 py-3.5">
-                <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-xs font-semibold text-violet-600">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="font-mono text-xs text-violet-700/70">
-                    {s.score}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm font-semibold text-violet-800">
-                  {s.name}
-                </p>
-                <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/80">
-                  <div
-                    className="h-full rounded-full bg-violet-500"
-                    style={{ width: `${s.score}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="mt-5">
+            <TopSkillCards />
           </div>
         )}
 
@@ -156,6 +140,7 @@ export default function TestsPage() {
               </span>
               <div>
                 <h2 className="font-display font-medium">{mbti.name}</h2>
+                <p className="text-xs text-stone-400">{mbti.method}</p>
                 <p className="font-mono text-xs text-stone-400">
                   {mbti.questions} вопросов · {mbti.duration}
                 </p>
@@ -225,6 +210,7 @@ export default function TestsPage() {
               </span>
               <div>
                 <h2 className="font-display font-medium">{holland.name}</h2>
+                <p className="text-xs text-stone-400">{holland.method}</p>
                 <p className="font-mono text-xs text-stone-400">
                   {holland.questions} вопроса · {holland.duration}
                 </p>
@@ -244,47 +230,11 @@ export default function TestsPage() {
             {holland.tagline} В результате — ваш код RIASEC по шкалам:{" "}
             {hollandScales.map((s) => s.name.toLowerCase()).join(", ")}.
           </p>
-          {/* Краткий результат: код и топ-3 типа интересов */}
+          {/* Краткий результат: диаграмма Голланда — как в отчёте */}
           {holland.passed ? (
-            <div className="mt-4 flex-1">
-              <div className="flex items-center gap-2">
-                {[...hollandScales]
-                  .sort((a, b) => b.score - a.score)
-                  .slice(0, 3)
-                  .map((s) => (
-                    <span
-                      key={s.code}
-                      className="font-display flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-lg text-violet-700"
-                    >
-                      {s.code}
-                    </span>
-                  ))}
-                <div className="ml-1.5">
-                  <p className="text-sm font-semibold">Код RIASEC</p>
-                  <p className="text-xs text-stone-400">профиль интересов</p>
-                </div>
-              </div>
-              <div className="mt-4 space-y-2.5">
-                {[...hollandScales]
-                  .sort((a, b) => b.score - a.score)
-                  .slice(0, 3)
-                  .map((s) => (
-                    <div key={s.code} className="flex items-center gap-2.5">
-                      <span className="w-36 flex-none text-xs font-medium text-stone-600">
-                        {s.name}
-                      </span>
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100">
-                        <div
-                          className="h-full rounded-full bg-violet-500"
-                          style={{ width: `${s.score}%` }}
-                        />
-                      </div>
-                      <span className="w-9 flex-none text-right font-mono text-[11px] text-violet-600">
-                        {s.score}%
-                      </span>
-                    </div>
-                  ))}
-              </div>
+            <div className="mt-4 flex-1 space-y-4">
+              <HollandTopTiles small />
+              <HollandBars compact />
             </div>
           ) : (
             <div className="mt-4 flex-1 rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">

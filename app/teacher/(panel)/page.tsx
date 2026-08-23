@@ -97,51 +97,47 @@ export default function TeacherDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        {/* График активности */}
-        <div className="lg:col-span-3">
-          <ActivityChart />
+      {/* Требуют внимания — горизонтально между KPI и графиком */}
+      <section>
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold">Требуют внимания</h2>
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
+            {attentionSignals.length}
+          </span>
         </div>
-
-        {/* Требуют внимания */}
-        <section className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Требуют внимания</h2>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
-              {attentionSignals.length}
-            </span>
-          </div>
-          <ul className="mt-3 space-y-3">
-            {attentionSignals.map((s) => {
-              const sev = severityStyles[s.severity];
-              return (
-                <li
-                  key={s.id}
-                  className="rounded-xl border border-slate-100 p-3.5"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold">{s.title}</p>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${sev.chip}`}
-                    >
-                      {sev.label}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    {s.text}
-                  </p>
-                  <Link
-                    href={s.href}
-                    className="mt-1.5 inline-block text-xs font-medium text-teal-600 hover:text-teal-700"
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {attentionSignals.map((s) => {
+            const sev = severityStyles[s.severity];
+            return (
+              <li
+                key={s.id}
+                className="flex flex-col rounded-xl border border-slate-200 bg-white p-3.5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-semibold">{s.title}</p>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${sev.chip}`}
                   >
-                    {s.action} →
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      </div>
+                    {sev.label}
+                  </span>
+                </div>
+                <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">
+                  {s.text}
+                </p>
+                <Link
+                  href={s.href}
+                  className="mt-1.5 inline-block text-xs font-medium text-teal-600 hover:text-teal-700"
+                >
+                  {s.action} →
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* График активности — на всю ширину */}
+      <ActivityChart />
 
       {/* Охват диагностикой по классам */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">

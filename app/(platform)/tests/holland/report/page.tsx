@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { HollandBars, ReportShell, Sect } from "@/components/report-blocks";
+import {
+  HollandBars,
+  HollandTopTiles,
+  ReportShell,
+  Sect,
+} from "@/components/report-blocks";
 import { hollandScales } from "@/lib/mock-data";
 import {
   hollandCodeMeaning,
@@ -103,8 +108,11 @@ export default function HollandReportPage() {
       </Sect>
 
       <Sect kicker="Диагностика" title="Твои результаты">
-        <div className="rounded-3xl border border-stone-200 bg-white p-6">
-          <HollandBars />
+        <div className="space-y-4">
+          <HollandTopTiles />
+          <div className="rounded-3xl border border-stone-200 bg-white p-6">
+            <HollandBars />
+          </div>
         </div>
       </Sect>
 

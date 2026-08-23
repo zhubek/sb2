@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { hollandScales, hollandSections } from "@/lib/mock-data";
+import { HollandBars, HollandTopTiles } from "@/components/report-blocks";
 import SectionQuiz from "@/components/section-quiz";
 import { CertificateArt, InterestsArt } from "@/components/brand-art";
 import { completeChecklistStep } from "@/lib/checklist-events";
@@ -19,7 +20,7 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
         <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
           Дополнительная диагностика
         </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Тест Голланда</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Модель профессиональных интересов Дж. Холланда (RIASEC)</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
           Определит ваши профессиональные интересы по 6 типам направленности:
           реалистичный, исследовательский, артистичный, социальный,
@@ -48,7 +49,7 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
   if (stage === "quiz") {
     return (
       <SectionQuiz
-        title="Тест Голланда"
+        title="Модель Дж. Холланда (RIASEC)"
         sections={hollandSections}
         onFinish={() => { setStage("result"); completeChecklistStep("c6"); }}
       />
@@ -62,7 +63,7 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
     <div className="mx-auto max-w-2xl">
       <div className="text-center">
         <p className="text-sm font-medium text-violet-600">
-          Результат теста Голланда
+          Результат теста по модели Дж. Холланда (RIASEC)
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
           {top.map((t) => t.name).join(" + ")} тип
@@ -86,22 +87,8 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-6">
         <h2 className="font-semibold">Профиль интересов (RIASEC)</h2>
         <div className="mt-5 space-y-4">
-          {sorted.map((s, i) => (
-            <div key={s.code}>
-              <div className="flex justify-between text-sm">
-                <span className={i < 2 ? "font-medium" : "text-stone-600"}>
-                  {s.code} · {s.name}
-                </span>
-                <span className="font-semibold text-stone-600">{s.score}</span>
-              </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-stone-100">
-                <div
-                  className={`h-full rounded-full ${i < 2 ? "bg-violet-600" : "bg-stone-300"}`}
-                  style={{ width: `${s.score}%` }}
-                />
-              </div>
-            </div>
-          ))}
+          <HollandTopTiles />
+          <HollandBars />
         </div>
       </div>
 

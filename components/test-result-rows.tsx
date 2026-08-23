@@ -3,7 +3,12 @@
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { MbtiBars } from "@/components/report-blocks";
+import {
+  HollandBars,
+  HollandTopTiles,
+  MbtiBars,
+  TopSkillCards,
+} from "@/components/report-blocks";
 import { currentUser, hollandScales, skills } from "@/lib/mock-data";
 
 // Раскрывающиеся строки с результатами тестов — редакционный список
@@ -18,7 +23,7 @@ export default function TestResultRows() {
     {
       id: "debruce",
       n: "01",
-      name: "DeBruce",
+      name: "Методика НАО им. Ы. Алтынсарина",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -33,17 +38,8 @@ export default function TestResultRows() {
       ),
       expanded: (
         <div>
-          {/* Только топ-3 навыка, без процентов — остальные в полном результате */}
-          <div className="grid gap-2.5 sm:grid-cols-3">
-            {skills.slice(0, 3).map((s, i) => (
-              <div key={s.id} className="rounded-2xl bg-violet-100 px-4 py-3.5">
-                <span className="font-mono text-xs font-semibold text-violet-600">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p className="mt-1 text-sm font-semibold text-violet-800">{s.name}</p>
-              </div>
-            ))}
-          </div>
+          {/* Топ-3 способности — нумерация как в отчёте */}
+          <TopSkillCards />
           <p className="mt-3 text-xs text-stone-400">
             Полный рейтинг всех навыков — в отчёте
           </p>
@@ -67,7 +63,7 @@ export default function TestResultRows() {
     {
       id: "mbti",
       n: "02",
-      name: "MBTI",
+      name: "Индикатор типов Майерс — Бриггс (MBTI)",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -101,7 +97,7 @@ export default function TestResultRows() {
     {
       id: "holland",
       n: "03",
-      name: "Тест Голланда",
+      name: "Модель профессиональных интересов Дж. Холланда (RIASEC)",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -120,23 +116,10 @@ export default function TestResultRows() {
         </p>
       ),
       expanded: (
-        <div>
-          {/* Топ-3 типа интересов — как в отчёте */}
-          <div className="grid gap-2.5 sm:grid-cols-3">
-            {[...hollandScales]
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 3)
-              .map((s, i) => (
-                <div key={s.code} className="rounded-2xl bg-violet-100 px-4 py-3.5">
-                  <span className="font-mono text-xs font-semibold text-violet-600">
-                    {s.code} · топ {i + 1}
-                  </span>
-                  <p className="mt-1 text-sm font-semibold text-violet-800">
-                    {s.name} · {s.score}%
-                  </p>
-                </div>
-              ))}
-          </div>
+        <div className="space-y-4">
+          {/* Диаграмма Голланда — как в отчёте */}
+          <HollandTopTiles />
+          <HollandBars compact />
           <div className="flex items-center gap-3 pt-4">
             <Link
               href="/tests/holland/report"

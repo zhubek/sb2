@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { teacher } from "@/lib/teacher-mock-data";
 
 const links = [
@@ -29,18 +30,42 @@ const links = [
 
 export default function TeacherNav() {
   const pathname = usePathname();
+  // Переключатель языка платформы — в шапке (демо)
+  const [lang, setLang] = useState<"ru" | "kk">("ru");
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-slate-100 bg-white text-slate-600">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-500 text-xs font-bold text-white">
-          AI
-        </span>
-        <div>
-          <p className="font-display text-sm leading-tight tracking-tight text-slate-800">
-            профориентатор<span className="text-teal-600">.</span>
-          </p>
-          <p className="text-[11px] text-slate-400">Платформа педагога</p>
+      <div className="flex items-center justify-between gap-2.5 px-5 py-5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-500 text-xs font-bold text-white">
+            AI
+          </span>
+          <div>
+            <p className="font-display text-sm leading-tight tracking-tight text-slate-800">
+              профориентатор<span className="text-teal-600">.</span>
+            </p>
+            <p className="text-[11px] text-slate-400">Платформа педагога</p>
+          </div>
+        </div>
+        <div className="flex flex-col rounded-lg bg-slate-100 p-0.5 text-[10px] font-bold">
+          {(
+            [
+              ["ru", "РУС"],
+              ["kk", "ҚАЗ"],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setLang(key)}
+              className={`rounded-md px-1.5 py-0.5 transition ${
+                lang === key
+                  ? "bg-white text-teal-700 shadow-sm"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 

@@ -8,11 +8,9 @@ import {
   ChevronDown,
   Clock,
   GraduationCap,
-  Globe,
   Languages,
   ListChecks,
   MapPin,
-  Phone,
   School,
   Search,
   Star,
@@ -32,8 +30,16 @@ import {
 // Заведения навигатора: вузы + колледжи в одном списке
 const institutions = [...universities, ...colleges];
 
-const allPrograms = [...new Set(institutions.flatMap((u) => u.programs))].sort();
-const allCities = [...new Set(institutions.map((u) => u.city))].sort();
+// Двухуровневая география: область → город/район
+const cityRegion: Record<string, string> = {
+  Алматы: "г. Алматы",
+  Астана: "г. Астана",
+  Шымкент: "г. Шымкент",
+  Каскелен: "Алматинская область",
+  Москва: "За рубежом",
+  Гонконг: "За рубежом",
+};
+const allRegions = [...new Set(institutions.map((u) => cityRegion[u.city] ?? "Другое"))].sort();
 
 const priceOptions = [
   { value: "1000000", label: "до 1 млн ₸/год" },
@@ -41,11 +47,17 @@ const priceOptions = [
   { value: "5000000", label: "до 5 млн ₸/год" },
 ];
 
-const typeOptions = [
-  { value: "university", label: "ВУЗы" },
+// Типы заведений — видимые чипы (как в прототипе)
+const typeChips = [
+  { value: "university", label: "Вузы" },
   { value: "college", label: "Колледжи" },
-  { value: "foreign", label: "Зарубежные ВУЗы" },
-];
+  { value: "foreign", label: "Зарубежные" },
+] as const;
+
+const industryOptions = recommendedIndustries.map((i) => ({
+  value: i.name,
+  label: i.name,
+}));
 
 function plural(n: number, forms: [string, string, string]) {
   const a = Math.abs(n) % 100;
@@ -56,7 +68,7 @@ function plural(n: number, forms: [string, string, string]) {
   return forms[2];
 }
 
-// Программы, входящие в отрасль (для пресета из рекомендаций DeBruce)
+// Программы, входящие в отрасль (для фильтра «Отрасль» и пресета из рекомендаций)
 function industryPrograms(industryName: string): Set<string> {
   const it = recommendedIndustries.find((i) => i.name === industryName);
   if (!it) return new Set();
@@ -67,14 +79,6 @@ function industryPrograms(industryName: string): Set<string> {
       .map((pr) => pr.name)
   );
 }
-
-type CardTab = "overview" | "programs" | "location";
-
-const cardTabs: { key: CardTab; label: string }[] = [
-  { key: "overview", label: "Обзор" },
-  { key: "programs", label: "Программы" },
-  { key: "location", label: "Локация" },
-];
 
 export type ExplorerTone = "violet" | "teal";
 
@@ -88,11 +92,9 @@ const tones = {
     muted2: "text-stone-500",
     body: "text-stone-600",
     divide: "border-stone-100",
-    photo: "from-violet-100 via-stone-50 to-stone-100 text-stone-300",
+    logo: "border-stone-200 bg-stone-50 text-stone-400",
     chip: "border-stone-200 text-stone-600 hover:bg-stone-50",
     chipOn: "border-violet-200 bg-violet-100 text-violet-700",
-    tabOn: "border-violet-600 text-stone-900",
-    tabOff: "border-transparent text-stone-400 hover:text-stone-600",
     pill: "bg-violet-100 text-violet-700",
     link: "hover:text-violet-700",
     accentText: "text-violet-600",
@@ -102,6 +104,7 @@ const tones = {
     segOn: "bg-white text-stone-900 shadow-sm",
     segOff: "text-stone-500 hover:text-stone-700",
     codePill: "bg-violet-100 text-violet-800",
+    soft: "bg-stone-50",
   },
   teal: {
     border: "border-slate-200",
@@ -111,11 +114,9 @@ const tones = {
     muted2: "text-slate-500",
     body: "text-slate-600",
     divide: "border-slate-100",
-    photo: "from-teal-100 via-slate-50 to-slate-100 text-slate-300",
+    logo: "border-slate-200 bg-slate-50 text-slate-400",
     chip: "border-slate-200 text-slate-600 hover:bg-slate-50",
     chipOn: "border-teal-200 bg-teal-50 text-teal-700",
-    tabOn: "border-teal-600 text-slate-900",
-    tabOff: "border-transparent text-slate-400 hover:text-slate-600",
     pill: "bg-teal-50 text-teal-700",
     link: "hover:text-teal-700",
     accentText: "text-teal-600",
@@ -125,11 +126,11 @@ const tones = {
     segOn: "bg-white text-slate-900 shadow-sm",
     segOff: "text-slate-500 hover:text-slate-700",
     codePill: "bg-teal-100 text-teal-800",
+    soft: "bg-slate-50",
   },
 } as const;
 
-// Чип-фильтр в строке поиска (как в Gmail): кнопка с меню-поповером;
-// выбранное значение показывается прямо в чипе, крестик сбрасывает.
+// Чип-фильтр в строке поиска: кнопка с меню-поповером
 function FilterChip({
   label,
   value,
@@ -182,7 +183,7 @@ function FilterChip({
 
       {open && (
         <div
-          className={`absolute top-full left-0 z-30 mt-1.5 max-h-64 w-56 overflow-y-auto rounded-xl border bg-white p-1 shadow-lg ${t.border}`}
+          className={`absolute top-full left-0 z-30 mt-1.5 max-h-64 w-60 overflow-y-auto rounded-xl border bg-white p-1 shadow-lg ${t.border}`}
         >
           {options.map((o) => (
             <button
@@ -221,21 +222,42 @@ export default function UniversityExplorer({
   const t = tones[tone];
   const [mode, setMode] = useState<"institutions" | "programs">("institutions");
   const [search, setSearch] = useState("");
-  const [program, setProgram] = useState(presetProgram ?? "");
+  const [industry, setIndustry] = useState(presetIndustry ?? "");
   const [type, setType] = useState("");
+  const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [onlyDorm, setOnlyDorm] = useState(false);
   const [onlyMilitary, setOnlyMilitary] = useState(false);
-  const [onlyGrants, setOnlyGrants] = useState(false);
   const [onlySaved, setOnlySaved] = useState(false);
   const [gopLevel, setGopLevel] = useState<"university" | "college">("university");
   const [saved, setSaved] = useState<string[]>(["kaznu", "kimep"]);
-  const [tabs, setTabs] = useState<Record<string, CardTab>>({});
+  const [openGop, setOpenGop] = useState<string | null>(null);
+
+  // Города выбранной области (или все)
+  const cityOptions = useMemo(() => {
+    const cities = [
+      ...new Set(
+        institutions
+          .filter((u) => !region || (cityRegion[u.city] ?? "Другое") === region)
+          .map((u) => u.city)
+      ),
+    ].sort();
+    return cities.map((c) => ({ value: c, label: c }));
+  }, [region]);
 
   const indPrograms = useMemo(
-    () => (presetIndustry ? industryPrograms(presetIndustry) : null),
-    [presetIndustry]
+    () => (industry ? industryPrograms(industry) : null),
+    [industry]
+  );
+
+  const counts = useMemo(
+    () => ({
+      university: institutions.filter((u) => !u.foreign && u.kind !== "college").length,
+      college: institutions.filter((u) => u.kind === "college").length,
+      foreign: institutions.filter((u) => u.foreign).length,
+    }),
+    []
   );
 
   const filtered = useMemo(
@@ -248,22 +270,22 @@ export default function UniversityExplorer({
             .includes(search.toLowerCase())
         )
           return false;
-        if (program && !u.programs.includes(program)) return false;
+        if (presetProgram && !u.programs.includes(presetProgram)) return false;
         if (indPrograms && !u.programs.some((p) => indPrograms.has(p)))
           return false;
         if (type === "university" && (u.foreign || u.kind === "college"))
           return false;
         if (type === "college" && u.kind !== "college") return false;
         if (type === "foreign" && !u.foreign) return false;
+        if (region && (cityRegion[u.city] ?? "Другое") !== region) return false;
         if (city && u.city !== city) return false;
         if (maxPrice && u.priceFrom > Number(maxPrice)) return false;
         if (onlyDorm && !u.dorm) return false;
         if (onlyMilitary && !u.military) return false;
-        if (onlyGrants && !u.grants) return false;
         if (onlySaved && !saved.includes(u.id)) return false;
         return true;
       }),
-    [search, program, indPrograms, type, city, maxPrice, onlyDorm, onlyMilitary, onlyGrants, onlySaved, saved]
+    [search, presetProgram, indPrograms, type, region, city, maxPrice, onlyDorm, onlyMilitary, onlySaved, saved]
   );
 
   const filteredGops = useMemo(
@@ -277,13 +299,13 @@ export default function UniversityExplorer({
             .includes(search.toLowerCase())
         )
           return false;
-        if (program && !g.programs.includes(program)) return false;
+        if (presetProgram && !g.programs.includes(presetProgram)) return false;
         if (indPrograms && !g.programs.some((p) => indPrograms.has(p)))
           return false;
         if (maxPrice && g.priceFrom > Number(maxPrice)) return false;
         return true;
       }),
-    [gopLevel, search, program, indPrograms, maxPrice]
+    [gopLevel, search, presetProgram, indPrograms, maxPrice]
   );
 
   function toggleSaved(id: string) {
@@ -337,7 +359,7 @@ export default function UniversityExplorer({
           <div className="flex gap-2">
             {(
               [
-                ["university", "ВУЗы"],
+                ["university", "Вузы"],
                 ["college", "Колледжи"],
               ] as const
             ).map(([key, label]) => (
@@ -355,7 +377,7 @@ export default function UniversityExplorer({
         )}
       </div>
 
-      {/* Поиск с фильтрами внутри — как в Gmail: строка + чипы под ней */}
+      {/* Поиск с фильтрами внутри: строка + чипы под ней */}
       <div
         className={`rounded-2xl border bg-white transition ${t.border} ${t.focusRing}`}
       >
@@ -384,27 +406,50 @@ export default function UniversityExplorer({
         <div
           className={`flex flex-wrap items-center gap-2 border-t px-3 py-2.5 ${t.divide}`}
         >
+          {/* Тип заведения — видимые чипы */}
+          {mode === "institutions" &&
+            typeChips.map((tc) => (
+              <button
+                key={tc.value}
+                onClick={() => setType(type === tc.value ? "" : tc.value)}
+                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  type === tc.value ? t.chipOn : t.chip
+                }`}
+              >
+                {tc.label}
+                <span className={`font-mono text-[10px] ${type === tc.value ? "" : t.muted}`}>
+                  {counts[tc.value]}
+                </span>
+              </button>
+            ))}
           {mode === "institutions" && (
-            <FilterChip
-              label="Тип заведения"
-              value={type}
-              options={typeOptions}
-              onChange={setType}
-              tone={tone}
-            />
+            <span className={`mx-1 h-4 w-px ${tone === "teal" ? "bg-slate-200" : "bg-stone-200"}`} />
           )}
+
           <FilterChip
-            label="Программа"
-            value={program}
-            options={allPrograms.map((p) => ({ value: p, label: p }))}
-            onChange={setProgram}
+            label="Отрасль"
+            value={industry}
+            options={industryOptions}
+            onChange={setIndustry}
             tone={tone}
           />
           {mode === "institutions" && (
             <FilterChip
-              label="Город"
+              label="Область"
+              value={region}
+              options={allRegions.map((r) => ({ value: r, label: r }))}
+              onChange={(v) => {
+                setRegion(v);
+                setCity(""); // город зависит от области
+              }}
+              tone={tone}
+            />
+          )}
+          {mode === "institutions" && (
+            <FilterChip
+              label="Город / район"
               value={city}
-              options={allCities.map((c) => ({ value: c, label: c }))}
+              options={cityOptions}
               onChange={setCity}
               tone={tone}
             />
@@ -419,7 +464,6 @@ export default function UniversityExplorer({
           {mode === "institutions" &&
             (
               [
-                ["Гранты и квоты", onlyGrants, setOnlyGrants],
                 ["Общежитие", onlyDorm, setOnlyDorm],
                 ["Военная кафедра", onlyMilitary, setOnlyMilitary],
               ] as const
@@ -446,159 +490,107 @@ export default function UniversityExplorer({
             {plural(filtered.length, ["заведение", "заведения", "заведений"])}
           </p>
 
-          {/* Карточки на всю ширину: фото слева, вкладки внутри */}
+          {/* Карточки: логотип-квадрат + обзор, одно действие — «Подробнее» */}
           <div className="space-y-4">
             {filtered.map((u) => {
-              const tab = tabs[u.id] ?? "overview";
               const isSaved = saved.includes(u.id);
               const isCollege = u.kind === "college";
               return (
                 <div
                   key={u.id}
-                  className={`flex flex-col overflow-hidden rounded-2xl border bg-white transition sm:flex-row ${t.border} ${t.borderHover}`}
+                  className={`rounded-2xl border bg-white p-5 transition ${t.border} ${t.borderHover}`}
                 >
-                  {/* Фото (мок-плейсхолдер) */}
-                  <div
-                    className={`flex h-36 items-center justify-center bg-gradient-to-br sm:h-auto sm:w-52 sm:shrink-0 ${t.photo}`}
-                  >
-                    {isCollege ? (
-                      <School size={52} strokeWidth={1.25} />
-                    ) : (
-                      <Building2 size={52} strokeWidth={1.25} />
-                    )}
-                  </div>
+                  <div className="flex items-start gap-4">
+                    {/* Маленький квадрат-логотип заведения */}
+                    <div
+                      className={`flex h-14 w-14 flex-none items-center justify-center rounded-xl border ${t.logo}`}
+                    >
+                      {isCollege ? (
+                        <School size={24} strokeWidth={1.5} />
+                      ) : (
+                        <Building2 size={24} strokeWidth={1.5} />
+                      )}
+                    </div>
 
-                  {/* Контент */}
-                  <div className="flex min-w-0 flex-1 flex-col p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <Link
+                            href={`${detailBase}/${u.id}`}
+                            className={`font-display font-medium leading-snug ${t.link}`}
+                          >
+                            {u.name}
+                          </Link>
+                          <p
+                            className={`mt-1 flex items-center gap-1 text-xs ${t.muted}`}
+                          >
+                            <MapPin size={12} />
+                            {u.city}, {u.country}
+                            {isCollege && (
+                              <span className="ml-1 rounded bg-teal-50 px-1.5 py-0.5 text-[10px] text-teal-700">
+                                колледж
+                              </span>
+                            )}
+                            {u.foreign && (
+                              <span className="ml-1 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] text-sky-700">
+                                зарубежный
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        {savable && (
+                          <button
+                            onClick={() => toggleSaved(u.id)}
+                            aria-label="Сохранить в избранное"
+                            className={`shrink-0 transition ${
+                              isSaved
+                                ? "text-amber-400"
+                                : `${t.muted} hover:text-amber-300`
+                            }`}
+                          >
+                            <Star size={19} fill={isSaved ? "currentColor" : "none"} />
+                          </button>
+                        )}
+                      </div>
+
+                      <p className={`mt-2.5 line-clamp-2 text-sm leading-relaxed ${t.body}`}>
+                        {u.description}
+                      </p>
+                      <div className="mt-2.5 flex flex-wrap gap-1.5">
+                        {u.grants && <Tag tone={tone}>Гранты</Tag>}
+                        {u.dorm && !u.foreign && <Tag tone={tone}>Общежитие</Tag>}
+                        {u.military && !isCollege && !u.foreign && (
+                          <Tag tone={tone}>Военная кафедра</Tag>
+                        )}
+                        {u.mobility && !isCollege && !u.foreign && (
+                          <Tag tone={tone}>Академ. мобильность</Tag>
+                        )}
+                      </div>
+
+                      <div
+                        className={`mt-3.5 flex items-center justify-between border-t pt-3.5 ${t.divide}`}
+                      >
+                        <div className="flex items-baseline gap-4 text-sm">
+                          <span className="font-display font-medium">
+                            {formatPrice(u.priceFrom)}
+                          </span>
+                          <span className={`font-mono text-xs ${t.muted}`}>
+                            {u.minScore > 0
+                              ? `балл от ${u.minScore}`
+                              : "конкурс аттестатов"}
+                          </span>
+                        </div>
                         <Link
                           href={`${detailBase}/${u.id}`}
-                          className={`font-display font-medium leading-snug ${t.link}`}
+                          className={`group flex items-center gap-1.5 rounded-full py-2 pr-4 pl-5 text-xs font-medium text-white transition ${t.cta}`}
                         >
-                          {u.name}
+                          Подробнее
+                          <ArrowRight
+                            size={13}
+                            className="transition group-hover:translate-x-0.5"
+                          />
                         </Link>
-                        <p
-                          className={`mt-1 flex items-center gap-1 text-xs ${t.muted}`}
-                        >
-                          <MapPin size={12} />
-                          {u.city}, {u.country}
-                          {isCollege && (
-                            <span className="ml-1 rounded bg-teal-50 px-1.5 py-0.5 text-[10px] text-teal-700">
-                              колледж
-                            </span>
-                          )}
-                          {u.foreign && (
-                            <span className="ml-1 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] text-sky-700">
-                              зарубежный
-                            </span>
-                          )}
-                        </p>
                       </div>
-                      {savable && (
-                        <button
-                          onClick={() => toggleSaved(u.id)}
-                          aria-label="Сохранить в избранное"
-                          className={`shrink-0 transition ${
-                            isSaved
-                              ? "text-amber-400"
-                              : `${t.muted} hover:text-amber-300`
-                          }`}
-                        >
-                          <Star size={19} fill={isSaved ? "currentColor" : "none"} />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Вкладки карточки */}
-                    <div className={`mt-3 flex gap-5 border-b ${t.divide}`}>
-                      {cardTabs.map((ct) => (
-                        <button
-                          key={ct.key}
-                          onClick={() => setTabs({ ...tabs, [u.id]: ct.key })}
-                          className={`-mb-px border-b-2 pb-2 text-xs font-medium transition ${
-                            tab === ct.key ? t.tabOn : t.tabOff
-                          }`}
-                        >
-                          {ct.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Контент вкладки */}
-                    <div className="mt-3 min-h-[72px] flex-1">
-                      {tab === "overview" && (
-                        <div>
-                          <p
-                            className={`line-clamp-2 text-sm leading-relaxed ${t.body}`}
-                          >
-                            {u.description}
-                          </p>
-                          <div className="mt-2.5 flex flex-wrap gap-1.5">
-                            {u.grants && <Tag tone={tone}>Гранты</Tag>}
-                            {u.dorm && <Tag tone={tone}>Общежитие</Tag>}
-                            {u.military && <Tag tone={tone}>Военная кафедра</Tag>}
-                            {u.mobility && (
-                              <Tag tone={tone}>Академ. мобильность</Tag>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {tab === "programs" && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {u.programs.map((p) => (
-                            <span
-                              key={p}
-                              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs ${t.pill}`}
-                            >
-                              <GraduationCap size={12} />
-                              {p}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {tab === "location" && (
-                        <div className={`space-y-1.5 text-sm ${t.body}`}>
-                          <p className="flex items-center gap-2">
-                            <MapPin size={14} className={t.muted} />
-                            {u.address}
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <Phone size={14} className={t.muted} />
-                            {u.phone}
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <Globe size={14} className={t.muted} />
-                            <span className={t.accentText}>{u.website}</span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Факты + переход */}
-                    <div
-                      className={`mt-3 flex items-center justify-between border-t pt-3 ${t.divide}`}
-                    >
-                      <div className="flex items-baseline gap-4 text-sm">
-                        <span className="font-display font-medium">
-                          {formatPrice(u.priceFrom)}
-                        </span>
-                        <span className={`font-mono text-xs ${t.muted}`}>
-                          {u.minScore > 0
-                            ? `балл от ${u.minScore}`
-                            : "конкурс аттестатов"}
-                        </span>
-                      </div>
-                      <Link
-                        href={`${detailBase}/${u.id}`}
-                        className={`group flex items-center gap-1.5 rounded-full py-2 pr-4 pl-5 text-xs font-medium text-white transition ${t.cta}`}
-                      >
-                        Подробнее
-                        <ArrowRight
-                          size={13}
-                          className="transition group-hover:translate-x-0.5"
-                        />
-                      </Link>
                     </div>
                   </div>
                 </div>
@@ -626,135 +618,207 @@ export default function UniversityExplorer({
             {plural(filteredGops.length, ["программа", "программы", "программ"])}
           </p>
 
-          {/* Карточки ГОП (программы без ГОП — в том же списке и том же виде) */}
-          <div className="space-y-4">
-            {filteredGops.map((g) => (
-              <div
-                key={g.id}
-                className={`rounded-2xl border bg-white p-5 transition ${t.border} ${t.borderHover}`}
-              >
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span
-                    className={`rounded-lg px-2.5 py-1 font-mono text-xs font-semibold ${t.codePill}`}
+          {/* Список ГОП: минимум в строке, подробности — по клику */}
+          <div className="space-y-3">
+            {filteredGops.map((g) => {
+              const isOpen = openGop === g.id;
+              return (
+                <div
+                  key={g.id}
+                  className={`rounded-2xl border bg-white transition ${t.border} ${isOpen ? "" : t.borderHover}`}
+                >
+                  {/* Свёрнутая строка: код, название, минимальные факты */}
+                  <button
+                    onClick={() => setOpenGop(isOpen ? null : g.id)}
+                    className="flex w-full items-center gap-3 p-5 text-left"
                   >
-                    {g.code ?? "без ГОП"}
-                  </span>
-                  <h3 className="font-display font-medium">{g.name}</h3>
-                </div>
-
-                <p className={`mt-2.5 max-w-3xl text-sm leading-relaxed ${t.body}`}>
-                  {g.description}
-                </p>
-
-                {/* Факты */}
-                <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                  <div className={`rounded-xl px-3.5 py-3 ${tone === "teal" ? "bg-slate-50" : "bg-stone-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide ${t.muted}`}>
-                      <ListChecks size={12} />
-                      ЕНТ
-                    </p>
-                    <p className="mt-1 font-medium">
-                      {g.entScore
-                        ? `балл от ${g.entScore}`
-                        : g.level === "college"
-                          ? "конкурс аттестатов"
-                          : "внутренний конкурс"}
-                    </p>
-                    {g.entSubjects && (
-                      <p className={`mt-0.5 text-xs ${t.muted2}`}>
-                        {g.entSubjects.join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                  <div className={`rounded-xl px-3.5 py-3 ${tone === "teal" ? "bg-slate-50" : "bg-stone-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide ${t.muted}`}>
-                      <Banknote size={12} />
-                      Стоимость
-                    </p>
-                    <p className="mt-1 font-medium">
-                      {formatPrice(g.priceFrom)}
-                      {g.priceTo ? ` – ${formatPrice(g.priceTo)}` : ""}
-                    </p>
-                  </div>
-                  <div className={`rounded-xl px-3.5 py-3 ${tone === "teal" ? "bg-slate-50" : "bg-stone-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide ${t.muted}`}>
-                      <Languages size={12} />
-                      Языки обучения
-                    </p>
-                    <p className="mt-1 font-medium">{g.languages.join(", ")}</p>
-                  </div>
-                  <div className={`rounded-xl px-3.5 py-3 ${tone === "teal" ? "bg-slate-50" : "bg-stone-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide ${t.muted}`}>
-                      <Clock size={12} />
-                      Срок обучения
-                    </p>
-                    <p className="mt-1 font-medium">{g.duration}</p>
-                  </div>
-                </div>
-
-                {/* Профессии и входящие ОП */}
-                <div className="mt-4 space-y-2.5">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className={`mr-1 text-xs font-medium ${t.muted2}`}>
-                      Примеры профессий:
-                    </span>
-                    {g.professions.map((p) => (
-                      <Tag key={p} tone={tone}>
-                        {p}
-                      </Tag>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className={`mr-1 text-xs font-medium ${t.muted2}`}>
-                      Образовательные программы:
-                    </span>
-                    {g.programs.map((p) => (
-                      <span
-                        key={p}
-                        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs ${t.pill}`}
-                      >
-                        <GraduationCap size={12} />
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Заведения, где ведётся обучение */}
-                <div className={`mt-4 border-t pt-3 ${t.divide}`}>
-                  <span className={`mr-2 text-xs font-medium ${t.muted2}`}>
-                    Где обучают:
-                  </span>
-                  <span className="inline-flex flex-wrap gap-1.5 align-middle">
-                    {g.institutionIds.map((id) => {
-                      const inst = institutions.find((u) => u.id === id);
-                      if (!inst) return null;
-                      const isUni = inst.kind !== "college";
-                      return isUni ? (
-                        <Link
-                          key={id}
-                          href={`${detailBase}/${id}`}
-                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${t.chip}`}
-                        >
-                          {inst.shortName}
-                        </Link>
-                      ) : (
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2.5">
                         <span
-                          key={id}
-                          className={`rounded-full border px-3 py-1 text-xs ${
-                            tone === "teal"
-                              ? "border-slate-200 text-slate-500"
-                              : "border-stone-200 text-stone-500"
-                          }`}
+                          className={`rounded-lg px-2.5 py-1 font-mono text-xs font-semibold ${t.codePill}`}
                         >
-                          {inst.shortName}
+                          {g.code ?? "без ГОП"}
                         </span>
-                      );
-                    })}
-                  </span>
+                        <h3 className="font-display font-medium">{g.name}</h3>
+                      </div>
+                      <p className={`mt-1.5 font-mono text-xs ${t.muted}`}>
+                        {g.institutionIds.length}{" "}
+                        {plural(g.institutionIds.length, [
+                          g.level === "college" ? "колледж" : "вуз",
+                          g.level === "college" ? "колледжа" : "вуза",
+                          g.level === "college" ? "колледжей" : "вузов",
+                        ])}{" "}
+                        · {g.duration} · {formatPrice(g.priceFrom)}
+                      </p>
+                    </div>
+                    <ChevronDown
+                      size={17}
+                      className={`shrink-0 transition ${t.muted} ${isOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  {/* Развёрнутые подробности */}
+                  {isOpen && (
+                    <div className={`border-t px-5 pt-4 pb-5 ${t.divide}`}>
+                      <p className={`max-w-3xl text-sm leading-relaxed ${t.body}`}>
+                        {g.about ?? g.description}
+                      </p>
+
+                      {/* Факты */}
+                      <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                        <div className={`rounded-xl px-3.5 py-3 ${t.soft}`}>
+                          <p className={`flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase ${t.muted}`}>
+                            <ListChecks size={12} />
+                            ЕНТ
+                          </p>
+                          <p className="mt-1 font-medium">
+                            {g.entScore
+                              ? `балл от ${g.entScore}`
+                              : g.level === "college"
+                                ? "конкурс аттестатов"
+                                : "внутренний конкурс"}
+                          </p>
+                          {g.entSubjects && (
+                            <p className={`mt-0.5 text-xs ${t.muted2}`}>
+                              {g.entSubjects.join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                        <div className={`rounded-xl px-3.5 py-3 ${t.soft}`}>
+                          <p className={`flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase ${t.muted}`}>
+                            <Banknote size={12} />
+                            Стоимость
+                          </p>
+                          <p className="mt-1 font-medium">
+                            {formatPrice(g.priceFrom)}
+                            {g.priceTo ? ` – ${formatPrice(g.priceTo)}` : ""}
+                          </p>
+                        </div>
+                        <div className={`rounded-xl px-3.5 py-3 ${t.soft}`}>
+                          <p className={`flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase ${t.muted}`}>
+                            <Languages size={12} />
+                            Языки обучения
+                          </p>
+                          <p className="mt-1 font-medium">{g.languages.join(", ")}</p>
+                        </div>
+                        <div className={`rounded-xl px-3.5 py-3 ${t.soft}`}>
+                          <p className={`flex items-center gap-1.5 text-[11px] font-medium tracking-wide uppercase ${t.muted}`}>
+                            <Clock size={12} />
+                            Срок обучения
+                          </p>
+                          <p className="mt-1 font-medium">{g.duration}</p>
+                        </div>
+                      </div>
+
+                      {/* Стоит присмотреться / чему научат / формат / кому не подойдёт */}
+                      {g.lookIf && (
+                        <div className={`mt-4 rounded-xl px-4 py-3.5 ${tone === "teal" ? "bg-teal-50" : "bg-violet-100/60"}`}>
+                          <p className={`text-xs font-semibold ${t.accentText}`}>
+                            Стоит присмотреться, если
+                          </p>
+                          <ul className="mt-2 space-y-1.5">
+                            {g.lookIf.map((li) => (
+                              <li key={li} className={`flex gap-2 text-sm ${t.body}`}>
+                                <Check size={14} className={`mt-0.5 flex-none ${t.accentText}`} />
+                                {li}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {g.learn && (
+                        <div className="mt-3.5">
+                          <p className="text-sm font-semibold">Чему конкретно научат</p>
+                          <p className={`mt-1 text-sm leading-relaxed ${t.body}`}>{g.learn}</p>
+                        </div>
+                      )}
+                      {g.format && (
+                        <div className="mt-3.5">
+                          <p className="text-sm font-semibold">Формат работы</p>
+                          <p className={`mt-1 text-sm leading-relaxed ${t.body}`}>{g.format}</p>
+                        </div>
+                      )}
+
+                      {/* Кем можно работать + входящие ОП */}
+                      <div className="mt-4 space-y-2.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className={`mr-1 text-xs font-medium ${t.muted2}`}>
+                            Кем можно работать:
+                          </span>
+                          {g.professions.map((p) => (
+                            <span
+                              key={p}
+                              className={`rounded-full px-3 py-1 text-xs ${t.pill}`}
+                            >
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className={`mr-1 text-xs font-medium ${t.muted2}`}>
+                            Образовательные программы:
+                          </span>
+                          {g.programs.map((p) => (
+                            <span
+                              key={p}
+                              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs ${t.pill}`}
+                            >
+                              <GraduationCap size={12} />
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {g.notFor && (
+                        <div className="mt-3.5 rounded-xl bg-amber-50 px-4 py-3">
+                          <p className="text-xs font-semibold text-amber-800">
+                            Кому точно не подойдёт
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-amber-900/80">
+                            {g.notFor}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Заведения, где ведётся обучение */}
+                      <div className={`mt-4 border-t pt-3 ${t.divide}`}>
+                        <span className={`mr-2 text-xs font-medium ${t.muted2}`}>
+                          Где обучают:
+                        </span>
+                        <span className="inline-flex flex-wrap gap-1.5 align-middle">
+                          {g.institutionIds.map((id) => {
+                            const inst = institutions.find((u) => u.id === id);
+                            if (!inst) return null;
+                            const isUni = inst.kind !== "college";
+                            return isUni ? (
+                              <Link
+                                key={id}
+                                href={`${detailBase}/${id}`}
+                                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${t.chip}`}
+                              >
+                                {inst.shortName}
+                              </Link>
+                            ) : (
+                              <span
+                                key={id}
+                                className={`rounded-full border px-3 py-1 text-xs ${
+                                  tone === "teal"
+                                    ? "border-slate-200 text-slate-500"
+                                    : "border-stone-200 text-stone-500"
+                                }`}
+                              >
+                                {inst.shortName}
+                              </span>
+                            );
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {filteredGops.length === 0 && (

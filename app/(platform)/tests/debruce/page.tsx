@@ -6,5 +6,8 @@ export default async function DebrucePage({
   searchParams: Promise<{ view?: string }>;
 }) {
   const { view } = await searchParams;
-  return <DebruceFlow initialStage={view === "result" ? "result" : "intro"} />;
+  // view=industry — сразу к выбору отрасли (из отчёта), view=result — 10 навыков
+  const stage =
+    view === "industry" ? "industry" : view === "result" ? "result" : "intro";
+  return <DebruceFlow initialStage={stage} />;
 }

@@ -741,8 +741,85 @@
     transform-origin: center;
     animation: illu-blink 4s ease-in-out infinite;
   }
+  .illu-spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: illu-spin 7s linear infinite;
+  }
+  .illu-type {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: illu-type 4.2s ease-in-out infinite;
+  }
+  .illu-pop {
+    transform-box: fill-box;
+    transform-origin: bottom left;
+    animation: illu-pop 4.2s ease-in-out infinite;
+  }
+  .illu-refresh {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: illu-refresh 3.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  .illu-day {
+    animation: illu-day 4s ease-in-out infinite;
+  }
 }
 
+@keyframes illu-type {
+  0%,
+  8% {
+    transform: scaleX(0);
+  }
+  28%,
+  88% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+@keyframes illu-pop {
+  0%,
+  50% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes illu-refresh {
+  0% {
+    transform: rotate(0deg);
+  }
+  45%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes illu-day {
+  0%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  45% {
+    opacity: 1;
+  }
+}
+@keyframes illu-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 @keyframes illu-float {
   0%,
   100% {

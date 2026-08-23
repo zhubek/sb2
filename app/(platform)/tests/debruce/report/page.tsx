@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { industryMeta } from "@/components/industry-meta";
 import { ReportShell, Sect } from "@/components/report-blocks";
 import { skills } from "@/lib/mock-data";
 import {
@@ -27,10 +28,10 @@ export default function DebruceReportPage() {
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {debruceTop.map((a, i) => (
             <div key={a.name} className="rounded-2xl bg-white px-4 py-4">
-              <p className="font-mono text-xs font-semibold text-violet-600">
-                Способность {i + 1}
-              </p>
-              <p className="font-display mt-1 text-lg text-violet-800">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 font-mono text-xs font-bold text-white">
+                {i + 1}
+              </span>
+              <p className="font-display mt-2 text-lg text-violet-800">
                 {a.name}
               </p>
               <p className="text-xs text-stone-400">{a.en}</p>
@@ -158,22 +159,34 @@ export default function DebruceReportPage() {
       {/* Рекомендуемые отрасли */}
       <Sect kicker="Рекомендации" title="Рекомендуемые отрасли">
         <div className="space-y-3">
-          {debruceIndustries.map((ind) => (
-            <div key={ind.name} className="rounded-3xl bg-violet-100 p-6">
-              <h3 className="font-display text-lg text-violet-800">
-                {ind.name}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-violet-900/75">
-                {ind.desc}
-              </p>
-              <p className="mt-3 text-sm text-violet-800/70">
-                <span className="font-semibold text-violet-800">
-                  Рекомендуемые профессии:
-                </span>{" "}
-                {ind.professions.join(" · ")}
-              </p>
-            </div>
-          ))}
+          {debruceIndustries.map((ind) => {
+            const m = industryMeta(ind.name);
+            return (
+              <div key={ind.name} className={`rounded-3xl border p-6 ${m.card}`}>
+                <div className="flex items-center gap-3">
+                  <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl ${m.iconBg}`}>
+                    <m.Icon size={19} />
+                  </span>
+                  <h3 className={`font-display text-lg ${m.title}`}>
+                    {ind.name}
+                  </h3>
+                </div>
+                <p className="mt-2.5 text-sm leading-relaxed text-stone-600">
+                  {ind.desc}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <span className="mr-1 text-sm font-semibold text-stone-700">
+                    Рекомендуемые профессии:
+                  </span>
+                  {ind.professions.map((p) => (
+                    <span key={p} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${m.chip}`}>
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
         <p className="mt-6 text-sm font-semibold text-stone-700">
           Дополнительные рекомендации
@@ -214,7 +227,7 @@ export default function DebruceReportPage() {
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           <Link
-            href="/tests/debruce?view=result"
+            href="/tests/debruce?view=industry"
             className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
           >
             Перейти к рекомендациям

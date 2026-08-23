@@ -3,13 +3,8 @@ import UniversityList from "./university-list";
 export default async function UniversitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string; industry?: string }>;
+  searchParams: Promise<{ industry?: string }>;
 }) {
-  const { program, industry } = await searchParams;
-  return (
-    <UniversityList
-      presetProgram={program ?? null}
-      presetIndustry={industry ?? null}
-    />
-  );
+  const { industry } = await searchParams;
+  return <UniversityList presetIndustry={industry ?? null} />;
 }

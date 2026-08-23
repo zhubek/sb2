@@ -1,11 +1,14 @@
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import DownloadPdf from "@/components/download-pdf";
+import { industryMeta } from "@/components/industry-meta";
 import {
   HollandBars,
+  HollandTopTiles,
   MbtiBars,
   ReportShell,
   Sect,
+  TopSkillCards,
 } from "@/components/report-blocks";
 import { hollandScales, skills } from "@/lib/mock-data";
 import {
@@ -82,30 +85,29 @@ export default function GeneralReportPage() {
         <p className="mt-4 text-sm font-semibold text-stone-700">
           По итогам теста выявлены три ведущие способности
         </p>
-        <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
-          {skills.slice(0, 3).map((s, i) => (
-            <div key={s.id} className="rounded-2xl bg-violet-100 px-4 py-3.5">
-              <span className="font-mono text-xs font-semibold text-violet-600">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <p className="mt-1 text-sm font-semibold text-violet-800">
-                {s.name}
-              </p>
-            </div>
-          ))}
+        <div className="mt-3">
+          <TopSkillCards />
         </div>
         <div className="mt-4 space-y-2.5">
-          {debruceIndustries.map((ind) => (
-            <div
-              key={ind.name}
-              className="rounded-2xl border border-stone-200 bg-white px-5 py-4"
-            >
-              <p className="text-sm font-semibold text-stone-800">{ind.name}</p>
-              <p className="mt-1 text-xs leading-relaxed text-stone-500">
-                Рекомендуемые профессии: {ind.professions.join(" · ")}
-              </p>
-            </div>
-          ))}
+          {debruceIndustries.map((ind) => {
+            const m = industryMeta(ind.name);
+            return (
+              <div
+                key={ind.name}
+                className={`flex items-start gap-3 rounded-2xl border px-5 py-4 ${m.card}`}
+              >
+                <span className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-lg ${m.iconBg}`}>
+                  <m.Icon size={15} />
+                </span>
+                <div>
+                  <p className={`text-sm font-semibold ${m.title}`}>{ind.name}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-stone-500">
+                    Рекомендуемые профессии: {ind.professions.join(" · ")}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <Link
           href="/tests/debruce/report"
@@ -148,8 +150,11 @@ export default function GeneralReportPage() {
         <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
           {hollandWhatIs}
         </p>
-        <div className="mt-4 rounded-3xl border border-stone-200 bg-white p-6">
-          <HollandBars />
+        <div className="mt-4 space-y-4">
+          <HollandTopTiles />
+          <div className="rounded-3xl border border-stone-200 bg-white p-6">
+            <HollandBars />
+          </div>
         </div>
         <div className="mt-3 rounded-2xl border border-stone-200 bg-white px-5 py-4">
           <p className="text-sm font-semibold text-stone-800">

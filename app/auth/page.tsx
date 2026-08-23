@@ -8,7 +8,11 @@ import { useState } from "react";
 const inputCls =
   "w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100";
 
-const letters = ["А", "Ә", "Б", "В", "Г", "Д", "Е"];
+// Литера класса — русский алфавит (без Ё, Й, Ъ, Ь)
+const letters = [
+  "А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П",
+  "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ы", "Э", "Ю", "Я",
+];
 
 function GoogleIcon() {
   return (

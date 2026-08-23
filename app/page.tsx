@@ -1,10 +1,29 @@
 "use client";
 
-import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Compass,
+  Sparkles,
+  Star,
+  TrendingUp,
+  UserRound,
+  Wrench,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/compass-marks";
 import ProfessionCarousel from "@/components/profession-carousel";
+import {
+  NoExamArt,
+  NobodySeesArt,
+  RetakeArt,
+  TalkArt,
+  TeacherSeesArt,
+} from "@/components/result-illustrations";
 
 // Лендинг по контент-мокапу v9 (ref/…/welcome-landing-mockup.html):
 // тексты, структура секций, телефонные мокапы и переключатель ҚАЗ/РУС — из
@@ -75,7 +94,10 @@ const how = {
     { ru: "15 минут", kk: "15 минут" },
   ],
   mainTitle: { ru: "Мои навыки", kk: "Менің дағдыларым" },
-  mainMeth: { ru: "методика DeBruce", kk: "DeBruce әдістемесі" },
+  mainMeth: {
+    ru: "Методика НАО им. Ы. Алтынсарина",
+    kk: "Ы. Алтынсарин атындағы ҰБА әдістемесі",
+  },
   mainDesc: {
     ru: "Тест показывает три твоих главных навыка и выстраивает остальные по рейтингу — от самых сильных до тех, что стоит подтянуть. По этому списку система подбирает тебе отрасли, программы и учебные заведения.",
     kk: "Тест сенің үш басты дағдыңды көрсетеді және қалғандарын рейтингке орналастырады — күштілерінен бастап, дамыту керектеріне дейін. Осы тізім бойынша жүйе саған сәйкес салаларды, бағдарламаларды және оқу орындарын таңдайды.",
@@ -90,7 +112,10 @@ const how = {
   opts: [
     {
       title: { ru: "Мой тип личности", kk: "Менің тұлға типім" },
-      meth: { ru: "методика MBTI", kk: "MBTI әдістемесі" },
+      meth: {
+        ru: "Индикатор типов Майерс — Бриггс (MBTI)",
+        kk: "Майерс — Бриггс типтер индикаторы (MBTI)",
+      },
       time: { ru: "8 минут", kk: "8 минут" },
       desc: {
         ru: "Покажет, как ты принимаешь решения, как отдыхаешь и какая роль тебе ближе в командной работе.",
@@ -99,7 +124,10 @@ const how = {
     },
     {
       title: { ru: "Мои интересы", kk: "Менің қызығушылықтарым" },
-      meth: { ru: "методика Голланда", kk: "Голланд әдістемесі" },
+      meth: {
+        ru: "Модель профессиональных интересов Дж. Холланда (RIASEC)",
+        kk: "Дж. Холландтың кәсіби қызығушылықтар моделі (RIASEC)",
+      },
       time: { ru: "8 минут", kk: "8 минут" },
       desc: {
         ru: "Покажет, чем тебе интересно заниматься на самом деле, в какой обстановке тебе комфортно работать — и какие профессии тебе подойдут.",
@@ -776,18 +804,18 @@ export default function WelcomePage() {
         </div>
       </header>
 
-      {/* Герой — индиговая пастельная подложка, один насыщенный акцент: коралловая кнопка */}
-      <section className="px-4 pt-6 pb-6 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-14 md:px-14 md:py-16">
+      {/* Герой — заливка на всю ширину, насыщенный градиент */}
+      <section className="bg-gradient-to-br from-violet-500 via-violet-600 to-violet-800">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:px-14 md:py-20">
           <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="text-xs font-semibold tracking-[0.11em] text-violet-600 uppercase">
+              <p className="text-xs font-semibold tracking-[0.11em] text-amber-400 uppercase">
                 {hero.eyebrow[lang]}
               </p>
-              <h1 className="font-display mt-5 text-4xl leading-[1.08] text-violet-800 md:text-[56px]">
+              <h1 className="font-display mt-5 text-4xl leading-[1.08] text-white md:text-[56px]">
                 {hero.h1[lang]}
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-violet-800/70">
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-violet-100">
                 {hero.lede[lang]}
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
@@ -799,11 +827,11 @@ export default function WelcomePage() {
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
-              <p className="mt-4 text-sm text-violet-800/50">{hero.micro[lang]}</p>
-              <div className="mt-9 flex flex-wrap gap-10 border-t border-violet-100 pt-7">
+              <p className="mt-4 text-sm text-violet-200">{hero.micro[lang]}</p>
+              <div className="mt-9 flex flex-wrap gap-10 border-t border-white/20 pt-7">
                 {hero.meta.map((m) => (
-                  <div key={m.b.ru} className="max-w-[17em] text-sm text-violet-800/60">
-                    <b className="font-display mb-0.5 block text-[21px] text-violet-800">
+                  <div key={m.b.ru} className="max-w-[17em] text-sm text-violet-100">
+                    <b className="font-display mb-0.5 block text-[21px] text-white">
                       {m.b[lang]}
                     </b>
                     {m.s[lang]}
@@ -821,7 +849,7 @@ export default function WelcomePage() {
       </section>
 
       {/* С чего начать */}
-      <section id="how" className="bg-stone-50 px-6 py-24">
+      <section id="how" className="bg-white px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="rv mb-12 max-w-2xl">
             <p className="text-xs font-semibold tracking-[0.11em] text-stone-400 uppercase">
@@ -834,7 +862,7 @@ export default function WelcomePage() {
           </div>
 
           {/* Главный тест */}
-          <div className="rv grid items-center gap-10 rounded-[28px] border border-violet-200/70 bg-violet-100 p-8 md:grid-cols-[1fr_auto] md:p-10">
+          <div className="rv grid items-center gap-10 rounded-[28px] bg-violet-500 p-8 shadow-[0_24px_60px_rgba(90,95,232,0.35)] md:grid-cols-[1fr_auto] md:p-10">
             <div>
               <div className="mb-4 flex gap-2">
                 {how.pills.map((p) => (
@@ -846,11 +874,16 @@ export default function WelcomePage() {
                   </span>
                 ))}
               </div>
-              <h3 className="font-display text-3xl text-violet-800">{how.mainTitle[lang]}</h3>
-              <p className="mt-2 text-[13px] tracking-wide text-violet-800/60">
+              <div className="flex items-center gap-3.5">
+                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white text-violet-600">
+                  <BarChart3 size={22} />
+                </span>
+                <h3 className="font-display text-3xl text-white">{how.mainTitle[lang]}</h3>
+              </div>
+              <p className="mt-2 text-[13px] tracking-wide text-violet-100">
                 {how.mainMeth[lang]}
               </p>
-              <p className="mt-3.5 max-w-xl leading-relaxed text-violet-900/80">
+              <p className="mt-3.5 max-w-xl leading-relaxed text-violet-50">
                 {how.mainDesc[lang]}
               </p>
             </div>
@@ -874,24 +907,33 @@ export default function WelcomePage() {
             {how.optLabel[lang]}
           </p>
           <div className="grid gap-3.5 md:grid-cols-2">
-            {how.opts.map((o) => (
-              <div key={o.title.ru} className="rv rounded-3xl border border-stone-200 bg-white p-7">
-                <h3 className="font-display text-[21px] text-stone-800">{o.title[lang]}</h3>
-                <p className="mt-1.5 text-[13px] text-stone-400">{o.meth[lang]}</p>
-                <p className="text-[13px] text-stone-400">{o.time[lang]}</p>
-                <p className="mt-3.5 text-stone-600">{o.desc[lang]}</p>
-              </div>
-            ))}
+            {how.opts.map((o, oi) => {
+              const OptIcon = oi === 0 ? UserRound : Compass;
+              const optChip = oi === 0 ? "bg-teal-500 text-white" : "bg-amber-400 text-stone-900";
+              return (
+                <div key={o.title.ru} className="rv rounded-3xl border border-stone-200 bg-white p-7">
+                  <div className="flex items-center gap-3">
+                    <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl ${optChip}`}>
+                      <OptIcon size={19} />
+                    </span>
+                    <h3 className="font-display text-[21px] text-stone-800">{o.title[lang]}</h3>
+                  </div>
+                  <p className="mt-2.5 text-[13px] text-stone-400">{o.meth[lang]}</p>
+                  <p className="text-[13px] text-stone-400">{o.time[lang]}</p>
+                  <p className="mt-3.5 text-stone-600">{o.desc[lang]}</p>
+                </div>
+              );
+            })}
           </div>
 
           {/* Комплексный отчёт */}
-          <div className="rv mt-3.5 flex items-start gap-5 rounded-3xl border-2 border-violet-200 bg-white p-7 md:p-8">
-            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-violet-500 text-white">
+          <div className="rv mt-3.5 flex items-start gap-5 rounded-3xl bg-stone-900 p-7 md:p-8">
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-amber-400 text-stone-900">
               <Star size={16} fill="currentColor" />
             </span>
             <div>
-              <h3 className="font-display text-xl text-stone-800">{how.bonusTitle[lang]}</h3>
-              <p className="mt-2.5 max-w-3xl text-stone-600">{how.bonusDesc[lang]}</p>
+              <h3 className="font-display text-xl text-white">{how.bonusTitle[lang]}</h3>
+              <p className="mt-2.5 max-w-3xl text-stone-300">{how.bonusDesc[lang]}</p>
             </div>
           </div>
         </div>
@@ -992,52 +1034,60 @@ export default function WelcomePage() {
 
       {/* Твои результаты — мятная пастельная секция */}
       <section id="privacy" className="px-4 py-24 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-teal-50 px-6 py-14 md:px-12 md:py-16">
+        <div className="mx-auto max-w-6xl rounded-[36px] bg-teal-500 px-6 py-14 md:px-12 md:py-16">
           <div className="rv mb-10 max-w-2xl">
-            <p className="text-xs font-semibold tracking-[0.11em] text-teal-700 uppercase">
+            <p className="text-xs font-semibold tracking-[0.11em] text-teal-100 uppercase">
               {privacy.eyebrow[lang]}
             </p>
-            <h2 className="font-display mt-3 text-3xl text-stone-800 md:text-[40px] md:leading-tight">
+            <h2 className="font-display mt-3 text-3xl text-white md:text-[40px] md:leading-tight">
               {privacy.h2[lang]}
             </h2>
-            <p className="mt-4 text-lg text-stone-600">{privacy.p[lang]}</p>
+            <p className="mt-4 text-lg text-teal-50">{privacy.p[lang]}</p>
           </div>
           <div className="grid gap-3.5 md:grid-cols-2">
-            {privacy.items.map((it) => (
-              <div
-                key={it.title.ru}
-                className={`rv rounded-3xl bg-white p-7 ${"wide" in it && it.wide ? "md:col-span-2" : ""}`}
-              >
-                <h3 className="font-display text-[19px] text-stone-800">{it.title[lang]}</h3>
-                <p className="mt-2.5 text-stone-600">{it.desc[lang]}</p>
-              </div>
-            ))}
+            {privacy.items.map((it, pi) => {
+              const Art = [NoExamArt, TeacherSeesArt, NobodySeesArt, RetakeArt, TalkArt][pi] ?? NoExamArt;
+              const wide = "wide" in it && it.wide;
+              return (
+                <div
+                  key={it.title.ru}
+                  className={`rv rounded-3xl bg-white p-7 ${wide ? "md:col-span-2 md:grid md:grid-cols-[260px_1fr] md:items-center md:gap-8" : ""}`}
+                >
+                  {/* Фирменная анимированная иллюстрация */}
+                  <Art className={wide ? "h-32 w-full" : "mb-5 h-28 w-full"} />
+                  <div>
+                    <h3 className="font-display text-[19px] text-stone-800">{it.title[lang]}</h3>
+                    <p className="mt-2.5 text-stone-600">{it.desc[lang]}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <p className="mt-6 text-sm text-teal-800/60">{privacy.note[lang]}</p>
+          <p className="mt-6 text-sm text-teal-50">{privacy.note[lang]}</p>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="bg-stone-50 px-6 py-24">
+      {/* FAQ — тёмная заливка для контраста */}
+      <section id="faq" className="bg-stone-900 px-6 py-24">
         <div className="mx-auto max-w-3xl">
           <div className="rv mb-10">
-            <p className="text-xs font-semibold tracking-[0.11em] text-stone-400 uppercase">
+            <p className="text-xs font-semibold tracking-[0.11em] text-violet-300 uppercase">
               {faq.eyebrow[lang]}
             </p>
-            <h2 className="font-display mt-3 text-3xl text-stone-800 md:text-[40px]">
+            <h2 className="font-display mt-3 text-3xl text-white md:text-[40px]">
               {faq.h2[lang]}
             </h2>
           </div>
           <div>
             {faq.qa.map((item, i) => (
-              <details key={item.q.ru} className="group border-b border-stone-200 py-5" open={i === 0}>
-                <summary className="font-display flex cursor-pointer list-none items-center justify-between gap-6 text-lg text-stone-800 transition hover:text-stone-900">
+              <details key={item.q.ru} className="group border-b border-stone-700 py-5" open={i === 0}>
+                <summary className="font-display flex cursor-pointer list-none items-center justify-between gap-6 text-lg text-stone-100 transition hover:text-white">
                   {item.q[lang]}
-                  <span className="flex-none text-2xl font-normal text-stone-300 transition group-open:rotate-45">
+                  <span className="flex-none text-2xl font-normal text-stone-500 transition group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="mt-3.5 max-w-2xl leading-relaxed text-stone-600">{item.a[lang]}</p>
+                <p className="mt-3.5 max-w-2xl leading-relaxed text-stone-400">{item.a[lang]}</p>
               </details>
             ))}
           </div>
@@ -1054,33 +1104,47 @@ export default function WelcomePage() {
             <p className="mt-4 text-lg text-stone-600">{codes.p[lang]}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {codes.cards.map((c) => (
-              <Link
-                key={c.title.ru}
-                href={c.href}
-                className="rv group rounded-3xl border border-stone-200 bg-white p-8 transition-all hover:border-violet-300 hover:shadow-[0_16px_40px_rgba(42,46,59,0.08)]"
-              >
-                <div className="flex items-start justify-between gap-5">
-                  <h3 className="font-display text-[21px] text-stone-800">{c.title[lang]}</h3>
-                  <span className="flex-none text-lg text-stone-300 transition group-hover:translate-x-1 group-hover:text-violet-600">
-                    →
-                  </span>
-                </div>
-                <p className="mt-3 text-stone-600">{c.desc[lang]}</p>
-              </Link>
-            ))}
+            {codes.cards.map((c, ci) => {
+              // Иконка и цвет справочника — по порядку карточек
+              const [CodeIcon, codeChip] = [
+                [TrendingUp, "bg-violet-500 text-white"],
+                [Building2, "bg-teal-500 text-white"],
+                [Wrench, "bg-orange-500 text-white"],
+                [Sparkles, "bg-amber-400 text-stone-900"],
+              ][ci] ?? [Sparkles, "bg-violet-500 text-white"];
+              return (
+                <Link
+                  key={c.title.ru}
+                  href={c.href}
+                  className="rv group rounded-3xl border border-stone-200 bg-white p-8 transition-all hover:border-violet-300 hover:shadow-[0_16px_40px_rgba(42,46,59,0.08)]"
+                >
+                  <div className="flex items-start justify-between gap-5">
+                    <div className="flex items-center gap-3.5">
+                      <span className={`flex h-12 w-12 flex-none items-center justify-center rounded-2xl transition-transform group-hover:scale-105 ${codeChip}`}>
+                        <CodeIcon size={22} />
+                      </span>
+                      <h3 className="font-display text-[21px] text-stone-800">{c.title[lang]}</h3>
+                    </div>
+                    <span className="flex-none text-lg text-stone-300 transition group-hover:translate-x-1 group-hover:text-violet-600">
+                      →
+                    </span>
+                  </div>
+                  <p className="mt-4 text-stone-600">{c.desc[lang]}</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Финальный CTA */}
+      {/* Финальный CTA — тёмная контрастная заливка */}
       <section className="px-4 pb-24 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-16 text-center md:py-20">
+        <div className="mx-auto max-w-6xl rounded-[36px] bg-gradient-to-br from-violet-700 to-violet-900 px-6 py-16 text-center md:py-20">
           <div className="mx-auto max-w-2xl space-y-6">
-            <h2 className="rv font-display text-3xl text-violet-800 md:text-5xl">
+            <h2 className="rv font-display text-3xl text-white md:text-5xl">
               {finalCta.h2[lang]}
             </h2>
-            <p className="rv mx-auto max-w-xl text-lg text-violet-800/70">{finalCta.p[lang]}</p>
+            <p className="rv mx-auto max-w-xl text-lg text-violet-200">{finalCta.p[lang]}</p>
             <Link
               href="/auth"
               className="rv group inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-9 py-4 font-bold text-stone-800 transition-all hover:bg-orange-400"
