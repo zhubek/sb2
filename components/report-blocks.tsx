@@ -105,14 +105,16 @@ export function CheckList({ items }: { items: string[] }) {
 // Топ-3 навыка — нумерация и названия как в отчёте
 export function TopSkillCards() {
   return (
-    <div className="grid gap-2.5 sm:grid-cols-3">
+    <div className="grid gap-2 sm:grid-cols-3 sm:gap-2.5">
       {skills.slice(0, 3).map((s, i) => (
-        <div key={s.id} className="rounded-2xl bg-violet-100 px-4 py-4">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 font-mono text-xs font-bold text-white">
+        <div key={s.id} className="flex items-center gap-3 rounded-2xl bg-violet-100 px-4 py-3 sm:block sm:py-4">
+          <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-violet-600 font-mono text-xs font-bold text-white">
             {i + 1}
           </span>
-          <p className="mt-2 text-sm font-semibold text-violet-900">{s.name}</p>
-          {s.en && <p className="text-xs text-violet-700/60">{s.en}</p>}
+          <div className="min-w-0 sm:mt-2">
+            <p className="text-sm font-semibold text-violet-900">{s.name}</p>
+            {s.en && <p className="text-xs text-violet-700/60">{s.en}</p>}
+          </div>
         </div>
       ))}
     </div>
@@ -123,11 +125,11 @@ export function TopSkillCards() {
 export function HollandTopTiles({ small = false }: { small?: boolean }) {
   const sorted = [...hollandScales].sort((a, b) => b.score - a.score).slice(0, 3);
   return (
-    <div className="grid grid-cols-3 gap-2.5">
+    <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
       {sorted.map((s, i) => (
         <div
           key={s.code}
-          className={`relative rounded-2xl bg-violet-100 text-center ${small ? "px-2 py-3" : "px-4 py-5"}`}
+          className={`relative min-w-0 rounded-2xl bg-violet-100 text-center ${small ? "px-1.5 py-3 sm:px-2" : "px-2 py-4 sm:px-4 sm:py-5"}`}
         >
           {/* «ТОП n» — в углу, всё остальное по центру, как в отчёте */}
           <span className="absolute top-2 right-2.5 font-mono text-[10px] tracking-wider text-violet-500 uppercase">
@@ -136,7 +138,7 @@ export function HollandTopTiles({ small = false }: { small?: boolean }) {
           <p className={`font-display leading-none text-violet-700 ${small ? "mt-1 text-2xl" : "mt-2 text-4xl"}`}>
             {s.code}
           </p>
-          <p className={`mt-2 font-semibold text-violet-900 ${small ? "text-xs" : "text-sm"}`}>
+          <p className={`mt-2 leading-tight font-semibold tracking-tight text-violet-900 sm:tracking-normal ${small ? "text-[10.5px] sm:text-xs" : "text-[11px] sm:text-sm"}`}>
             {s.name}
           </p>
           <p className={`mt-0.5 font-mono text-violet-700 ${small ? "text-xs" : "text-sm"}`}>
@@ -160,7 +162,7 @@ export function HollandBars({ compact = false }: { compact?: boolean }) {
             {i === 3 && <div className="mb-2.5 border-t border-stone-100" />}
             <div className="flex items-center gap-3">
               <span
-                className={`flex-none ${compact ? "w-40 text-xs" : "w-52 text-sm"} ${
+                className={`flex-none ${compact ? "w-36 text-[11px] sm:w-40 sm:text-xs" : "w-36 text-xs sm:w-52 sm:text-sm"} ${
                   top ? "font-semibold text-violet-900" : "text-stone-400"
                 }`}
               >
@@ -179,7 +181,7 @@ export function HollandBars({ compact = false }: { compact?: boolean }) {
                 />
               </div>
               <span
-                className={`w-11 flex-none text-right font-mono ${compact ? "text-xs" : "text-sm"} ${
+                className={`w-9 flex-none text-right font-mono sm:w-11 ${compact ? "text-xs" : "text-sm"} ${
                   top ? "font-bold text-violet-700" : "text-stone-400"
                 }`}
               >
@@ -241,37 +243,57 @@ export function MbtiBars({ compact = false }: { compact?: boolean }) {
     <div className={compact ? "space-y-3" : "space-y-4"}>
       {mbtiScales.map((s) => {
         const leftWin = s.side === "left";
-        return (
-          <div key={s.left} className="flex items-center gap-3">
-            <span
-              className={`flex-none text-right ${compact ? "w-24" : "w-32"} ${label} ${
-                leftWin ? "font-bold text-violet-800" : "font-medium text-stone-400"
-              }`}
-            >
-              {s.left}
-            </span>
+        const track = (
+          <div className={`relative flex-1 overflow-hidden rounded-full bg-stone-100 ${compact ? "h-3" : "h-4"}`}>
             <div
-              className={`relative flex-1 overflow-hidden rounded-full bg-stone-100 ${compact ? "h-3" : "h-4"}`}
-            >
-              <div
-                className={`absolute inset-y-0 rounded-full ${
-                  leftWin
-                    ? "left-0 bg-gradient-to-r from-violet-600 to-indigo-400"
-                    : "right-0 bg-gradient-to-l from-violet-600 to-indigo-400"
-                }`}
-                style={{ width: `${s.value}%` }}
-              />
-            </div>
-            <span className={`w-10 flex-none text-right font-bold text-violet-700 ${compact ? "text-xs" : "text-sm"}`}>
-              {s.value}%
-            </span>
-            <span
-              className={`flex-none ${compact ? "w-24" : "w-32"} ${label} ${
-                leftWin ? "font-medium text-stone-400" : "font-bold text-violet-800"
+              className={`absolute inset-y-0 rounded-full ${
+                leftWin
+                  ? "left-0 bg-gradient-to-r from-violet-600 to-indigo-400"
+                  : "right-0 bg-gradient-to-l from-violet-600 to-indigo-400"
               }`}
-            >
-              {s.right}
-            </span>
+              style={{ width: `${s.value}%` }}
+            />
+          </div>
+        );
+        const pct = <span className="font-mono font-bold text-violet-700">{s.value}%</span>;
+        return (
+          <div key={s.left}>
+            {/* Телефон: подписи над треком, процент у выигравшего полюса */}
+            <div className="sm:hidden">
+              <div className={`mb-1.5 flex items-baseline justify-between gap-3 ${compact ? "text-xs" : "text-[13px]"}`}>
+                <span className={leftWin ? "font-bold text-violet-800" : "text-stone-400"}>
+                  {leftWin && <>{pct} </>}
+                  {s.left}
+                </span>
+                <span className={`text-right ${leftWin ? "text-stone-400" : "font-bold text-violet-800"}`}>
+                  {s.right}
+                  {!leftWin && <> {pct}</>}
+                </span>
+              </div>
+              {track}
+            </div>
+
+            {/* Планшет и шире: подпись · трек · % · подпись — как в отчёте */}
+            <div className="hidden items-center gap-3 sm:flex">
+              <span
+                className={`flex-none text-right ${compact ? "w-24" : "w-32"} ${label} ${
+                  leftWin ? "font-bold text-violet-800" : "font-medium text-stone-400"
+                }`}
+              >
+                {s.left}
+              </span>
+              {track}
+              <span className={`w-10 flex-none text-right font-bold text-violet-700 ${compact ? "text-xs" : "text-sm"}`}>
+                {s.value}%
+              </span>
+              <span
+                className={`flex-none ${compact ? "w-24" : "w-32"} ${label} ${
+                  leftWin ? "font-medium text-stone-400" : "font-bold text-violet-800"
+                }`}
+              >
+                {s.right}
+              </span>
+            </div>
           </div>
         );
       })}

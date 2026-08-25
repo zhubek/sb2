@@ -49,40 +49,40 @@ export default function BonusPage() {
       </div>
 
       {/* Сводка сезона */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="flex items-center gap-1.5 text-xs tracking-wider text-slate-400 uppercase">
             <Sparkles size={13} className="text-teal-500" />
             Баллы за сезон
           </p>
-          <p className="font-display mt-1 text-2xl font-semibold">
+          <p className="font-display mt-1 text-xl font-semibold sm:text-2xl">
             {seasonPoints.total.toLocaleString("ru-RU")}
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="flex items-center gap-1.5 text-xs tracking-wider text-slate-400 uppercase">
             <Trophy size={13} className="text-teal-500" />
             Место в лиге
           </p>
-          <p className="font-display mt-1 text-2xl font-semibold">
+          <p className="font-display mt-1 text-xl font-semibold sm:text-2xl">
             #{ownRank}{" "}
             <span className="text-sm font-normal text-slate-400">
               городские школы
             </span>
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="text-xs tracking-wider text-slate-400 uppercase">
             Значки
           </p>
-          <p className="font-display mt-1 text-2xl font-semibold">
+          <p className="font-display mt-1 text-xl font-semibold sm:text-2xl">
             {earned.length}{" "}
             <span className="text-sm font-normal text-slate-400">
               из {teacherBadges.length}
             </span>
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="flex items-center gap-1.5 text-xs tracking-wider text-slate-400 uppercase">
             Определились с выбором
             <span className="group relative inline-flex">
@@ -95,7 +95,7 @@ export default function BonusPage() {
               </span>
             </span>
           </p>
-          <p className="font-display mt-1 text-2xl font-semibold">
+          <p className="font-display mt-1 text-xl font-semibold sm:text-2xl">
             {decidedPct}%{" "}
             <span className="text-sm font-normal text-slate-400">
               учеников
@@ -105,24 +105,24 @@ export default function BonusPage() {
       </div>
 
       {/* Значки */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <h2 className="font-semibold">Значки сезона</h2>
         <p className="text-sm text-slate-500">
           Награды за рубежи — отображаются в профиле и рядом с именем в
           лидерборде. Значок не отзывается задним числом.
         </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
           {teacherBadges.map((b) => (
             <div
               key={b.id}
-              className={`rounded-xl border p-4 ${
+              className={`min-w-0 rounded-xl border p-3 sm:p-4 ${
                 b.earned
                   ? "border-teal-200 bg-teal-50/50"
                   : "border-slate-100 opacity-50"
               }`}
             >
-              <span className="text-2xl">{b.icon}</span>
-              <p className="mt-2 text-sm font-medium">{b.name}</p>
+              <span className="text-xl sm:text-2xl">{b.icon}</span>
+              <p className="mt-1.5 text-[13px] leading-snug font-medium sm:mt-2 sm:text-sm">{b.name}</p>
               <p className="mt-0.5 text-xs leading-snug text-slate-500">
                 {b.desc}
               </p>
@@ -135,7 +135,7 @@ export default function BonusPage() {
       </section>
 
       {/* Лидерборд */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-semibold">Лидерборд педагогов</h2>
@@ -188,8 +188,8 @@ export default function BonusPage() {
               <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
                 <th className="py-2.5 pr-4 font-medium">Место</th>
                 <th className="py-2.5 pr-4 font-medium">Педагог</th>
-                <th className="py-2.5 pr-4 font-medium">Школа</th>
-                <th className="py-2.5 pr-4 font-medium">Значки</th>
+                <th className="hidden py-2.5 pr-4 font-medium sm:table-cell">Школа</th>
+                <th className="hidden py-2.5 pr-4 font-medium sm:table-cell">Значки</th>
                 <th className="py-2.5 text-right font-medium">
                   Баллы · {leaderPeriodLabels[period].toLowerCase()}
                 </th>
@@ -203,19 +203,22 @@ export default function BonusPage() {
                     key={r.name}
                     className={r.own ? "bg-teal-50/60" : "hover:bg-slate-50/60"}
                   >
-                    <td className="py-3 pr-4 font-mono text-slate-500">
+                    <td className="py-3 pr-3 font-mono whitespace-nowrap text-slate-500 sm:pr-4">
                       {rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : `#${rank}`}
                     </td>
-                    <td className="py-3 pr-4 font-medium">
+                    <td className="py-3 pr-4 font-medium whitespace-nowrap">
                       {r.name}
                       {r.own && (
                         <span className="ml-2 rounded-full bg-teal-100 px-2 py-0.5 text-[11px] font-medium text-teal-700">
                           Вы
                         </span>
                       )}
+                      <span className="block text-xs font-normal whitespace-normal text-slate-400 sm:hidden">
+                        {r.school} · 🏅 {r.badges}
+                      </span>
                     </td>
-                    <td className="py-3 pr-4 text-slate-500">{r.school}</td>
-                    <td className="py-3 pr-4 font-mono text-xs text-slate-500">
+                    <td className="hidden py-3 pr-4 text-slate-500 sm:table-cell">{r.school}</td>
+                    <td className="hidden py-3 pr-4 font-mono text-xs text-slate-500 sm:table-cell">
                       🏅 {r.badges}
                     </td>
                     <td className="py-3 text-right font-mono font-medium">
@@ -234,7 +237,7 @@ export default function BonusPage() {
 
       <div className="grid gap-6 lg:grid-cols-5">
         {/* Баллы по блокам + охват */}
-        <section className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
+        <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6 lg:col-span-2">
           <h2 className="font-semibold">Баллы по блокам</h2>
           <ul className="mt-4 space-y-3.5">
             {seasonPoints.byBlock.map((b) => (
@@ -295,7 +298,7 @@ export default function BonusPage() {
         </section>
 
         {/* История начислений */}
-        <section className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-3">
+        <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6 lg:col-span-3">
           <h2 className="font-semibold">История начислений</h2>
           <p className="text-sm text-slate-500">
             Начисляется только то, что платформа фиксирует автоматически
@@ -330,7 +333,7 @@ export default function BonusPage() {
       </div>
 
       {/* Правила начисления */}
-      <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <h2 className="font-semibold">За что начисляются баллы</h2>
         <p className="text-sm text-slate-500">
           Пять блоков; начисления за ученика — раз в сезон

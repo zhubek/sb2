@@ -18,9 +18,9 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mx-auto max-w-xl text-center">
         <InterestsArt className="mx-auto h-44 w-56" />
         <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          Дополнительная диагностика
+          Модель профессиональных интересов Дж. Холланда (RIASEC)
         </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Модель профессиональных интересов Дж. Холланда (RIASEC)</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Мои интересы</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
           Определит ваши профессиональные интересы по 6 типам направленности:
           реалистичный, исследовательский, артистичный, социальный,
@@ -49,7 +49,7 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
   if (stage === "quiz") {
     return (
       <SectionQuiz
-        title="Модель Дж. Холланда (RIASEC)"
+        title="Мои интересы"
         sections={hollandSections}
         onFinish={() => { setStage("result"); completeChecklistStep("c6"); }}
       />

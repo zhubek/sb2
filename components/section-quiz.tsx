@@ -2,7 +2,8 @@
 
 import { CompassArt } from "@/components/brand-art";
 import { IconAI } from "@/components/compass-marks";
-import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { QuizSection } from "@/lib/mock-data";
 
 const scale = [
@@ -28,6 +29,12 @@ export default function SectionQuiz({
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [processing, setProcessing] = useState(false);
   const [starting, setStarting] = useState(true);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Активный раздел всегда виден в горизонтальной ленте
+  useEffect(() => {
+    tabRefs.current[sectionIdx]?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  }, [sectionIdx]);
 
   // Короткая заставка «тест начинается»
   useEffect(() => {
@@ -101,32 +108,50 @@ export default function SectionQuiz({
         />
       </div>
 
-      {/* Навигация по разделам — текстовые вкладки без иконок */}
-      <div className="mt-7 flex flex-wrap gap-x-6 gap-y-0 border-b border-stone-200">
-        {sections.map((s, i) => {
-          const done = sectionAnswered(i);
-          const current = i === sectionIdx;
-          return (
-            <button
-              key={s.id}
-              onClick={() => setSectionIdx(i)}
-              className={`-mb-px flex shrink-0 items-baseline gap-1.5 border-b-2 pb-2.5 text-sm transition ${
-                current
-                  ? "border-violet-600 font-medium text-stone-900"
-                  : "border-transparent text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              <span className="font-mono text-[11px]">
-                {done && !current ? "✓" : String(i + 1).padStart(2, "0")}
-              </span>
-              {s.title}
-            </button>
-          );
-        })}
+      {/* Навигация по разделам — горизонтальная лента «пилюль», листается пальцем */}
+      <div className="relative mt-6 -mx-4 sm:mx-0">
+        <div className="no-scrollbar flex snap-x gap-2 overflow-x-auto px-4 py-1 sm:px-0">
+          {sections.map((s, i) => {
+            const done = sectionAnswered(i);
+            const current = i === sectionIdx;
+            return (
+              <button
+                key={s.id}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
+                onClick={() => setSectionIdx(i)}
+                className={`flex shrink-0 snap-start items-center gap-2 rounded-full border py-1.5 pr-3.5 pl-1.5 text-sm whitespace-nowrap transition ${
+                  current
+                    ? "border-violet-500 bg-violet-500 font-medium text-white shadow-[0_8px_20px_rgba(90,95,232,0.28)]"
+                    : done
+                      ? "border-teal-200 bg-teal-100 text-teal-800 hover:border-teal-300"
+                      : "border-stone-200 bg-white text-stone-500 hover:border-stone-300 hover:text-stone-800"
+                }`}
+              >
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full font-mono text-[11px] font-semibold ${
+                    current
+                      ? "bg-white/20 text-white"
+                      : done
+                        ? "bg-teal-500 text-white"
+                        : "bg-stone-100 text-stone-500"
+                  }`}
+                >
+                  {done && !current ? <Check size={12} strokeWidth={3} /> : i + 1}
+                </span>
+                {s.title}
+              </button>
+            );
+          })}
+        </div>
+        {/* Мягкие края — подсказка, что лента листается */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent sm:hidden" />
       </div>
 
       {/* Раздел: заголовок */}
-      <div className="mt-9">
+      <div className="mt-7">
         <p className="font-mono text-xs text-stone-400">
           Раздел {sectionIdx + 1} из {sections.length}
         </p>

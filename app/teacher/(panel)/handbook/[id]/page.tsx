@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import InstitutionView from "@/components/navigator/institution-view";
 import { buildInstitutionGroups, getDetail, getInstitution } from "@/lib/nav/server";
 
-// Страница заведения: данные собираются на сервере из lib/nav/*.json
-export default async function InstitutionPage({
+export default async function TeacherInstitutionPage({
   params,
   searchParams,
 }: {
@@ -23,6 +22,8 @@ export default async function InstitutionPage({
       detail={detail}
       groups={buildInstitutionGroups(d)}
       initialTab={tab === "programs" ? "programs" : "about"}
+      base="/teacher/handbook"
+      savable={false}
     />
   );
 }

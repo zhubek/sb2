@@ -1,7 +1,6 @@
 "use client";
 
-import { Compass, Target } from "lucide-react";
-import Link from "next/link";
+import { Target } from "lucide-react";
 import { useState } from "react";
 import Navigator from "@/components/navigator/navigator";
 
@@ -12,20 +11,11 @@ export default function UniversityList({ presetIndustry }: { presetIndustry: str
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Навигатор образования</h1>
-          <p className="mt-1 text-stone-500">
-            Все вузы и колледжи Казахстана, зарубежные университеты и образовательные программы
-          </p>
-        </div>
-        <Link
-          href="/universities/industries"
-          className="inline-flex items-center gap-2 rounded-2xl border border-violet-200 px-4 py-2.5 text-sm font-medium text-violet-700 transition hover:bg-violet-100"
-        >
-          <Compass size={15} />
-          Отрасли и профессии
-        </Link>
+      <div>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Навигатор образования</h1>
+        <p className="mt-1 text-stone-500">
+          Все вузы и колледжи Казахстана, зарубежные университеты и образовательные программы
+        </p>
       </div>
 
       {showPreset && presetIndustry && (

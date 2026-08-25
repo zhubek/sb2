@@ -3,7 +3,6 @@
 import {
   BedDouble,
   Check,
-  ChevronDown,
   ChevronRight,
   Search,
   Shield,
@@ -31,7 +30,6 @@ import {
   obls,
   plural,
   priceLabel,
-  priceShort,
   regionCities,
 } from "@/lib/nav/types";
 
@@ -94,7 +92,15 @@ function Chip({
   );
 }
 
-export default function Navigator({ presetIndustry = null }: { presetIndustry?: string | null }) {
+export default function Navigator({
+  presetIndustry = null,
+  base = "/universities",
+  savable = true,
+}: {
+  presetIndustry?: string | null;
+  base?: string;
+  savable?: boolean;
+}) {
   const presetIdx = industries.findIndex((x) => x.name === presetIndustry);
   const [view, setView] = useState<"inst" | "op">("inst");
   const [f, setF] = useState<Filters>({
@@ -111,7 +117,6 @@ export default function Navigator({ presetIndustry = null }: { presetIndustry?: 
   const [fav, setFav] = useState<Set<string>>(new Set());
   const [limit, setLimit] = useState(PAGE);
   const [showFilters, setShowFilters] = useState(false);
-  const [openCp, setOpenCp] = useState<string | null>(null);
 
   function set<K extends keyof Filters>(k: K, v: Filters[K]) {
     setF((s) => ({ ...s, [k]: v }));
@@ -232,8 +237,8 @@ export default function Navigator({ presetIndustry = null }: { presetIndustry?: 
   const gopItems = useMemo(
     () =>
       [
-        ...gops.map((g) => ({ t: g.name, key: "g" + g.code, node: <GopCard key={"g" + g.code} g={g} n={gopUnis(g).length} /> })),
-        ...nogops.map(({ d, op }) => ({ t: op.name, key: `n${d.i}-${op.k}`, node: <NoGopCard key={`n${d.i}-${op.k}`} d={d} op={op} /> })),
+        ...gops.map((g) => ({ t: g.name, key: "g" + g.code, node: <GopCard key={"g" + g.code} g={g} n={gopUnis(g).length} base={base} /> })),
+        ...nogops.map(({ d, op }) => ({ t: op.name, key: `n${d.i}-${op.k}`, node: <NoGopCard key={`n${d.i}-${op.k}`} d={d} op={op} base={base} /> })),
       ].sort((a, b) => a.t.localeCompare(b.t, "ru")),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [gops, nogops]
@@ -266,10 +271,12 @@ export default function Navigator({ presetIndustry = null }: { presetIndustry?: 
             </button>
           ))}
         </div>
-        <span className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600">
-          <Star size={13} className={fav.size ? "text-amber-400" : ""} fill={fav.size ? "currentColor" : "none"} />
-          Избранное · {fav.size}
-        </span>
+        {savable && (
+          <span className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600">
+            <Star size={13} className={fav.size ? "text-amber-400" : ""} fill={fav.size ? "currentColor" : "none"} />
+            <span className="hidden sm:inline">Избранное ·</span> {fav.size}
+          </span>
+        )}
       </div>
 
       {/* Поиск */}
@@ -412,22 +419,14 @@ export default function Navigator({ presetIndustry = null }: { presetIndustry?: 
 
           {view === "inst" &&
             insts.slice(0, limit).map((d) => (
-              <InstCard key={d.i} d={d} fav={fav.has("i" + d.i)} onFav={() => toggleFav("i" + d.i)} />
+              <InstCard key={d.i} d={d} base={base} fav={fav.has("i" + d.i)} onFav={savable ? () => toggleFav("i" + d.i) : undefined} />
             ))}
 
           {view === "op" && kind === "v" && gopItems.slice(0, limit).map((x) => x.node)}
 
           {view === "op" &&
             kind === "c" &&
-            cprogs.slice(0, limit).map(({ p, cols }) => (
-              <CollegeProgramCard
-                key={p.code + p.name}
-                p={p}
-                cols={cols}
-                open={openCp === p.code + p.name}
-                onToggle={() => setOpenCp(openCp === p.code + p.name ? null : p.code + p.name)}
-              />
-            ))}
+            cprogs.slice(0, limit).map(({ p, cols }) => <CollegeProgramCard key={p.code + p.name} p={p} cols={cols} base={base} />)}
 
           {limit < total && (
             <button
@@ -507,13 +506,13 @@ function CheckList<T extends string | number>({
 
 // ── Карточки ───────────────────────────────────────────────────────────────
 
-function InstCard({ d, fav, onFav }: { d: NavInst; fav: boolean; onFav: () => void }) {
+function InstCard({ d, base, fav, onFav }: { d: NavInst; base: string; fav: boolean; onFav?: () => void }) {
   const k = KIND[d.kind];
   const isA = d.kind === "a";
   return (
-    <div className="flex gap-4 rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
+    <div className="flex gap-3.5 rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300 sm:gap-4">
       <Link
-        href={`/universities/${d.i}`}
+        href={`${base}/${d.i}`}
         className="flex h-14 w-14 flex-none items-center justify-center rounded-xl font-mono text-sm font-bold text-white"
         style={{ background: k.color }}
       >
@@ -525,16 +524,18 @@ function InstCard({ d, fav, onFav }: { d: NavInst; fav: boolean; onFav: () => vo
             <p className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: k.color }}>
               {k.label}
             </p>
-            <Link href={`/universities/${d.i}`} className="font-display block leading-snug font-medium hover:text-violet-700">
+            <Link href={`${base}/${d.i}`} className="font-display block leading-snug font-medium hover:text-violet-700">
               {d.name}
             </Link>
             <p className="mt-0.5 text-xs text-stone-400">
               {isA ? `${d.country}, ${d.city}` : `${d.city} · ${d.nOps} прогр.`}
             </p>
           </div>
-          <button onClick={onFav} aria-label="В избранное" className={`shrink-0 ${fav ? "text-amber-400" : "text-stone-300 hover:text-amber-300"}`}>
-            <Star size={18} fill={fav ? "currentColor" : "none"} />
-          </button>
+          {onFav && (
+            <button onClick={onFav} aria-label="В избранное" className={`shrink-0 ${fav ? "text-amber-400" : "text-stone-300 hover:text-amber-300"}`}>
+              <Star size={18} fill={fav ? "currentColor" : "none"} />
+            </button>
+          )}
         </div>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           {!isA && (
@@ -556,7 +557,7 @@ function InstCard({ d, fav, onFav }: { d: NavInst; fav: boolean; onFav: () => vo
   );
 }
 
-function GopCard({ g, n }: { g: GopCompact; n: number }) {
+function GopCard({ g, n, base }: { g: GopCompact; n: number; base: string }) {
   const cities = Object.keys(g.univ)
     .map((ui) => BY_IDX.get(Number(ui))?.city)
     .filter(Boolean) as string[];
@@ -565,7 +566,7 @@ function GopCard({ g, n }: { g: GopCompact; n: number }) {
   const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]);
   const cityLine = top.length ? `${top[0]}${top.length > 1 ? ` +${top.length - 1}` : ""}` : "";
   return (
-    <Link href={`/universities/gop/${g.code}`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
+    <Link href={`${base}/gop/${g.code}`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[11px] font-semibold tracking-wide text-violet-600 uppercase">ГОП {g.code}</p>
@@ -582,12 +583,14 @@ function GopCard({ g, n }: { g: GopCompact; n: number }) {
   );
 }
 
-function NoGopCard({ d, op }: { d: NavInst; op: NoGopCompact }) {
+function NoGopCard({ d, op, base }: { d: NavInst; op: NoGopCompact; base: string }) {
   return (
-    <Link href={`/universities/${d.i}?tab=programs`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
+    <Link href={`${base}/${d.i}?tab=programs`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[11px] font-semibold tracking-wide text-teal-700 uppercase">Собственная программа · {d.name}</p>
+          <p className="truncate font-mono text-[11px] font-semibold tracking-wide text-violet-600 uppercase">
+            {industries[op.ind]?.short ?? "Программа вуза"} · {d.name}
+          </p>
           <p className="font-display mt-0.5 font-medium">{op.name}</p>
           <p className="mt-1.5 font-mono text-xs text-stone-400">
             {d.city} · {priceLabel(op.p)}
@@ -601,46 +604,29 @@ function NoGopCard({ d, op }: { d: NavInst; op: NoGopCompact }) {
   );
 }
 
-function CollegeProgramCard({ p, cols, open, onToggle }: { p: CollegeProgram; cols: number[]; open: boolean; onToggle: () => void }) {
-  const prices = cols.map((ci) => BY_IDX.get(ci)?.price).filter((x): x is number => x != null);
-  const hasFree = prices.some((x) => x === 0);
-  const paid = prices.filter((x) => x > 0);
-  const pM = !prices.length ? "Не указана" : hasFree ? "Бесплатно" : priceShort(Math.min(...prices));
-  const pS = !prices.length ? "цена" : hasFree && paid.length ? `или ${priceShort(Math.min(...paid))}` : hasFree ? "по гранту" : "в год";
+function CollegeProgramCard({ p, cols, base }: { p: CollegeProgram; cols: number[]; base: string }) {
+  const cities = cols.map((ci) => BY_IDX.get(ci)?.city).filter(Boolean) as string[];
+  const cnt: Record<string, number> = {};
+  cities.forEach((c) => (cnt[c] = (cnt[c] ?? 0) + 1));
+  const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]);
+  const cityLine = top.length ? `${top[0]}${top.length > 1 ? ` +${top.length - 1}` : ""}` : "";
+  const n = cols.length;
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white transition hover:border-teal-300">
-      <button onClick={onToggle} className="flex w-full items-start gap-3 p-4 text-left">
+    <Link href={`${base}/college/${p.code}`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-teal-300">
+      <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[11px] font-semibold tracking-wide text-teal-700 uppercase">{p.code}</p>
+          <p className="font-mono text-[11px] font-semibold tracking-wide text-teal-700 uppercase">
+            {p.code} · {p.g}
+          </p>
           <p className="font-display mt-0.5 font-medium">{p.name}</p>
-          <p className="mt-0.5 text-xs text-stone-500">{p.g}</p>
           <p className="mt-1.5 font-mono text-xs text-stone-400">
-            {cols.length} {plural(cols.length, ["колледж", "колледжа", "колледжей"])} · {industries[p.ind]?.short}
+            <b className="text-stone-700">{n}</b> {plural(n, ["колледж", "колледжа", "колледжей"])}
+            {cityLine && ` · ${cityLine}`}
+            {industries[p.ind] && ` · ${industries[p.ind].short}`}
           </p>
         </div>
-        <div className="flex flex-none gap-4 text-right">
-          <div>
-            <p className="text-sm font-semibold">{pM}</p>
-            <p className="text-[10px] text-stone-400">{pS}</p>
-          </div>
-          <ChevronDown size={17} className={`mt-1 text-stone-300 transition ${open ? "rotate-180" : ""}`} />
-        </div>
-      </button>
-      {open && (
-        <div className="border-t border-stone-100 px-4 pt-3 pb-4">
-          <p className="mb-2 text-xs font-medium text-stone-500">Где обучают:</p>
-          <div className="flex flex-wrap gap-1.5">
-            {cols.map((ci) => {
-              const d = BY_IDX.get(ci)!;
-              return (
-                <Link key={ci} href={`/universities/${ci}`} className="rounded-full border border-stone-200 px-3 py-1 text-xs transition hover:border-teal-400 hover:text-teal-700">
-                  {d.name} · {d.city}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
+        <ChevronRight size={17} className="shrink-0 text-stone-300" />
+      </div>
+    </Link>
   );
 }

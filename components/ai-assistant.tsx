@@ -43,13 +43,13 @@ export default function AiAssistant() {
       <button
         onClick={() => setOpen(!open)}
         aria-label="ИИ-ассистент"
-        className="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600 print:hidden"
+        className="fixed right-4 bottom-[4.75rem] z-50 flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-500 md:right-5 md:bottom-5 md:h-14 md:w-14 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600 print:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Bot className="h-6 w-6" />}
       </button>
 
       {open && (
-        <div className="fixed right-5 bottom-24 z-50 flex h-[520px] w-[360px] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl print:hidden">
+        <div className="fixed right-4 bottom-[8.5rem] z-50 flex h-[min(520px,calc(100dvh-11rem))] w-[360px] max-w-[calc(100vw-2rem)] md:right-5 md:bottom-24 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl print:hidden">
           <div className="bg-violet-100 px-4 py-3">
             <p className="font-display text-sm text-violet-800">ИИ-ассистент</p>
             <p className="text-xs text-violet-800/60">

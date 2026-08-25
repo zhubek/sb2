@@ -32,7 +32,17 @@ export interface GopInfo {
 }
 
 // Страница ГОП: шапка в цвете группы, вкладки «О группе» / «Где учат»
-export default function GopView({ g, unis }: { g: GopInfo; unis: GopUni[] }) {
+export default function GopView({
+  g,
+  unis,
+  base = "/universities",
+  savable = true,
+}: {
+  g: GopInfo;
+  unis: GopUni[];
+  base?: string;
+  savable?: boolean;
+}) {
   const [tab, setTab] = useState<"about" | "where">("about");
   const [fav, setFav] = useState(false);
   const accent = g.accent ?? "#5A5FE8";
@@ -40,26 +50,28 @@ export default function GopView({ g, unis }: { g: GopInfo; unis: GopUni[] }) {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/universities" className="text-sm text-stone-400 hover:text-stone-600">
-        ← К навигатору
+      <Link href={base} className="text-sm text-stone-400 hover:text-stone-600">
+        ← {base === "/universities" ? "К навигатору" : "К справочнику"}
       </Link>
 
-      <div className="mt-5 rounded-3xl p-7 text-white" style={{ background: accent }}>
+      <div className="mt-5 rounded-3xl p-5 text-white sm:p-7" style={{ background: accent }}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase opacity-80">ГОП {g.code} · {g.ind}</p>
-            <h1 className="font-display mt-1 text-2xl leading-snug font-semibold">{g.name}</h1>
+            <h1 className="font-display mt-1 text-xl leading-snug font-semibold sm:text-2xl">{g.name}</h1>
             <p className="mt-2 text-sm opacity-85">
               {g.no} {plural(g.no, ["программа", "программы", "программ"])} в {g.nu} {plural(g.nu, ["вузе", "вузах", "вузах"])}
             </p>
           </div>
-          <button
-            onClick={() => setFav(!fav)}
-            aria-label="В избранное"
-            className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
-          >
-            <Star size={17} fill={fav ? "currentColor" : "none"} />
-          </button>
+          {savable && (
+            <button
+              onClick={() => setFav(!fav)}
+              aria-label="В избранное"
+              className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
+            >
+              <Star size={17} fill={fav ? "currentColor" : "none"} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -126,7 +138,7 @@ export default function GopView({ g, unis }: { g: GopInfo; unis: GopUni[] }) {
           {unis.map(({ d, k, p, g: th }) => (
             <Link
               key={d.i}
-              href={`/universities/${d.i}?tab=programs`}
+              href={`${base}/${d.i}?tab=programs`}
               className="flex items-center gap-3.5 rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300"
             >
               <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl font-mono text-xs font-bold text-white" style={{ background: accent }}>

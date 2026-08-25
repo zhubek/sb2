@@ -125,7 +125,7 @@ export default function StudentsAnalyticsPage() {
             <tbody className="divide-y divide-slate-50">
               {filtered.map((s) => (
                 <tr key={s.id} className="hover:bg-slate-50/60">
-                  <td className="py-3 pr-4">
+                  <td className="py-3 pr-4 whitespace-nowrap">
                     <Link
                       href={`/teacher/analytics/student/${s.id}`}
                       className="font-medium hover:text-teal-700"
@@ -133,7 +133,7 @@ export default function StudentsAnalyticsPage() {
                       {s.name}
                     </Link>
                   </td>
-                  <td className="py-3 pr-4 text-slate-600">{s.className}</td>
+                  <td className="py-3 pr-4 whitespace-nowrap text-slate-600">{s.className}</td>
                   <td className="py-3 pr-4">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">

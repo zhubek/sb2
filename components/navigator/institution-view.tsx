@@ -26,7 +26,8 @@ export interface ViewOp {
   dur?: number | string;
 }
 export interface ViewGroup {
-  code: string; // код ГОП или "" для собственных программ
+  code: string; // код ГОП или "" для групп по отрасли/направлению
+  label?: string; // подпись над названием: «ГОП 6B061», «Направление», «Отрасль»
   name: string;
   ind?: string;
   dur?: string;
@@ -65,11 +66,15 @@ export default function InstitutionView({
   detail,
   groups,
   initialTab = "about",
+  base = "/universities",
+  savable = true,
 }: {
   d: NavInst;
   detail: ViewDetail;
   groups: ViewGroup[];
   initialTab?: "about" | "programs";
+  base?: string;
+  savable?: boolean;
 }) {
   const [tab, setTab] = useState<"about" | "programs">(initialTab);
   const [fav, setFav] = useState(false);
@@ -81,31 +86,33 @@ export default function InstitutionView({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/universities" className="text-sm text-stone-400 hover:text-stone-600">
-        ← К навигатору
+      <Link href={base} className="text-sm text-stone-400 hover:text-stone-600">
+        ← {base === "/universities" ? "К навигатору" : "К справочнику"}
       </Link>
 
       {/* Шапка */}
-      <div className="mt-5 overflow-hidden rounded-3xl p-7 text-white" style={{ background: k.color }}>
-        <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl bg-white/15 font-mono text-lg font-bold">
+      <div className="mt-5 overflow-hidden rounded-3xl p-5 text-white sm:p-7" style={{ background: k.color }}>
+        <div className="flex items-start gap-3.5 sm:gap-4">
+          <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/15 font-mono text-base font-bold sm:h-16 sm:w-16 sm:text-lg">
             {initials(d.name)}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase opacity-80">{k.label}</p>
-            <h1 className="font-display mt-1 text-2xl leading-snug font-semibold">{d.name}</h1>
+            <h1 className="font-display mt-1 text-xl leading-snug font-semibold sm:text-2xl">{d.name}</h1>
             <p className="mt-1 flex items-center gap-1.5 text-sm opacity-80">
               <MapPin size={14} />
               {isA ? `${d.country}, ${d.city}` : d.city}
             </p>
           </div>
-          <button
-            onClick={() => setFav(!fav)}
-            className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
-            aria-label="В избранное"
-          >
-            <Star size={17} fill={fav ? "currentColor" : "none"} />
-          </button>
+          {savable && (
+            <button
+              onClick={() => setFav(!fav)}
+              className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
+              aria-label="В избранное"
+            >
+              <Star size={17} fill={fav ? "currentColor" : "none"} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -244,7 +251,7 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
         <span className="h-10 w-1.5 flex-none rounded-full" style={{ background: accent }} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[11px] font-semibold tracking-wide uppercase" style={{ color: accent }}>
-            {g.code ? `ГОП ${g.code}` : "Собственные программы"}{g.ind ? ` · ${g.ind}` : ""}
+            {g.label ?? (g.code ? `ГОП ${g.code}` : "Программы")}{g.ind ? ` · ${g.ind}` : ""}
           </p>
           <p className="font-display mt-0.5 font-medium">{g.name}</p>
           <p className="mt-0.5 font-mono text-xs text-stone-400">
@@ -323,8 +330,11 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{o.name}</p>
                     <p className="mt-0.5 font-mono text-[11px] text-stone-400">
-                      {o.code}
-                      {o.l && ` · ${o.l.split(/[,;]/).map((x) => langAbbr(x.trim())).join(" · ")}`}
+                      {o.code && <span className="font-semibold text-stone-500">{o.code}</span>}
+                      {o.code && (o.l || o.dur || (o.e && o.e.length > 0)) ? " · " : ""}
+                      {o.dur && `${o.dur}`}
+                      {o.dur && o.l ? " · " : ""}
+                      {o.l && `${o.l.split(/[,;]/).map((x) => langAbbr(x.trim())).join(" · ")}`}
                       {o.e && o.e.length > 0 && ` · ЕНТ: ${o.e.join(" + ")}`}
                     </p>
                   </div>

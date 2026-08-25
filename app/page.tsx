@@ -2,21 +2,40 @@
 
 import {
   ArrowRight,
+  Award,
   BarChart3,
+  BedDouble,
+  BookOpenCheck,
+  Bot,
+  Briefcase,
   Building2,
   ChevronLeft,
   ChevronRight,
   Compass,
+  FolderOpen,
+  Globe,
+  HandHeart,
+  History,
+  Medal,
+  Menu,
+  MessageSquareText,
+  Plane,
+  Search,
   Sparkles,
   Star,
+  Target,
   TrendingUp,
+  Trophy,
   UserRound,
+  Wallet,
   Wrench,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/compass-marks";
 import ProfessionCarousel from "@/components/profession-carousel";
+import { ReportThumb } from "@/components/report-blocks";
 import {
   NoExamArt,
   NobodySeesArt,
@@ -208,6 +227,20 @@ const panes = [
       { ru: "Всё под рукой, когда понадобится", kk: "Керек кезде бәрі қолыңның астында" },
     ],
   },
+];
+
+// Иконки пунктов карточек и цвета акцентов (по кругу: индиго, мята, коралл, янтарь)
+const paneIcons = [
+  [Sparkles, Trophy, History, MessageSquareText],
+  [Target, Briefcase, Search, Bot],
+  [BookOpenCheck, Wallet, BedDouble, Plane, Globe],
+  [Medal, Award, HandHeart, FolderOpen],
+];
+const accentChips = [
+  "bg-violet-500 text-white",
+  "bg-teal-500 text-white",
+  "bg-orange-500 text-white",
+  "bg-amber-400 text-stone-900",
 ];
 
 const paneScreens = {
@@ -484,7 +517,7 @@ const finalCta = {
 // «корпуса» телефона
 function Phone({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-[330px] rounded-[28px] border border-stone-100 bg-white p-5 shadow-[0_1px_2px_rgba(38,36,89,0.06),0_24px_60px_rgba(38,36,89,0.14)]">
+    <div className="w-full max-w-[330px] rounded-[28px] border border-stone-100 bg-white p-5 shadow-[0_1px_2px_rgba(38,36,89,0.06),0_24px_60px_rgba(38,36,89,0.14)]">
       {children}
     </div>
   );
@@ -596,6 +629,7 @@ function NavRow({
 export default function WelcomePage() {
   const [lang, setLang] = useState<Lang>("ru");
   const [pane, setPane] = useState(0);
+  const [menu, setMenu] = useState(false);
   const dragX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -623,7 +657,11 @@ export default function WelcomePage() {
       },
       { threshold: 0.12, rootMargin: "0px 0px -40px" }
     );
-    els.forEach((e) => io.observe(e));
+    els.forEach((e) => {
+      // Что уже на экране — показываем сразу, без ожидания наблюдателя
+      if (e.getBoundingClientRect().top < window.innerHeight) e.classList.add("in");
+      else io.observe(e);
+    });
     return () => io.disconnect();
   }, []);
 
@@ -741,26 +779,32 @@ export default function WelcomePage() {
     );
   }
 
-  function paneText(i: number, compact = false) {
+  function paneText(i: number) {
     const p = panes[i];
     return (
       <div>
         <p className="text-[11.5px] font-semibold tracking-[0.09em] text-stone-400 uppercase">
           {p.q[lang]}
         </p>
-        <h3 className="font-display mt-2 mb-3.5 text-[27px] leading-tight text-stone-800">
+        <h3 className="font-display mt-2 mb-3.5 text-2xl leading-tight text-stone-800 md:text-[27px]">
           {p.title[lang]}
         </h3>
         <p className="text-stone-600">{p.desc[lang]}</p>
-        <ul className={`mt-4 border-t border-stone-200 ${compact ? "" : ""}`}>
-          {p.list.map((li) => (
-            <li
-              key={li.ru}
-              className="border-b border-stone-200 py-2 text-[15px] text-stone-500 last:border-b-0"
-            >
-              {li[lang]}
-            </li>
-          ))}
+        <ul className="mt-5 space-y-2">
+          {p.list.map((li, li_i) => {
+            const ItemIcon = paneIcons[i]?.[li_i] ?? Sparkles;
+            return (
+              <li
+                key={li.ru}
+                className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-3.5 py-2.5 text-[15px] text-stone-700"
+              >
+                <span className={`flex h-8 w-8 flex-none items-center justify-center rounded-xl ${accentChips[li_i % 4]}`}>
+                  <ItemIcon size={16} />
+                </span>
+                {li[lang]}
+              </li>
+            );
+          })}
         </ul>
       </div>
     );
@@ -770,7 +814,7 @@ export default function WelcomePage() {
     <div className="min-h-screen bg-[#fcfbfd] text-stone-800 selection:bg-violet-200">
       {/* Навбар */}
       <header className="sticky top-0 z-50 w-full border-b border-stone-100 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3.5">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-3.5">
           <span className="font-display mr-auto flex items-center gap-2 text-sm tracking-tight text-stone-800">
             <LogoMark className="h-6 w-6" />
             AI профориентатор
@@ -787,7 +831,7 @@ export default function WelcomePage() {
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={`px-3 py-1.5 tracking-wide transition ${
+                className={`px-2.5 py-1.5 tracking-wide transition sm:px-3 ${
                   lang === l ? "bg-stone-800 text-white" : "text-stone-500 hover:text-stone-800"
                 }`}
               >
@@ -797,22 +841,53 @@ export default function WelcomePage() {
           </div>
           <Link
             href="/auth"
-            className="rounded-2xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50"
+            className="hidden rounded-2xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 sm:block"
           >
             {lang === "kk" ? "Кіру" : "Войти"}
           </Link>
+          <button
+            onClick={() => setMenu(!menu)}
+            aria-label={menu ? "Закрыть меню" : "Открыть меню"}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 text-stone-600 lg:hidden"
+          >
+            {menu ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
+        {/* Мобильное меню */}
+        {menu && (
+          <div className="border-t border-stone-100 bg-white px-4 py-3 lg:hidden">
+            <nav className="flex flex-col">
+              {nav.map((n) => (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  onClick={() => setMenu(false)}
+                  className="border-b border-stone-100 py-3 text-[15px] text-stone-700 last:border-b-0"
+                >
+                  {n.label[lang]}
+                </a>
+              ))}
+            </nav>
+            <Link
+              href="/auth"
+              className="mt-3 flex items-center justify-center gap-2 rounded-2xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white"
+            >
+              {lang === "kk" ? "Кіру" : "Войти"}
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Герой — заливка на всю ширину, насыщенный градиент */}
       <section className="bg-gradient-to-br from-violet-500 via-violet-600 to-violet-800">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:px-14 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 md:px-14 md:py-20">
           <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <p className="text-xs font-semibold tracking-[0.11em] text-amber-400 uppercase">
                 {hero.eyebrow[lang]}
               </p>
-              <h1 className="font-display mt-5 text-4xl leading-[1.08] text-white md:text-[56px]">
+              <h1 className="font-display mt-5 text-[34px] leading-[1.08] text-white sm:text-4xl md:text-[56px]">
                 {hero.h1[lang]}
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-violet-100">
@@ -821,14 +896,14 @@ export default function WelcomePage() {
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/auth"
-                  className="group flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-8 py-4 font-bold text-stone-800 transition-all hover:bg-orange-400"
+                  className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-8 py-4 font-bold text-stone-800 transition-all hover:bg-orange-400 sm:w-auto"
                 >
                   {hero.cta[lang]}
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
               <p className="mt-4 text-sm text-violet-200">{hero.micro[lang]}</p>
-              <div className="mt-9 flex flex-wrap gap-10 border-t border-white/20 pt-7">
+              <div className="mt-9 flex flex-wrap gap-6 border-t border-white/20 pt-7 sm:gap-10">
                 {hero.meta.map((m) => (
                   <div key={m.b.ru} className="max-w-[17em] text-sm text-violet-100">
                     <b className="font-display mb-0.5 block text-[21px] text-white">
@@ -849,9 +924,9 @@ export default function WelcomePage() {
       </section>
 
       {/* С чего начать */}
-      <section id="how" className="bg-white px-6 py-24">
+      <section id="how" className="bg-white px-4 py-16 sm:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <div className="rv mb-12 max-w-2xl">
+          <div className="rv mb-10 max-w-2xl md:mb-12">
             <p className="text-xs font-semibold tracking-[0.11em] text-stone-400 uppercase">
               {how.eyebrow[lang]}
             </p>
@@ -862,7 +937,7 @@ export default function WelcomePage() {
           </div>
 
           {/* Главный тест */}
-          <div className="rv grid items-center gap-10 rounded-[28px] bg-violet-500 p-8 shadow-[0_24px_60px_rgba(90,95,232,0.35)] md:grid-cols-[1fr_auto] md:p-10">
+          <div className="rv grid items-center gap-7 rounded-[28px] bg-violet-500 p-6 shadow-[0_24px_60px_rgba(90,95,232,0.35)] sm:p-8 md:grid-cols-[1fr_auto] md:gap-10 md:p-10">
             <div>
               <div className="mb-4 flex gap-2">
                 {how.pills.map((p) => (
@@ -878,7 +953,7 @@ export default function WelcomePage() {
                 <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white text-violet-600">
                   <BarChart3 size={22} />
                 </span>
-                <h3 className="font-display text-3xl text-white">{how.mainTitle[lang]}</h3>
+                <h3 className="font-display text-2xl text-white sm:text-3xl">{how.mainTitle[lang]}</h3>
               </div>
               <p className="mt-2 text-[13px] tracking-wide text-violet-100">
                 {how.mainMeth[lang]}
@@ -887,7 +962,7 @@ export default function WelcomePage() {
                 {how.mainDesc[lang]}
               </p>
             </div>
-            <div className="flex min-w-[296px] flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 md:min-w-[296px]">
               {how.unlocks.map((u) => (
                 <div
                   key={u.ru}
@@ -911,7 +986,7 @@ export default function WelcomePage() {
               const OptIcon = oi === 0 ? UserRound : Compass;
               const optChip = oi === 0 ? "bg-teal-500 text-white" : "bg-amber-400 text-stone-900";
               return (
-                <div key={o.title.ru} className="rv rounded-3xl border border-stone-200 bg-white p-7">
+                <div key={o.title.ru} className="rv rounded-3xl border border-stone-200 bg-white p-6 sm:p-7">
                   <div className="flex items-center gap-3">
                     <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl ${optChip}`}>
                       <OptIcon size={19} />
@@ -927,21 +1002,26 @@ export default function WelcomePage() {
           </div>
 
           {/* Комплексный отчёт */}
-          <div className="rv mt-3.5 flex items-start gap-5 rounded-3xl bg-stone-900 p-7 md:p-8">
-            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-amber-400 text-stone-900">
-              <Star size={16} fill="currentColor" />
-            </span>
-            <div>
-              <h3 className="font-display text-xl text-white">{how.bonusTitle[lang]}</h3>
-              <p className="mt-2.5 max-w-3xl text-stone-300">{how.bonusDesc[lang]}</p>
+          <div className="rv mt-3.5 flex items-center gap-6 rounded-3xl bg-stone-900 p-6 sm:p-7 md:gap-10 md:p-8">
+            <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-5">
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-amber-400 text-stone-900">
+                <Star size={17} fill="currentColor" />
+              </span>
+              <div>
+                <h3 className="font-display text-xl text-white">{how.bonusTitle[lang]}</h3>
+                <p className="mt-2.5 max-w-3xl text-stone-300">{how.bonusDesc[lang]}</p>
+              </div>
+            </div>
+            <div className="hidden flex-none pr-2 md:block">
+              <ReportThumb />
             </div>
           </div>
         </div>
       </section>
 
       {/* Что тут есть — карусель карточек */}
-      <section id="what" className="pt-24">
-        <div className="mx-auto max-w-6xl px-6">
+      <section id="what" className="pt-16 md:pt-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="rv max-w-2xl">
             <p className="text-xs font-semibold tracking-[0.11em] text-stone-400 uppercase">
               {what.eyebrow[lang]}
@@ -1020,10 +1100,10 @@ export default function WelcomePage() {
         </div>
 
         {/* Мобайл: карточки друг под другом */}
-        <div className="mx-auto mt-10 max-w-6xl space-y-14 px-6 pb-24 lg:hidden">
+        <div className="mx-auto mt-8 max-w-6xl space-y-12 px-4 pb-16 sm:px-6 md:pb-24 lg:hidden">
           {panes.map((_, i) => (
             <div key={i} className="rv">
-              {paneText(i, true)}
+              {paneText(i)}
               <div className="mt-6 flex justify-center">
                 <Phone>{paneScreen(i, true)}</Phone>
               </div>
@@ -1033,8 +1113,8 @@ export default function WelcomePage() {
       </section>
 
       {/* Твои результаты — мятная пастельная секция */}
-      <section id="privacy" className="px-4 py-24 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-teal-500 px-6 py-14 md:px-12 md:py-16">
+      <section id="privacy" className="px-3 py-16 sm:px-6 md:py-24">
+        <div className="mx-auto max-w-6xl rounded-[28px] bg-teal-500 px-4 py-10 sm:rounded-[36px] sm:px-6 sm:py-14 md:px-12 md:py-16">
           <div className="rv mb-10 max-w-2xl">
             <p className="text-xs font-semibold tracking-[0.11em] text-teal-100 uppercase">
               {privacy.eyebrow[lang]}
@@ -1051,7 +1131,7 @@ export default function WelcomePage() {
               return (
                 <div
                   key={it.title.ru}
-                  className={`rv rounded-3xl bg-white p-7 ${wide ? "md:col-span-2 md:grid md:grid-cols-[260px_1fr] md:items-center md:gap-8" : ""}`}
+                  className={`rv rounded-3xl bg-white p-6 sm:p-7 ${wide ? "md:col-span-2 md:grid md:grid-cols-[260px_1fr] md:items-center md:gap-8" : ""}`}
                 >
                   {/* Фирменная анимированная иллюстрация */}
                   <Art className={wide ? "h-32 w-full" : "mb-5 h-28 w-full"} />
@@ -1068,7 +1148,7 @@ export default function WelcomePage() {
       </section>
 
       {/* FAQ — тёмная заливка для контраста */}
-      <section id="faq" className="bg-stone-900 px-6 py-24">
+      <section id="faq" className="bg-stone-900 px-4 py-16 sm:px-6 md:py-24">
         <div className="mx-auto max-w-3xl">
           <div className="rv mb-10">
             <p className="text-xs font-semibold tracking-[0.11em] text-violet-300 uppercase">
@@ -1095,7 +1175,7 @@ export default function WelcomePage() {
       </section>
 
       {/* Справочники */}
-      <section id="codes" className="px-6 py-24">
+      <section id="codes" className="px-4 py-16 sm:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="rv mb-12 max-w-2xl">
             <h2 className="font-display text-3xl text-stone-800 md:text-[40px] md:leading-tight">
@@ -1116,7 +1196,7 @@ export default function WelcomePage() {
                 <Link
                   key={c.title.ru}
                   href={c.href}
-                  className="rv group rounded-3xl border border-stone-200 bg-white p-8 transition-all hover:border-violet-300 hover:shadow-[0_16px_40px_rgba(42,46,59,0.08)]"
+                  className="rv group rounded-3xl border border-stone-200 bg-white p-6 transition-all sm:p-8 hover:border-violet-300 hover:shadow-[0_16px_40px_rgba(42,46,59,0.08)]"
                 >
                   <div className="flex items-start justify-between gap-5">
                     <div className="flex items-center gap-3.5">
@@ -1138,13 +1218,13 @@ export default function WelcomePage() {
       </section>
 
       {/* Финальный CTA — тёмная контрастная заливка */}
-      <section className="px-4 pb-24 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-[36px] bg-gradient-to-br from-violet-700 to-violet-900 px-6 py-16 text-center md:py-20">
+      <section className="px-3 pb-16 sm:px-6 md:pb-24">
+        <div className="mx-auto max-w-6xl rounded-[28px] sm:rounded-[36px] bg-gradient-to-br from-violet-500 via-violet-600 to-violet-800 px-6 py-14 text-center shadow-[0_24px_60px_rgba(90,95,232,0.3)] md:py-20">
           <div className="mx-auto max-w-2xl space-y-6">
             <h2 className="rv font-display text-3xl text-white md:text-5xl">
               {finalCta.h2[lang]}
             </h2>
-            <p className="rv mx-auto max-w-xl text-lg text-violet-200">{finalCta.p[lang]}</p>
+            <p className="rv mx-auto max-w-xl text-lg text-violet-100">{finalCta.p[lang]}</p>
             <Link
               href="/auth"
               className="rv group inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-9 py-4 font-bold text-stone-800 transition-all hover:bg-orange-400"

@@ -23,7 +23,8 @@ export default function TestResultRows() {
     {
       id: "debruce",
       n: "01",
-      name: "Методика НАО им. Ы. Алтынсарина",
+      name: "Мои навыки",
+      meth: "Методика НАО им. Ы. Алтынсарина",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -63,7 +64,8 @@ export default function TestResultRows() {
     {
       id: "mbti",
       n: "02",
-      name: "Индикатор типов Майерс — Бриггс (MBTI)",
+      name: "Мой тип личности",
+      meth: "Индикатор типов Майерс — Бриггс (MBTI)",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -97,7 +99,8 @@ export default function TestResultRows() {
     {
       id: "holland",
       n: "03",
-      name: "Модель профессиональных интересов Дж. Холланда (RIASEC)",
+      name: "Мои интересы",
+      meth: "Модель профессиональных интересов Дж. Холланда (RIASEC)",
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -147,13 +150,13 @@ export default function TestResultRows() {
           <div key={row.id}>
             <div
               onClick={() => toggle(row.id)}
-              className="flex w-full cursor-pointer items-center gap-5 py-5"
+              className="flex w-full cursor-pointer items-center gap-4 py-5 sm:gap-5"
             >
-              <span className="font-display text-sm text-stone-300">
+              <span className="font-display hidden text-sm text-stone-300 sm:block">
                 {row.n}
               </span>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="font-display font-medium">{row.name}</span>
                   {row.passed ? (
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
@@ -165,6 +168,7 @@ export default function TestResultRows() {
                     </span>
                   )}
                 </div>
+                <p className="mt-0.5 text-xs text-stone-400">{row.meth}</p>
                 <div className="mt-1">{row.preview}</div>
               </div>
               <button
@@ -184,7 +188,7 @@ export default function TestResultRows() {
                 />
               </button>
             </div>
-            {isOpen && <div className="pb-6 pl-11">{row.expanded}</div>}
+            {isOpen && <div className="pb-6 sm:pl-11">{row.expanded}</div>}
           </div>
         );
       })}

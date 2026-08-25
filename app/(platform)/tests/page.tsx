@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Compass, History, UserRound } from "lucide-react";
+import { BarChart3, Compass, History, UserRound } from "lucide-react";
 import Link from "next/link";
 import DownloadReport from "@/components/download-report";
 import {
@@ -81,22 +81,17 @@ export default function TestsPage() {
             </span>
             <div>
               <h2 className="font-display text-xl">{debruce.name}</h2>
+              <p className="text-xs text-stone-400">{debruce.method}</p>
               <p className="font-mono text-xs text-stone-400">
                 {debruce.questions} вопросов · {debruce.duration}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2.5">
-            {debruce.passed && (
-              <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
-                пройден
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-[11px] font-medium text-stone-600">
-              <BookOpen size={12} className="text-violet-600" />
-              {debruce.method}
+          {debruce.passed && (
+            <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
+              пройден
             </span>
-          </div>
+          )}
         </div>
 
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-stone-600">

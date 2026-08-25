@@ -11,7 +11,7 @@ export default function TeacherAiButton() {
   return (
     <Link
       href="/teacher/assistant"
-      className="fixed right-6 bottom-6 z-50 flex items-center gap-2 rounded-full bg-teal-600 py-3 pr-5 pl-4 text-sm font-medium text-white shadow-lg shadow-teal-600/25 transition hover:bg-teal-700"
+      className="fixed right-4 bottom-4 z-50 flex items-center gap-2 rounded-full bg-teal-600 py-3 pr-5 pl-4 text-sm font-medium text-white sm:right-6 sm:bottom-6 shadow-lg shadow-teal-600/25 transition hover:bg-teal-700"
     >
       <span className="text-lg">🤖</span>
       Спросить AI

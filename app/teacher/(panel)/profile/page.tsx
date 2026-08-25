@@ -94,7 +94,7 @@ export default function TeacherProfilePage() {
 
       {/* Пройденные модули — прогресс из раздела «Обучающий курс» */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="flex items-center gap-2 font-semibold">
             <BookOpen size={16} className="text-slate-400" />
             Пройденные модули · {doneModules.length} из {courseModules.length}
@@ -108,7 +108,7 @@ export default function TeacherProfilePage() {
         </div>
         <ul className="mt-3 divide-y divide-slate-100">
           {doneModules.map((m) => (
-            <li key={m.id} className="flex items-center justify-between py-3">
+            <li key={m.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-3">
               <p className="text-sm font-medium">{m.title}</p>
               <p className="font-mono text-xs text-slate-400">
                 {moduleStatusLabels[m.status]} · {m.completedAt}
@@ -116,7 +116,7 @@ export default function TeacherProfilePage() {
             </li>
           ))}
           {inProgress.map((m) => (
-            <li key={m.id} className="flex items-center justify-between py-3">
+            <li key={m.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-3">
               <p className="text-sm font-medium text-slate-600">{m.title}</p>
               <p className="font-mono text-xs text-amber-600">
                 {moduleStatusLabels[m.status]} · {m.progress}%

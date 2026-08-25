@@ -43,7 +43,7 @@ export default function ReportsPage() {
 
       {/* Фильтры и поиск */}
       <div className="flex flex-wrap items-center gap-2.5">
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search
             size={15}
             className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
@@ -52,7 +52,7 @@ export default function ReportsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Поиск по названию…"
-            className="w-64 rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm outline-none transition focus:border-teal-400"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm outline-none transition focus:border-teal-400 sm:w-64"
           />
         </div>
         <select
@@ -80,11 +80,11 @@ export default function ReportsPage() {
         <h2 className="font-semibold">Найдено отчётов: {filtered.length}</h2>
         <ul className="mt-3 divide-y divide-slate-100">
           {filtered.map((r) => (
-            <li key={r.id} className="flex items-center gap-3 py-3.5">
+            <li key={r.id} className="flex flex-wrap items-center gap-3 py-3.5">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
                 <FileText size={16} />
               </span>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-[12rem]">
                 <p className="truncate text-sm font-medium">{r.title}</p>
                 <p className="font-mono text-xs text-slate-400">
                   {r.level} · {r.date} · {r.size}
@@ -99,6 +99,7 @@ export default function ReportsPage() {
               >
                 {r.source === "auto" ? "Автоматически" : "Вручную"}
               </span>
+              <span className="ml-auto flex sm:hidden" />
               <button
                 onClick={() => download(r.id)}
                 className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition ${

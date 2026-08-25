@@ -79,7 +79,7 @@ export default function CoursePage() {
                 ? "border border-slate-200 text-slate-600 hover:bg-slate-50"
                 : "bg-teal-600 text-white hover:bg-teal-700";
             return (
-              <li key={m.id} className="flex items-center gap-4 py-4">
+              <li key={m.id} className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3 py-4 sm:flex">
                 <span
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-mono text-xs ${
                     m.status === "done"
@@ -116,7 +116,7 @@ export default function CoursePage() {
                       : ""}
                   </p>
                   {m.status === "progress" && (
-                    <div className="mt-2 h-1.5 w-48 overflow-hidden rounded-full bg-slate-100">
+                    <div className="mt-2 h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-slate-100">
                       <div
                         className="h-full rounded-full bg-amber-400"
                         style={{ width: `${m.progress}%` }}
@@ -124,6 +124,7 @@ export default function CoursePage() {
                     </div>
                   )}
                 </div>
+                <div className="col-start-2 flex items-center gap-2.5 sm:contents">
                 <span
                   className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${statusStyles[m.status]}`}
                 >
@@ -145,6 +146,7 @@ export default function CoursePage() {
                     {action}
                   </button>
                 )}
+                </div>
               </li>
             );
           })}

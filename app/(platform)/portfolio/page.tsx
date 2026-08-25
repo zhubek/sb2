@@ -48,7 +48,7 @@ export default function PortfolioPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-end justify-between">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
             Портфолио
@@ -59,7 +59,7 @@ export default function PortfolioPage() {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
+          className="flex flex-none items-center gap-2 rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
           <Upload size={15} />
           Загрузить
@@ -72,7 +72,7 @@ export default function PortfolioPage() {
           <button
             key={p.id}
             onClick={() => setOpenItem(p.id)}
-            className="group rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-violet-300"
+            className="group min-w-0 rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-violet-300"
           >
             <div className="rounded-xl bg-stone-50 px-6 py-4 transition group-hover:bg-violet-100/50">
               <CertificateArt className="mx-auto w-40" />

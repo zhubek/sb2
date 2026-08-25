@@ -7,7 +7,10 @@ import industriesData from "./industries.json";
 import institutions from "./institutions.json";
 import nogop from "./nogop.json";
 import collegePrograms from "./college-programs.json";
-import type { NavInst } from "./types";
+import { type NavInst, industries } from "./types";
+import type { ViewGroup } from "@/components/navigator/institution-view";
+import type { GopUni } from "@/components/navigator/gop-view";
+import type { CollegeView } from "@/components/navigator/college-view";
 
 export interface InstOp {
   code: string;
@@ -130,4 +133,142 @@ export function collegeAgg(code: string) {
 }
 export function collegeProgramsOf(i: number) {
   return cprog.programs.filter((p) => p.cols.includes(i));
+}
+
+export function getCollegeProgram(code: string) {
+  return cprog.programs.find((p) => p.code === code) ?? null;
+}
+
+// Программы заведения, сгруппированные для страницы: вуз — по ГОП (остальные —
+// по отраслям), колледж — по направлениям с описанием направления
+export function buildInstitutionGroups(d: NavInst): ViewGroup[] {
+  const groups: ViewGroup[] = [];
+  const detail = getDetail(d.i);
+  if (d.kind === "v") {
+    const byGop = new Map<string, ViewGroup>();
+    (detail?.ops ?? []).forEach((o) => {
+      const code = o.g ?? "";
+      if (!byGop.has(code)) {
+        const g = code ? getGop(code) : null;
+        byGop.set(code, {
+          code,
+          label: code ? `ГОП ${code}` : "Программы",
+          name: g?.name ?? "Программы без группы",
+          ind: g?.ind,
+          dur: g?.dur,
+          langs: g?.langs,
+          ent: g?.ent,
+          about: g?.about,
+          fit: g?.fit,
+          skills: g?.skills,
+          format: g?.format,
+          roles: g?.roles,
+          notfor: g?.notfor,
+          accent: g?.accent,
+          tint: g?.tint,
+          ops: [],
+        });
+      }
+      byGop.get(code)!.ops.push({ code: o.code, name: o.name, p: o.p, t: o.t, e: o.e, l: o.l, dur: o.dur });
+    });
+    // Программы вне ГОП — по отраслям (без отдельной «собственной» категории)
+    const byInd = new Map<string, ViewGroup>();
+    getNoGop(d.i).forEach((o) => {
+      const ind = o.ind ?? "Другие направления";
+      if (!byInd.has(ind)) {
+        const meta = industries.find((x) => x.name === ind);
+        byInd.set(ind, {
+          code: "",
+          label: "Отрасль",
+          name: ind,
+          about: o.d?.about,
+          fit: o.d?.fit,
+          skills: o.d?.skills,
+          format: o.d?.format,
+          roles: o.d?.roles,
+          notfor: o.d?.notfor,
+          accent: meta?.c,
+          tint: meta?.cl,
+          ops: [],
+        });
+      }
+      byInd.get(ind)!.ops.push({ code: o.code, name: o.name, p: o.p, t: o.t, l: o.l, dur: o.dur });
+    });
+    groups.push(
+      ...[...byGop.values()].sort((a, b) => a.name.localeCompare(b.name, "ru")),
+      ...[...byInd.values()].sort((a, b) => a.name.localeCompare(b.name, "ru"))
+    );
+  } else if (d.kind === "c") {
+    const byDir = new Map<string, ViewGroup>();
+    const progs = (detail?.ops ?? []).length ? detail!.ops! : collegeProgramsOf(d.i);
+    progs.forEach((o) => {
+      const dir = (o as { g?: string }).g ?? "Другое";
+      if (!byDir.has(dir)) {
+        const td = getDirectionDesc(dir);
+        const meta = td ? industries.find((x) => x.name === td.ind) : undefined;
+        byDir.set(dir, {
+          code: "",
+          label: "Направление",
+          name: dir,
+          ind: meta?.short,
+          about: td?.about,
+          fit: td?.fit,
+          skills: td?.skills,
+          format: td?.format,
+          roles: td?.roles,
+          notfor: td?.notfor,
+          accent: "#0E8A6B",
+          tint: "#ECF7F3",
+          ops: [],
+        });
+      }
+      const agg = collegeAgg(o.code);
+      const dur = agg ? [...new Set([...agg.d9, ...agg.d11])].join(" / ") : undefined;
+      byDir.get(dir)!.ops.push({ code: o.code, name: o.name, l: agg?.l.join(", "), dur });
+    });
+    groups.push(...[...byDir.values()].sort((a, b) => a.name.localeCompare(b.name, "ru")));
+  }
+  return groups;
+}
+
+// Вузы, где есть программы ГОП
+export function buildGopUnis(g: Gop): GopUni[] {
+  return Object.entries(g.univ)
+    .map(([ui, u]) => {
+      const d = getInstitution(Number(ui));
+      if (!d) return null;
+      const ps = u.ops.map((o) => o.p).filter((x): x is number => x != null);
+      const gs = u.ops.map((o) => o.g).filter((x): x is number => x != null);
+      return { d, k: u.k, p: ps.length ? Math.min(...ps) : null, g: gs.length ? Math.min(...gs) : null };
+    })
+    .filter((x): x is GopUni => x !== null)
+    .sort((a, b) => b.k - a.k);
+}
+
+// Специальность колледжа: код, направление с описанием, сроки, языки и колледжи
+export function buildCollegeView(code: string): CollegeView | null {
+  const p = getCollegeProgram(code);
+  if (!p) return null;
+  const agg = collegeAgg(code);
+  const td = getDirectionDesc(p.g);
+  const cols = p.cols
+    .map((i) => getInstitution(i))
+    .filter((d): d is NavInst => d !== null)
+    .sort((a, b) => a.city.localeCompare(b.city, "ru") || a.name.localeCompare(b.name, "ru"));
+  return {
+    code: p.code,
+    name: p.name,
+    dir: p.g,
+    ind: industries[p.ind]?.name ?? td?.ind ?? "",
+    langs: agg?.l ?? [],
+    d9: agg?.d9 ?? [],
+    d11: agg?.d11 ?? [],
+    about: td?.about,
+    fit: td?.fit,
+    skills: td?.skills,
+    format: td?.format,
+    roles: td?.roles,
+    notfor: td?.notfor,
+    cols,
+  };
 }

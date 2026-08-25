@@ -22,9 +22,9 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mx-auto max-w-xl text-center">
         <SkillsArt className="mx-auto h-44 w-56" />
         <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600">
-          DeBruce · 10 ключевых навыков
+          Методика НАО им. Ы. Алтынсарина · DeBruce
         </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Методика НАО им. Ы. Алтынсарина</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Мои навыки</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
           Тест определит рейтинг ваших 10 ключевых навыков. На основе топ-3 мы
           предложим подходящие отрасли, направления и образовательные программы
@@ -58,7 +58,7 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
   if (stage === "quiz") {
     return (
       <SectionQuiz
-        title="Методика НАО им. Ы. Алтынсарина"
+        title="Мои навыки"
         sections={debruceSections}
         onFinish={() => {
           setStage("result");

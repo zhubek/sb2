@@ -61,7 +61,7 @@ export default function TeacherDashboard() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-xl font-bold sm:text-2xl">
           Добрый день, {teacher.firstName}!
         </h1>
         <p className="mt-1 text-slate-500">
@@ -70,12 +70,12 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Ключевые показатели */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {kpis.map((k) => (
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+        {kpis.map((k, ki) => (
           <Link
             key={k.label}
             href={k.href}
-            className="group flex flex-col rounded-xl border border-slate-200 bg-white p-4 transition hover:border-teal-300"
+            className={`group flex flex-col rounded-xl border border-slate-200 bg-white p-4 transition hover:border-teal-300 ${ki === 0 ? "col-span-2 lg:col-span-1" : ""}`}
           >
             <p className="text-xs text-slate-500">{k.label}</p>
             <p className="mt-1.5 text-[26px] leading-none font-bold">
@@ -90,7 +90,7 @@ export default function TeacherDashboard() {
                 />
               </div>
             )}
-            <p className="mt-auto pt-2.5 text-xs font-medium text-teal-600 opacity-0 transition group-hover:opacity-100">
+            <p className="mt-auto hidden pt-2.5 text-xs font-medium text-teal-600 opacity-0 transition group-hover:opacity-100 lg:block">
               {k.link} →
             </p>
           </Link>
@@ -105,7 +105,7 @@ export default function TeacherDashboard() {
             {attentionSignals.length}
           </span>
         </div>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {attentionSignals.map((s) => {
             const sev = severityStyles[s.severity];
             return (
@@ -113,15 +113,13 @@ export default function TeacherDashboard() {
                 key={s.id}
                 className="flex flex-col rounded-xl border border-slate-200 bg-white p-3.5"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-semibold">{s.title}</p>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${sev.chip}`}
-                  >
-                    {sev.label}
-                  </span>
-                </div>
-                <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">
+                <span
+                  className={`w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${sev.chip}`}
+                >
+                  {sev.label}
+                </span>
+                <p className="mt-2.5 text-sm leading-snug font-semibold">{s.title}</p>
+                <p className="mt-1.5 flex-1 text-xs leading-relaxed text-slate-500">
                   {s.text}
                 </p>
                 <Link
@@ -162,7 +160,7 @@ export default function TeacherDashboard() {
                 const pct = Math.round((c.tested / c.students) * 100);
                 return (
                   <tr key={c.id} className="relative hover:bg-slate-50/60">
-                    <td className="py-3 pr-4 font-medium">
+                    <td className="py-3 pr-4 font-medium whitespace-nowrap">
                       <Link
                         href={`/teacher/analytics/class/${c.id}`}
                         className="after:absolute after:inset-0"

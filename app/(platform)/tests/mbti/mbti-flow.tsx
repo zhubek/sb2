@@ -18,9 +18,9 @@ export default function MbtiFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mx-auto max-w-xl text-center">
         <PersonalityArt className="mx-auto h-44 w-56" />
         <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          Дополнительная диагностика
+          Индикатор типов Майерс — Бриггс (MBTI)
         </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Индикатор типов Майерс — Бриггс (MBTI)</h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Мой тип личности</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
           Определит ваш тип личности: как вы восполняете энергию, воспринимаете
           информацию, принимаете решения и организуете свою жизнь. Вместе с
@@ -48,7 +48,7 @@ export default function MbtiFlow({ initialStage }: { initialStage: Stage }) {
   if (stage === "quiz") {
     return (
       <SectionQuiz
-        title="Индикатор типов Майерс — Бриггс (MBTI)"
+        title="Мой тип личности"
         sections={mbtiSections}
         onFinish={() => { setStage("result"); completeChecklistStep("c5"); }}
       />
