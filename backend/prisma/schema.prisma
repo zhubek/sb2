@@ -1,0 +1,496 @@
+// Smart Bolashaq — схема БД по ERD (6 модулей).
+// Пробелы ERD закрыты: id/created, недостающие FK (напр. userId в
+// User_StudentAchievements, lessonId в UserLessons), роль пользователя,
+// роль автора сообщения в чате. Модуль «Навигатор» спроектирован
+// под данные lib/nav/*.json фронтенда.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Profile ─────────────────────────────────────────────────────────────────
+
+enum Language {
+  KZ
+  RU
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum DiplomaType {
+  DIPLOMA
+  CERTIFICATE
+}
+
+model Region {
+  id     Int    @id @default(autoincrement())
+  name   String
+  cities City[]
+}
+
+model City {
+  id            Int            @id @default(autoincrement())
+  name          String
+  regionId      Int
+  region        Region         @relation(fields: [regionId], references: [id])
+  organizations Organization[]
+}
+
+model Organization {
+  id           Int                         @id @default(autoincrement())
+  name         String
+  cityId       Int?
+  city         City?                       @relation(fields: [cityId], references: [id])
+  ownerUserId  Int?                        @unique
+  owner        User?                       @relation("OrgOwner", fields: [ownerUserId], references: [id])
+  users        User[]                      @relation("OrgMembers")
+  admins       OrganizationAdmin[]
+  achievements OrganizationOrgAchievement[]
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  name           String
+  surname        String
+  email          String        @unique
+  grade          String?
+  language       Language      @default(RU)
+  photoUrl       String?
+  role           UserRole      @default(STUDENT)
+  organizationId Int?
+  organization   Organization? @relation("OrgMembers", fields: [organizationId], references: [id])
+  createdAt      DateTime      @default(now())
+
+  ownedOrganization   Organization?            @relation("OrgOwner")
+  orgAdminOf          OrganizationAdmin[]
+  diplomas            Diploma[]
+  userTests           UserTest[]
+  userQuestions       UserQuestion[]
+  userAnswers         UserAnswer[]
+  chats               Chat[]
+  userCourses         UserCourse[]
+  userModules         UserModule[]
+  userLessons         UserLesson[]
+  userQuizzes         UserQuiz[]
+  studentAchievements UserStudentAchievement[]
+  organizationLogs    OrganizationLog[]
+}
+
+model Diploma {
+  id       Int         @id @default(autoincrement())
+  name     String
+  uploaded DateTime    @default(now())
+  type     DiplomaType
+  fileUrl  String?
+  userId   Int
+  user     User        @relation(fields: [userId], references: [id])
+}
+
+model OrganizationAdmin {
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@id([organizationId, userId])
+}
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
+
+enum QuestionType {
+  SINGLE
+  MULTIPLE
+  LIKERT
+}
+
+enum ProgressState {
+  STARTED
+  FINISHED
+}
+
+model Test {
+  id           Int        @id @default(autoincrement())
+  slug         String     @unique // debruce | mbti | holland
+  name         String
+  description  String
+  instructions Json
+  duration     Int // минуты
+  questions    Question[]
+  userTests    UserTest[]
+}
+
+model Question {
+  id            Int            @id @default(autoincrement())
+  content       Json
+  questionType  QuestionType
+  testId        Int
+  test          Test           @relation(fields: [testId], references: [id])
+  order         Int            @default(0)
+  answers       Answer[]
+  userQuestions UserQuestion[]
+}
+
+model Answer {
+  id          Int          @id @default(autoincrement())
+  content     Json
+  questionId  Int
+  question    Question     @relation(fields: [questionId], references: [id])
+  order       Int          @default(0)
+  userAnswers UserAnswer[]
+}
+
+model UserTest {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  user            User           @relation(fields: [userId], references: [id])
+  testId          Int
+  test            Test           @relation(fields: [testId], references: [id])
+  started         DateTime       @default(now())
+  finished        DateTime?
+  result          Json?
+  currentQuestion Int            @default(0)
+  state           ProgressState  @default(STARTED)
+  userQuestions   UserQuestion[]
+}
+
+model UserQuestion {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  questionId  Int
+  question    Question     @relation(fields: [questionId], references: [id])
+  userTestId  Int
+  userTest    UserTest     @relation(fields: [userTestId], references: [id])
+  userAnswers UserAnswer[]
+
+  @@unique([userTestId, questionId])
+}
+
+model UserAnswer {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  answerId       Int
+  answer         Answer       @relation(fields: [answerId], references: [id])
+  userQuestionId Int
+  userQuestion   UserQuestion @relation(fields: [userQuestionId], references: [id])
+  isPicked       Boolean      @default(true)
+}
+
+// ─── Navigator ───────────────────────────────────────────────────────────────
+
+enum InstitutionType {
+  UNIVERSITY
+  COLLEGE
+  INTERNATIONAL
+}
+
+enum ProgramLevel {
+  BACHELOR // ГОП вузов (6B…)
+  COLLEGE // специальности колледжей (8-значный код)
+}
+
+model Industry {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  short       String?
+  description String?
+  programs    Program[]
+}
+
+model Institution {
+  id        Int              @id @default(autoincrement())
+  extId     Int? // индекс из lib/nav/institutions.json
+  name      String
+  type      InstitutionType
+  city      String?
+  region    String?
+  price     Int? // мин. цена, тг/год
+  threshold Int? // порог ЕНТ
+  dorm      Boolean          @default(false)
+  military  Boolean          @default(false)
+  mobility  Boolean          @default(false)
+  about     String?
+  address   String?
+  phone     String?
+  email     String?
+  site      String?
+  instagram String?
+  programs  InstitutionProgram[]
+
+  @@index([type])
+}
+
+model Program {
+  id           Int                  @id @default(autoincrement())
+  code         String               @unique // ГОП (B057) или код специальности (05320100)
+  name         String
+  level        ProgramLevel
+  industryId   Int?
+  industry     Industry?            @relation(fields: [industryId], references: [id])
+  description  Json? // блоки описания направления/ГОП
+  institutions InstitutionProgram[]
+}
+
+model InstitutionProgram {
+  id            Int         @id @default(autoincrement())
+  institutionId Int
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  programId     Int
+  program       Program     @relation(fields: [programId], references: [id])
+  opCode        String? // код ОП (6B04125) внутри ГОП
+  opName        String?
+  price         Int?
+  seats         Int?
+  languages     String?
+  duration      Int?
+  exams         Json?
+
+  @@index([institutionId])
+  @@index([programId])
+}
+
+// ─── Chat ────────────────────────────────────────────────────────────────────
+
+enum ChatType {
+  MAIN_STUDENT
+  MAIN_TEACHER
+  CORNER_STUDENT
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+model Chat {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  startTime DateTime  @default(now())
+  chatType  ChatType
+  messages  Message[]
+}
+
+model Message {
+  id     Int         @id @default(autoincrement())
+  text   String
+  chatId Int
+  chat   Chat        @relation(fields: [chatId], references: [id])
+  time   DateTime    @default(now())
+  role   MessageRole @default(USER)
+}
+
+// ─── Course ──────────────────────────────────────────────────────────────────
+
+model Manual {
+  id      Int    @id @default(autoincrement())
+  title   String
+  content Json
+}
+
+model Course {
+  id          Int            @id @default(autoincrement())
+  title       String
+  content     Json
+  modules     CourseModule[]
+  userCourses UserCourse[]
+}
+
+model CourseModule {
+  id          Int          @id @default(autoincrement())
+  courseId    Int
+  course      Course       @relation(fields: [courseId], references: [id])
+  title       String
+  content     Json
+  order       Int          @default(0)
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  userModules UserModule[]
+}
+
+model Lesson {
+  id          Int          @id @default(autoincrement())
+  moduleId    Int
+  module      CourseModule @relation(fields: [moduleId], references: [id])
+  title       String
+  content     Json
+  order       Int          @default(0)
+  userLessons UserLesson[]
+}
+
+model Quiz {
+  id         Int            @id @default(autoincrement())
+  moduleId   Int
+  module     CourseModule   @relation(fields: [moduleId], references: [id])
+  content    Json
+  questions  QuizQuestion[]
+  userQuizzes UserQuiz[]
+}
+
+model QuizQuestion {
+  id                Int                @id @default(autoincrement())
+  quizId            Int
+  quiz              Quiz               @relation(fields: [quizId], references: [id])
+  content           Json
+  type              QuestionType
+  order             Int                @default(0)
+  answers           QuizAnswer[]
+  userQuizQuestions UserQuizQuestion[]
+}
+
+model QuizAnswer {
+  id              Int              @id @default(autoincrement())
+  quizQuestionId  Int
+  quizQuestion    QuizQuestion     @relation(fields: [quizQuestionId], references: [id])
+  content         Json
+  order           Int              @default(0)
+  userQuizAnswers UserQuizAnswer[]
+}
+
+model UserCourse {
+  id          Int           @id @default(autoincrement())
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  courseId    Int
+  course      Course        @relation(fields: [courseId], references: [id])
+  startedTime DateTime      @default(now())
+  state       ProgressState @default(STARTED)
+  userModules UserModule[]
+  userLessons UserLesson[]
+
+  @@unique([userId, courseId])
+}
+
+model UserModule {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id])
+  userCourseId Int
+  userCourse   UserCourse    @relation(fields: [userCourseId], references: [id])
+  moduleId     Int
+  module       CourseModule  @relation(fields: [moduleId], references: [id])
+  state        ProgressState @default(STARTED)
+  content      Json?
+
+  @@unique([userCourseId, moduleId])
+}
+
+model UserLesson {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id])
+  userCourseId Int
+  userCourse   UserCourse    @relation(fields: [userCourseId], references: [id])
+  lessonId     Int
+  lesson       Lesson        @relation(fields: [lessonId], references: [id])
+  state        ProgressState @default(STARTED)
+  content      Json?
+
+  @@unique([userCourseId, lessonId])
+}
+
+model UserQuiz {
+  id                Int                @id @default(autoincrement())
+  userId            Int
+  user              User               @relation(fields: [userId], references: [id])
+  quizId            Int
+  quiz              Quiz               @relation(fields: [quizId], references: [id])
+  takenTime         DateTime           @default(now())
+  result            Json?
+  userQuizQuestions UserQuizQuestion[]
+}
+
+model UserQuizQuestion {
+  id              Int              @id @default(autoincrement())
+  userQuizId      Int
+  userQuiz        UserQuiz         @relation(fields: [userQuizId], references: [id])
+  quizQuestionId  Int
+  quizQuestion    QuizQuestion     @relation(fields: [quizQuestionId], references: [id])
+  pickedValue     Json?
+  userQuizAnswers UserQuizAnswer[]
+}
+
+model UserQuizAnswer {
+  id                 Int              @id @default(autoincrement())
+  userQuizQuestionId Int
+  userQuizQuestion   UserQuizQuestion @relation(fields: [userQuizQuestionId], references: [id])
+  quizAnswerId       Int
+  quizAnswer         QuizAnswer       @relation(fields: [quizAnswerId], references: [id])
+  isPicked           Boolean          @default(true)
+}
+
+// ─── Achievements ────────────────────────────────────────────────────────────
+
+enum OrgLogGroup {
+  STUDENTS
+  REACH
+  REPORT
+  LEARN
+  CONSISTENCY
+}
+
+model StudentAchievement {
+  id    Int                      @id @default(autoincrement())
+  name  String
+  order Int                      @default(0)
+  users UserStudentAchievement[]
+}
+
+model UserStudentAchievement {
+  id                   Int                @id @default(autoincrement())
+  userId               Int
+  user                 User               @relation(fields: [userId], references: [id])
+  studentAchievementId Int
+  studentAchievement   StudentAchievement @relation(fields: [studentAchievementId], references: [id])
+  isSuccess            Boolean            @default(false)
+  achievedAt           DateTime?
+
+  @@unique([userId, studentAchievementId])
+}
+
+model OrgAchievement {
+  id            Int                          @id @default(autoincrement())
+  name          String
+  content       Json
+  organizations OrganizationOrgAchievement[]
+}
+
+model OrganizationOrgAchievement {
+  id               Int            @id @default(autoincrement())
+  orgAchievementId Int
+  orgAchievement   OrgAchievement @relation(fields: [orgAchievementId], references: [id])
+  organizationId   Int
+  organization     Organization   @relation(fields: [organizationId], references: [id])
+  isSuccess        Boolean        @default(false)
+
+  @@unique([orgAchievementId, organizationId])
+}
+
+model OrgLogType {
+  id    Int               @id @default(autoincrement())
+  name  String
+  point Int
+  group OrgLogGroup
+  logs  OrganizationLog[]
+}
+
+model OrganizationLog {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id])
+  orgLogTypeId Int
+  orgLogType   OrgLogType @relation(fields: [orgLogTypeId], references: [id])
+  dateTime     DateTime   @default(now())
+  text         String?
+}
