@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { teacher } from "@/lib/teacher-mock-data";
 
@@ -103,12 +104,12 @@ export default function TeacherNav() {
             </p>
           </div>
         </div>
-        <Link
-          href="/teacher/login"
+        <button
+          onClick={() => signOut({ redirectTo: "/teacher/login" })}
           className="mt-3 block text-xs text-slate-400 hover:text-slate-600"
         >
           Выйти
-        </Link>
+        </button>
       </div>
     </>
   );

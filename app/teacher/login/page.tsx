@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 const inputCls =
@@ -10,18 +11,22 @@ const inputCls =
 export default function TeacherLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    // Мок ветвления: почта не с домена школы → ошибка входа
-    if (email && !email.includes("@")) return;
-    if (email.endsWith("@wrong.kz")) {
+    setBusy(true);
+    const res = await signIn("teacher", { email, password, redirect: false });
+    setBusy(false);
+    if (res?.error) {
       setError(true);
       return;
     }
     // Онбординга нет — сразу на Dashboard (ТЗ, раздел 3)
     router.push("/teacher");
+    router.refresh();
   }
 
   return (
@@ -68,14 +73,17 @@ export default function TeacherLoginPage() {
             <input
               required
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Пароль"
               className={inputCls}
             />
             <button
               type="submit"
-              className="w-full rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
+              disabled={busy}
+              className="w-full rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 disabled:opacity-60"
             >
-              Войти
+              {busy ? "Входим…" : "Войти"}
             </button>
           </form>
 

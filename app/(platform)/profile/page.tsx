@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Camera, Check, Globe, Lock, LogOut } from "lucide-react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { currentUser } from "@/lib/mock-data";
 
@@ -221,13 +222,13 @@ export default function StudentProfilePage() {
             Результаты тестов сохранятся — вы сможете войти снова.
           </p>
         </div>
-        <Link
-          href="/auth"
+        <button
+          onClick={() => signOut({ redirectTo: "/auth" })}
           className="flex items-center gap-2 rounded-2xl border border-red-200 px-5 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-50"
         >
           <LogOut size={15} />
           Выйти
-        </Link>
+        </button>
       </section>
     </div>
   );
