@@ -23,7 +23,8 @@ export default function SectionQuiz({
 }: {
   title: string;
   sections: QuizSection[];
-  onFinish: () => void;
+  // values — ответы 1–5 в сквозном порядке вопросов (для записи в бекенд)
+  onFinish: (values: number[]) => void;
 }) {
   const [sectionIdx, setSectionIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -61,7 +62,10 @@ export default function SectionQuiz({
     if (!sectionAnswered(sectionIdx)) return;
     if (last) {
       setProcessing(true);
-      setTimeout(onFinish, 2500);
+      const values = sections.flatMap((s, si) =>
+        s.questions.map((_, qi) => answers[key(si, qi)])
+      );
+      setTimeout(() => onFinish(values), 2500);
     } else {
       setSectionIdx(sectionIdx + 1);
       window.scrollTo({ top: 0 });

@@ -1,8 +1,9 @@
 "use client";
 
 import { Award, Calendar, FileBadge, FileText, Paperclip, Upload, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CertificateArt } from "@/components/brand-art";
+import { apiSafe, backendUserId, type ApiDiploma } from "@/lib/api";
 import { portfolioItems } from "@/lib/mock-data";
 
 type Item = (typeof portfolioItems)[number];
@@ -25,25 +26,54 @@ export default function PortfolioPage() {
 
   const selected = items.find((p) => p.id === openItem);
 
-  function submit(e: React.FormEvent) {
+  // Дипломы из бекенда добавляются к мок-элементам (демо-режим без API)
+  useEffect(() => {
+    (async () => {
+      const uid = await backendUserId();
+      if (!uid) return;
+      const diplomas = await apiSafe<ApiDiploma[]>(`/users/${uid}/diplomas`);
+      if (!diplomas?.length) return;
+      const fromApi: Item[] = diplomas.map((d) => ({
+        id: `api-${d.id}`,
+        name: d.name,
+        date: new Date(d.uploaded).getFullYear().toString(),
+        year: new Date(d.uploaded).getFullYear().toString(),
+        type: d.type === "DIPLOMA" ? "Диплом" : "Сертификат",
+        description: "",
+        fileName: d.fileUrl ?? "dokument.pdf",
+      }));
+      setItems((list) => [
+        ...fromApi,
+        ...list.filter((it) => !it.id.startsWith("api-")),
+      ]);
+    })();
+  }, []);
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setItems((list) => [
-      {
-        id: `p${Date.now()}`,
-        name,
-        date: year,
-        year,
-        type: "Сертификат",
-        description,
-        fileName: fileName || "dokument.pdf",
-      },
-      ...list,
-    ]);
+    const item: Item = {
+      id: `p${Date.now()}`,
+      name,
+      date: year,
+      year,
+      type: "Сертификат",
+      description,
+      fileName: fileName || "dokument.pdf",
+    };
+    setItems((list) => [item, ...list]);
     setShowForm(false);
     setName("");
     setYear("");
     setDescription("");
     setFileName("");
+    // Сохранение в бекенд (файл — на этапе S3; пока пишется карточка)
+    const uid = await backendUserId();
+    if (uid) {
+      apiSafe(`/users/${uid}/diplomas`, {
+        method: "POST",
+        body: JSON.stringify({ name: item.name, type: "CERTIFICATE" }),
+      });
+    }
   }
 
   return (

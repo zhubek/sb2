@@ -3,6 +3,7 @@
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { IconAI } from "@/components/compass-marks";
+import { apiSafe, backendUserId } from "@/lib/api";
 import { aiTemplateQuestions, currentUser } from "@/lib/mock-data";
 
 interface Message {
@@ -24,6 +25,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [hintIdx, setHintIdx] = useState(0);
   const feedRef = useRef<HTMLDivElement>(null);
+  const chatIdRef = useRef<number | null>(null);
 
   const empty = messages.length === 0;
   const busy = thinking || streaming !== null;
@@ -44,16 +46,42 @@ export default function ChatPage() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, streaming, thinking]);
 
+  // Сообщение уходит в бекенд (чат создаётся при первом сообщении),
+  // ответ ассистента приходит из API; при недоступном API — мок-ответ
+  async function fetchReply(text: string): Promise<string> {
+    const uid = await backendUserId();
+    if (!uid) return LONG_ANSWER;
+    if (!chatIdRef.current) {
+      const chat = await apiSafe<{ id: number }>("/chats", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: uid,
+          chatType: "MAIN_STUDENT",
+          name: text.slice(0, 60),
+        }),
+      });
+      chatIdRef.current = chat?.id ?? null;
+    }
+    if (!chatIdRef.current) return LONG_ANSWER;
+    const res = await apiSafe<{ assistantMessage: { text: string } }>(
+      `/chats/${chatIdRef.current}/messages`,
+      { method: "POST", body: JSON.stringify({ text }) }
+    );
+    return res?.assistantMessage.text ?? LONG_ANSWER;
+  }
+
   function send(text: string) {
     if (!text.trim() || busy) return;
     setMessages((m) => [...m, { role: "user", text }]);
     setInput("");
     setThinking(true);
 
-    // «Думает» → слово за словом, как SSE
-    setTimeout(() => {
+    // «Думает» (запрос к API) → слово за словом, как SSE
+    const replyPromise = fetchReply(text);
+    setTimeout(async () => {
+      const answer = await replyPromise;
       setThinking(false);
-      const words = LONG_ANSWER.split(" ");
+      const words = answer.split(" ");
       let i = 0;
       setStreaming("");
       const iv = setInterval(() => {
@@ -61,7 +89,7 @@ export default function ChatPage() {
         setStreaming(words.slice(0, i).join(" "));
         if (i >= words.length) {
           clearInterval(iv);
-          setMessages((m) => [...m, { role: "ai", text: LONG_ANSWER }]);
+          setMessages((m) => [...m, { role: "ai", text: answer }]);
           setStreaming(null);
         }
       }, WORD_MS);

@@ -1,7 +1,14 @@
 "use client";
 
 import { ChevronDown, Info, Sparkles, Trophy } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  apiSafe,
+  backendUserId,
+  type ApiOrgLog,
+  type ApiOrgPoints,
+  type ApiUser,
+} from "@/lib/api";
 import {
   bonusTransactions,
   coverageProgress,
@@ -20,6 +27,55 @@ export default function BonusPage() {
   const [league, setLeague] = useState<"urban" | "rural">("urban");
   const [period, setPeriod] = useState<LeaderPeriod>("all");
   const [showAllTx, setShowAllTx] = useState(false);
+  // Живые данные бекенда; до загрузки (или без API) — мок-значения
+  const [apiPoints, setApiPoints] = useState<ApiOrgPoints | null>(null);
+  const [apiTx, setApiTx] = useState<typeof bonusTransactions | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const uid = await backendUserId();
+      if (!uid) return;
+      const me = await apiSafe<ApiUser>(`/users/${uid}`);
+      if (!me?.organizationId) return;
+      const [points, logs] = await Promise.all([
+        apiSafe<ApiOrgPoints>(`/organizations/${me.organizationId}/points`),
+        apiSafe<ApiOrgLog[]>(`/users/${uid}/org-logs`),
+      ]);
+      if (points) setApiPoints(points);
+      if (logs?.length)
+        setApiTx(
+          logs.map((l) => ({
+            id: `api-${l.id}`,
+            reason: l.text ?? l.orgLogType.name,
+            points: l.orgLogType.point,
+            date: new Date(l.dateTime)
+              .toLocaleString("ru-RU", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              .replace(", ", " · "),
+          }))
+        );
+    })();
+  }, []);
+
+  const blockGroups: Record<string, string> = {
+    "Ученики": "STUDENTS",
+    "Охват школы": "REACH",
+    "Отчёты": "REPORT",
+    "Обучение": "LEARN",
+    "Регулярность": "CONSISTENCY",
+  };
+  const totalPoints = apiPoints?.total ?? seasonPoints.total;
+  const byBlock = seasonPoints.byBlock.map((b) => ({
+    ...b,
+    points: apiPoints
+      ? (apiPoints.byGroup[blockGroups[b.block]] ?? 0)
+      : b.points,
+  }));
 
   const earned = teacherBadges.filter((b) => b.earned);
   const ownRank =
@@ -29,7 +85,8 @@ export default function BonusPage() {
   const rows = [...leaderboards[league]].sort(
     (a, b) => b.points[period] - a.points[period]
   );
-  const tx = showAllTx ? bonusTransactions : bonusTransactions.slice(0, 6);
+  const txAll = apiTx ?? bonusTransactions;
+  const tx = showAllTx ? txAll : txAll.slice(0, 6);
   const decidedPct = Math.round((decidedStudents.count / decidedStudents.of) * 100);
 
   return (
@@ -56,7 +113,7 @@ export default function BonusPage() {
             Баллы за сезон
           </p>
           <p className="font-display mt-1 text-xl font-semibold sm:text-2xl">
-            {seasonPoints.total.toLocaleString("ru-RU")}
+            {totalPoints.toLocaleString("ru-RU")}
           </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
@@ -240,7 +297,7 @@ export default function BonusPage() {
         <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6 lg:col-span-2">
           <h2 className="font-semibold">Баллы по блокам</h2>
           <ul className="mt-4 space-y-3.5">
-            {seasonPoints.byBlock.map((b) => (
+            {byBlock.map((b) => (
               <li key={b.block}>
                 <div className="flex items-baseline justify-between text-sm">
                   <span>{b.block}</span>
@@ -319,14 +376,14 @@ export default function BonusPage() {
               </li>
             ))}
           </ul>
-          {bonusTransactions.length > 6 && (
+          {txAll.length > 6 && (
             <button
               onClick={() => setShowAllTx(!showAllTx)}
               className="mt-3 w-full border-t border-slate-100 pt-3 text-center text-xs font-medium text-teal-600 transition hover:text-teal-700"
             >
               {showAllTx
                 ? "Свернуть"
-                : `Показать все · ${bonusTransactions.length}`}
+                : `Показать все · ${txAll.length}`}
             </button>
           )}
         </section>

@@ -458,13 +458,85 @@ async function seedAchievements(orgId: number, teacherId: number) {
   );
 }
 
+// Демо-активность: пройденные тесты Айгерим и журнал баллов Гульнары —
+// чтобы интегрированные страницы выглядели живыми сразу после сида
+async function seedDemoActivity(studentId: number, teacherId: number) {
+  const allTests = await prisma.test.findMany({ select: { id: true, slug: true } });
+  const results: Record<string, { summary: string } & Record<string, unknown>> = {
+    debruce: {
+      summary: "Топ-3: Креативность · Коммуникация · Эмпатия",
+      top: ["Креативность", "Коммуникация", "Эмпатия"],
+    },
+    mbti: { summary: "ENFJ · Протагонист", type: "ENFJ" },
+    holland: { summary: "Код ASE · Артистичный тип", code: "ASE" },
+  };
+  let daysAgo = 21;
+  for (const t of allTests) {
+    const started = new Date(Date.now() - daysAgo * 24 * 3600 * 1000);
+    daysAgo -= 7;
+    await prisma.userTest.create({
+      data: {
+        userId: studentId,
+        testId: t.id,
+        started,
+        finished: new Date(started.getTime() + 14 * 60 * 1000),
+        state: "FINISHED",
+        result: results[t.slug],
+      },
+    });
+  }
+
+  // Чек-лист Айгерим: первые 7 шагов выполнены (соответствует пройденным тестам)
+  const achievements = await prisma.studentAchievement.findMany({
+    orderBy: { order: "asc" },
+  });
+  for (const a of achievements.slice(0, 7)) {
+    await prisma.userStudentAchievement.create({
+      data: {
+        userId: studentId,
+        studentAchievementId: a.id,
+        isSuccess: true,
+        achievedAt: new Date(Date.now() - (20 - a.order) * 24 * 3600 * 1000),
+      },
+    });
+  }
+
+  const logTypes = await prisma.orgLogType.findMany();
+  const byName = (part: string) =>
+    logTypes.find((lt) => lt.name.includes(part));
+  const entries: { type?: (typeof logTypes)[number]; count: number; text: string }[] = [
+    { type: byName("хотя бы один тест"), count: 18, text: "Ученик прошёл первый тест" },
+    { type: byName("DeBruce"), count: 15, text: "Пройден DeBruce" },
+    { type: byName("MBTI"), count: 11, text: "Пройден MBTI" },
+    { type: byName("Голланда"), count: 9, text: "Пройден тест Голланда" },
+    { type: byName("диагностический цикл"), count: 7, text: "Полный цикл из трёх тестов" },
+    { type: byName("25%"), count: 1, text: "Школа достигла 25% охвата" },
+  ];
+  let logDays = 60;
+  for (const e of entries) {
+    if (!e.type) continue;
+    for (let i = 0; i < e.count; i++) {
+      await prisma.organizationLog.create({
+        data: {
+          userId: teacherId,
+          orgLogTypeId: e.type.id,
+          text: e.text,
+          dateTime: new Date(Date.now() - logDays-- * 12 * 3600 * 1000),
+        },
+      });
+    }
+  }
+  console.log("demo activity: 3 пройденных теста, журнал баллов педагога");
+}
+
 async function main() {
   await clear();
-  const { org, teacher } = await seedProfile();
+  const { org, student, teacher } = await seedProfile();
   await seedTests();
   await seedNavigator();
   await seedCourse();
   await seedAchievements(org.id, teacher.id);
+  await seedDemoActivity(student.id, teacher.id);
 }
 
 main()

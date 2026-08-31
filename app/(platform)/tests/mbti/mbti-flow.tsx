@@ -7,6 +7,7 @@ import { currentUser, mbtiSections } from "@/lib/mock-data";
 import SectionQuiz from "@/components/section-quiz";
 import { PersonalityArt } from "@/components/brand-art";
 import { completeChecklistStep } from "@/lib/checklist-events";
+import { recordTestAttempt } from "@/lib/api";
 
 type Stage = "intro" | "quiz" | "result";
 
@@ -50,7 +51,11 @@ export default function MbtiFlow({ initialStage }: { initialStage: Stage }) {
       <SectionQuiz
         title="Мой тип личности"
         sections={mbtiSections}
-        onFinish={() => { setStage("result"); completeChecklistStep("c5"); }}
+        onFinish={(values) => {
+          setStage("result");
+          completeChecklistStep("c5");
+          recordTestAttempt("mbti", values, { summary: "ENFJ · Протагонист", type: "ENFJ" });
+        }}
       />
     );
   }

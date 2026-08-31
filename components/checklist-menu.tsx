@@ -4,6 +4,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { apiSafe, backendUserId, type ApiAchievement } from "@/lib/api";
 import { CHECKLIST_STEP_DONE } from "@/lib/checklist-events";
 import { checklist } from "@/lib/mock-data";
 
@@ -18,6 +19,23 @@ export default function ChecklistMenu() {
   const [justDone, setJustDone] = useState<string | null>(null);
   const [burst, setBurst] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  // Достижения из бекенда: id по порядку соответствуют пунктам чек-листа
+  const achIdsRef = useRef<number[] | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const uid = await backendUserId();
+      if (!uid) return;
+      const list = await apiSafe<ApiAchievement[]>(`/users/${uid}/achievements`);
+      if (!list?.length) return;
+      achIdsRef.current = list.map((a) => a.id);
+      setDone(
+        Object.fromEntries(
+          checklist.map((c, i) => [c.id, list[i]?.isSuccess ?? c.done])
+        )
+      );
+    })();
+  }, []);
 
   const doneCount = Object.values(done).filter(Boolean).length;
   const total = checklist.length;
@@ -47,6 +65,15 @@ export default function ChecklistMenu() {
         setOpen(true);
         setBurst((b) => b + 1);
         setTimeout(() => setJustDone(null), 2600);
+        // Отметка в бекенде (fire-and-forget)
+        const idx = checklist.findIndex((c) => c.id === id);
+        const achId = achIdsRef.current?.[idx];
+        if (achId !== undefined) {
+          backendUserId().then((uid) => {
+            if (uid)
+              apiSafe(`/users/${uid}/achievements/${achId}`, { method: "POST" });
+          });
+        }
         return { ...d, [id]: true };
       });
     }

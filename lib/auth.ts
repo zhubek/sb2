@@ -66,16 +66,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role ?? "student";
+        // Связываем сессию с пользователем в БД бекенда (upsert по почте)
+        try {
+          const apiUrl =
+            process.env.API_URL ??
+            process.env.NEXT_PUBLIC_API_URL ??
+            "http://localhost:3002/api";
+          const email = user.email ?? "";
+          const res = await fetch(`${apiUrl}/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              name: user.name?.split(" ")[0] || email.split("@")[0] || "Ученик",
+              surname: user.name?.split(" ").slice(1).join(" ") || undefined,
+              role: token.role === "teacher" ? "TEACHER" : "STUDENT",
+            }),
+          });
+          if (res.ok) token.backendId = (await res.json()).id;
+        } catch {
+          // Бекенд недоступен — сессия работает без backendId (мок-режим)
+        }
       }
       return token;
     },
     session({ session, token }) {
       session.user.id = token.id as string;
       session.user.role = (token.role as "student" | "teacher") ?? "student";
+      session.user.backendId = token.backendId as number | undefined;
       return session;
     },
   },

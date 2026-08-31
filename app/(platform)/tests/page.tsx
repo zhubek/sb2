@@ -13,6 +13,8 @@ import {
   testHistory,
   tests,
 } from "@/lib/mock-data";
+import { apiSafe, type ApiAttempt, type ApiTest } from "@/lib/api";
+import { auth } from "@/lib/auth";
 
 const testIcons = {
   debruce: BarChart3,
@@ -20,11 +22,46 @@ const testIcons = {
   holland: Compass,
 } as const;
 
-export default function TestsPage() {
-  const passedCount = tests.filter((t) => t.passed).length;
-  const debruce = tests.find((t) => t.id === "debruce")!;
-  const mbti = tests.find((t) => t.id === "mbti")!;
-  const holland = tests.find((t) => t.id === "holland")!;
+export default async function TestsPage() {
+  // Реальные данные из бекенда; при недоступном API — мок-режим
+  const session = await auth();
+  const uid = session?.user?.backendId;
+  const [apiTests, apiAttempts] = uid
+    ? await Promise.all([
+        apiSafe<ApiTest[]>("/tests"),
+        apiSafe<ApiAttempt[]>(`/users/${uid}/attempts`),
+      ])
+    : [null, null];
+  const finishedSlugs = new Set(
+    (apiAttempts ?? [])
+      .filter((a) => a.state === "FINISHED")
+      .map((a) => a.test?.slug)
+  );
+  const live = tests.map((t) => ({
+    ...t,
+    passed: apiAttempts ? finishedSlugs.has(t.id) : t.passed,
+    questions:
+      apiTests?.find((x) => x.slug === t.id)?._count?.questions ?? t.questions,
+  }));
+  const history = apiAttempts?.length
+    ? apiAttempts.map((a) => ({
+        id: String(a.id),
+        testId: (a.test?.slug ?? "debruce") as keyof typeof testIcons,
+        date: new Date(a.started).toLocaleDateString("ru-RU"),
+        time: new Date(a.started).toLocaleTimeString("ru-RU", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        summary:
+          a.result?.summary ??
+          (a.state === "FINISHED" ? "Завершён" : "Не завершён"),
+      }))
+    : testHistory;
+
+  const passedCount = live.filter((t) => t.passed).length;
+  const debruce = live.find((t) => t.id === "debruce")!;
+  const mbti = live.find((t) => t.id === "mbti")!;
+  const holland = live.find((t) => t.id === "holland")!;
 
   return (
     <div className="space-y-8">
@@ -49,7 +86,7 @@ export default function TestsPage() {
               : "Чтобы получить комплексную диагностику, пройдите все три теста — ИИ соберёт навыки, тип личности и интересы в единый портрет с рекомендациями."}
           </p>
           <div className="mt-3 flex items-center gap-2">
-            {tests.map((t) => (
+            {live.map((t) => (
               <span
                 key={t.id}
                 className={`h-1.5 w-16 rounded-full ${t.passed ? "bg-white" : "bg-white/30"}`}
@@ -269,8 +306,8 @@ export default function TestsPage() {
           старые результаты остаются в истории.
         </p>
         <ul className="mt-4 divide-y divide-stone-100">
-          {testHistory.map((h) => {
-            const meta = tests.find((t) => t.id === h.testId)!;
+          {history.map((h) => {
+            const meta = live.find((t) => t.id === h.testId)!;
             const Icon = testIcons[h.testId];
             return (
               <li

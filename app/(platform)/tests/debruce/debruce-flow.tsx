@@ -9,6 +9,7 @@ import { industries } from "@/lib/nav/types";
 import SectionQuiz from "@/components/section-quiz";
 import { SkillsArt } from "@/components/brand-art";
 import { completeChecklistStep } from "@/lib/checklist-events";
+import { recordTestAttempt } from "@/lib/api";
 
 type Stage = "intro" | "quiz" | "result" | "industry";
 
@@ -60,9 +61,13 @@ export default function DebruceFlow({ initialStage }: { initialStage: Stage }) {
       <SectionQuiz
         title="Мои навыки"
         sections={debruceSections}
-        onFinish={() => {
+        onFinish={(values) => {
           setStage("result");
           completeChecklistStep("c3");
+          recordTestAttempt("debruce", values, {
+            summary: "Топ-3: Креативность · Коммуникация · Эмпатия",
+            top: ["Креативность", "Коммуникация", "Эмпатия"],
+          });
         }}
       />
     );

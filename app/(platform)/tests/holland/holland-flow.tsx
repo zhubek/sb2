@@ -7,6 +7,7 @@ import { HollandBars, HollandTopTiles } from "@/components/report-blocks";
 import SectionQuiz from "@/components/section-quiz";
 import { CertificateArt, InterestsArt } from "@/components/brand-art";
 import { completeChecklistStep } from "@/lib/checklist-events";
+import { recordTestAttempt } from "@/lib/api";
 
 type Stage = "intro" | "quiz" | "result";
 
@@ -51,7 +52,11 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
       <SectionQuiz
         title="Мои интересы"
         sections={hollandSections}
-        onFinish={() => { setStage("result"); completeChecklistStep("c6"); }}
+        onFinish={(values) => {
+          setStage("result");
+          completeChecklistStep("c6");
+          recordTestAttempt("holland", values, { summary: "Код ASE · Артистичный тип", code: "ASE" });
+        }}
       />
     );
   }

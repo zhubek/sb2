@@ -4,6 +4,7 @@ import { ArrowLeft, Camera, Check, Globe, Lock, LogOut } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { apiSafe, backendUserId } from "@/lib/api";
 import { currentUser } from "@/lib/mock-data";
 
 const PROFILE_KEY = "student-profile";
@@ -53,12 +54,25 @@ export default function StudentProfilePage() {
     setSaved(false);
   }
 
-  function handleSave() {
+  async function handleSave() {
     localStorage.setItem(PROFILE_KEY, JSON.stringify(form));
     localStorage.setItem(LANG_KEY, lang);
     setSaved(true);
     // Имя в шапке обновится без перезагрузки
     window.dispatchEvent(new Event("student-profile-updated"));
+    // Синхронизация с бекендом (fire-and-forget)
+    const uid = await backendUserId();
+    if (uid) {
+      apiSafe(`/users/${uid}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          name: form.firstName,
+          surname: form.lastName,
+          grade: form.grade,
+          language: lang === "kk" ? "KZ" : "RU",
+        }),
+      });
+    }
   }
 
   return (

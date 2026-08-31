@@ -29,8 +29,14 @@ export class ProfileService {
     return user;
   }
 
+  // Идемпотентно: повторный POST с той же почтой возвращает существующего
+  // пользователя (используется фронтендом при каждом входе через Auth.js)
   createUser(dto: CreateUserDto) {
-    return this.prisma.user.create({ data: dto });
+    return this.prisma.user.upsert({
+      where: { email: dto.email },
+      create: { ...dto, surname: dto.surname ?? "" },
+      update: {},
+    });
   }
 
   updateUser(id: number, dto: UpdateUserDto) {
