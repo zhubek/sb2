@@ -4,6 +4,7 @@ import { Bot, Compass, FolderOpen, Home, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ChecklistMenu from "@/components/checklist-menu";
 import { LogoMark } from "@/components/compass-marks";
 import { currentUser } from "@/lib/mock-data";
 
@@ -63,8 +64,8 @@ export default function PlatformNav() {
               href="/dashboard"
               className="font-display flex items-center gap-2 text-sm font-semibold tracking-tight"
             >
-              <LogoMark className="h-6 w-6" />
-              <span>профориентатор<span className="text-violet-600">.</span></span>
+              <LogoMark className="h-6 w-6 shrink-0" />
+              <span className="hidden min-[440px]:inline">профориентатор<span className="text-violet-600">.</span></span>
             </Link>
             <nav className="hidden gap-5 md:flex">
               {links.map((l) => {
@@ -85,7 +86,8 @@ export default function PlatformNav() {
               })}
             </nav>
           </div>
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ChecklistMenu />
             <div className="flex overflow-hidden rounded-full border border-stone-200 text-[12px] font-semibold">
               {(["kk", "ru"] as Lang[]).map((l) => (
                 <button

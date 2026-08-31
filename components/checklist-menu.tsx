@@ -108,7 +108,9 @@ export default function ChecklistMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-stone-200 bg-white p-4 shadow-xl">
+        // На телефоне fixed относительно шапки (backdrop-blur делает её
+        // containing block) — раскрываем на всю ширину экрана
+        <div className="fixed inset-x-3 top-16 z-50 rounded-2xl border border-stone-200 bg-white p-4 shadow-xl sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-80">
           <div className="flex items-baseline justify-between">
             <p className="font-display text-sm font-medium">Мой прогресс</p>
             <p className="font-mono text-xs text-stone-400">{pct}%</p>
