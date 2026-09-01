@@ -98,7 +98,7 @@ export async function backendUserId(): Promise<number | null> {
   } catch {
     cachedUid = null;
   }
-  return cachedUid;
+  return cachedUid ?? null;
 }
 
 // ── Запись прохождения теста ────────────────────────────────────────────────

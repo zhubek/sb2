@@ -122,7 +122,31 @@ async function seedProfile() {
   await prisma.organizationAdmin.create({
     data: { organizationId: org.id, userId: teacher.id },
   });
-  console.log("profile: org + 2 users");
+
+  // Аккаунты с нулевым прогрессом — показать опыт нового пользователя
+  await prisma.user.create({
+    data: {
+      name: "Арман",
+      surname: "Нурланов",
+      email: "arman@example.kz",
+      grade: "9",
+      organizationId: org.id,
+    },
+  });
+  const org2 = await prisma.organization.create({
+    data: { name: "Лицей №15 Астана", cityId: city.id },
+  });
+  await prisma.user.create({
+    data: {
+      name: "Марат",
+      surname: "Кенжебаев",
+      email: "marat@lyceum.kz",
+      role: "TEACHER",
+      organizationId: org2.id,
+    },
+  });
+
+  console.log("profile: 2 организации + 4 пользователя (2 с нулевым прогрессом)");
   return { org, student, teacher };
 }
 

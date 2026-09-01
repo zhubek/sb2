@@ -41,7 +41,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = String(credentials?.email ?? "").toLowerCase().trim();
         const code = String(credentials?.code ?? "");
         if (!email || !code) return null;
-        if (!consumeOtp(email, code)) return null;
+        // Дев-режим: универсальный код 000000 — регистрация без проверки
+        // почты (убрать при подключении реальной отправки писем)
+        if (code !== "000000" && !consumeOtp(email, code)) return null;
         // Прод: найти/создать пользователя в БД (см. authConfig старой платформы)
         return { id: email, email, role: "student" as const };
       },

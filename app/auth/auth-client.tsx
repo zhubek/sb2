@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { LogoMark } from "@/components/compass-marks";
+import { apiSafe, backendUserId } from "@/lib/api";
 import { requestOtp } from "@/lib/auth-actions";
 
 const inputCls =
@@ -79,6 +80,21 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
     setStep(2);
   }
 
+  // Регистрация без проверки почты (дев-режим): аккаунт создаётся сразу,
+  // шаг с кодом пропускается — используем универсальный код 000000
+  async function registerNow(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const res = await signIn("otp", { email, code: "000000", redirect: false });
+    setBusy(false);
+    if (res?.error) {
+      setError("Не удалось создать аккаунт. Проверьте адрес почты.");
+      return;
+    }
+    setStep(3);
+  }
+
   function google() {
     if (!googleEnabled) {
       setError(
@@ -109,7 +125,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
     }
   }
 
-  function finish(e: React.FormEvent) {
+  async function finish(e: React.FormEvent) {
     e.preventDefault();
     // Имя показывается в шапке кабинета (профиль пока живёт в localStorage)
     try {
@@ -120,6 +136,14 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
       );
       window.dispatchEvent(new Event("student-profile-updated"));
     } catch {}
+    // Имя и фамилия — в профиль пользователя в бекенде
+    const uid = await backendUserId();
+    if (uid) {
+      apiSafe(`/users/${uid}`, {
+        method: "PATCH",
+        body: JSON.stringify({ name: firstName, surname: lastName }),
+      });
+    }
     router.push("/onboarding");
   }
 
@@ -157,27 +181,37 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
             ))}
           </div>
 
-          {/* Индикатор шагов (при входе — без шага «О себе») */}
+          {/* Индикатор шагов: регистрация — почта → о себе (без кода, дев-режим);
+              вход — почта → код */}
           <div className="mb-6 flex items-center gap-2">
-            {(mode === "register" ? [1, 2, 3] : [1, 2]).map((s) => (
-              <div key={s} className="flex flex-1 items-center gap-2">
+            {(mode === "register"
+              ? [
+                  { n: 1, label: "Почта" },
+                  { n: 3, label: "О себе" },
+                ]
+              : [
+                  { n: 1, label: "Почта" },
+                  { n: 2, label: "Код" },
+                ]
+            ).map((s, i) => (
+              <div key={s.n} className="flex flex-1 items-center gap-2">
                 <span
                   className={`flex h-6 w-6 flex-none items-center justify-center rounded-full text-xs font-semibold transition ${
-                    s < step
+                    s.n < step
                       ? "bg-teal-500 text-white"
-                      : s === step
+                      : s.n === step
                         ? "bg-violet-500 text-white"
                         : "bg-stone-100 text-stone-400"
                   }`}
                 >
-                  {s < step ? "✓" : s}
+                  {s.n < step ? "✓" : i + 1}
                 </span>
                 <span
                   className={`hidden text-xs sm:block ${
-                    s === step ? "font-medium text-stone-700" : "text-stone-400"
+                    s.n === step ? "font-medium text-stone-700" : "text-stone-400"
                   }`}
                 >
-                  {s === 1 ? "Почта" : s === 2 ? "Код" : "О себе"}
+                  {s.label}
                 </span>
               </div>
             ))}
@@ -206,7 +240,10 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                 или через почту
                 <div className="h-px flex-1 bg-stone-100" />
               </div>
-              <form onSubmit={sendCode} className="space-y-3">
+              <form
+                onSubmit={mode === "register" ? registerNow : sendCode}
+                className="space-y-3"
+              >
                 <input
                   required
                   type="email"
@@ -220,8 +257,19 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                   disabled={busy}
                   className="w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600 disabled:opacity-60"
                 >
-                  {busy ? "Отправляем…" : "Получить код"}
+                  {busy
+                    ? mode === "register"
+                      ? "Создаём…"
+                      : "Отправляем…"
+                    : mode === "register"
+                      ? "Продолжить"
+                      : "Получить код"}
                 </button>
+                {mode === "register" && (
+                  <p className="text-center text-xs text-stone-400">
+                    Дев-режим: почта не проверяется, аккаунт создаётся сразу
+                  </p>
+                )}
               </form>
             </>
           )}
@@ -283,7 +331,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           {step === 3 && (
             <form onSubmit={finish} className="space-y-3">
               <p className="rounded-xl bg-teal-50 px-4 py-2.5 text-xs text-teal-700">
-                Почта {email} подтверждена
+                Аккаунт для {email} создан — осталось рассказать о себе
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <input
