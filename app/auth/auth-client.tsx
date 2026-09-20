@@ -1,4 +1,10 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,6 +22,8 @@ const letters = [
   "А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "К", "Л", "М", "Н", "О", "П",
   "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ы", "Э", "Ю", "Я",
 ];
+
+const inlineDefault_letters = letters;
 
 function GoogleIcon() {
   return (
@@ -41,6 +49,8 @@ function GoogleIcon() {
 }
 
 export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }) {
+  const pageCopy = useCopy("copy.app.auth.auth-client");
+  const letters = useContent("inline.app.auth.auth-client.letters", inlineDefault_letters);
   const router = useRouter();
   const search = useSearchParams();
   const callbackUrl = search.get("callbackUrl") || "/dashboard";
@@ -89,7 +99,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
     const res = await signIn("otp", { email, code: "000000", redirect: false });
     setBusy(false);
     if (res?.error) {
-      setError("Не удалось создать аккаунт. Проверьте адрес почты.");
+      setError(pageCopy("x001","Не удалось создать аккаунт. Проверьте адрес почты."));
       return;
     }
     setStep(3);
@@ -98,7 +108,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
   function google() {
     if (!googleEnabled) {
       setError(
-        "Вход через Google появится после настройки OAuth (AUTH_GOOGLE_ID и AUTH_GOOGLE_SECRET в .env)."
+        pageCopy("x002","Вход через Google появится после настройки OAuth (AUTH_GOOGLE_ID и AUTH_GOOGLE_SECRET в .env).")
       );
       return;
     }
@@ -114,7 +124,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
     const res = await signIn("otp", { email, code, redirect: false });
     setBusy(false);
     if (res?.error) {
-      setError("Неверный или устаревший код. Запросите новый и попробуйте ещё раз.");
+      setError(pageCopy("x003","Неверный или устаревший код. Запросите новый и попробуйте ещё раз."));
       return;
     }
     if (mode === "login") {
@@ -149,13 +159,14 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-10">
+      <div className="fixed bottom-5 right-5 z-20"><Link href="/login" className="rounded-xl bg-white px-4 py-3 text-sm text-violet-700 shadow-md border">Вход по паролю →</Link></div>
       <div className="w-full max-w-md">
         <Link
           href="/"
           className="font-display mb-8 flex items-center justify-center gap-2 text-sm tracking-tight"
         >
           <LogoMark className="h-7 w-7" />
-          <span>профориентатор<span className="text-violet-600">.</span></span>
+          <span><ContentText id="copy.app.auth.auth-client.001" fallback="профориентатор" /><span className="text-violet-600">.</span></span>
         </Link>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -163,8 +174,8 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           <div className="mb-6 grid grid-cols-2 rounded-xl bg-stone-100 p-1 text-sm font-medium">
             {(
               [
-                ["register", "Регистрация"],
-                ["login", "Вход"],
+                ["register", pageCopy("x004","Регистрация")],
+                ["login", pageCopy("x005","Вход")],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -186,12 +197,12 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           <div className="mb-6 flex items-center gap-2">
             {(mode === "register"
               ? [
-                  { n: 1, label: "Почта" },
-                  { n: 3, label: "О себе" },
+                  { n: 1, label: pageCopy("x006","Почта") },
+                  { n: 3, label: pageCopy("x007","О себе") },
                 ]
               : [
-                  { n: 1, label: "Почта" },
-                  { n: 2, label: "Код" },
+                  { n: 1, label: pageCopy("x008","Почта") },
+                  { n: 2, label: pageCopy("x009","Код") },
                 ]
             ).map((s, i) => (
               <div key={s.n} className="flex flex-1 items-center gap-2">
@@ -227,18 +238,16 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           {step === 1 && (
             <>
               <button
-                onClick={google}
+                data-cms-navigation="true" onClick={google}
                 className={`flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 py-2.5 text-sm font-medium transition hover:bg-stone-50 ${
                   googleEnabled ? "" : "opacity-60"
                 }`}
               >
                 <GoogleIcon />
-                Продолжить с Google
-              </button>
+                <ContentText id="copy.app.auth.auth-client.002" fallback="Продолжить с Google" /></button>
               <div className="my-5 flex items-center gap-3 text-xs text-stone-400">
                 <div className="h-px flex-1 bg-stone-100" />
-                или через почту
-                <div className="h-px flex-1 bg-stone-100" />
+                <ContentText id="copy.app.auth.auth-client.003" fallback="или через почту" /><div className="h-px flex-1 bg-stone-100" />
               </div>
               <form
                 onSubmit={mode === "register" ? registerNow : sendCode}
@@ -249,7 +258,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Электронная почта"
+                  placeholder={pageCopy("x010","Электронная почта")}
                   className={inputCls}
                 />
                 <button
@@ -259,16 +268,15 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                 >
                   {busy
                     ? mode === "register"
-                      ? "Создаём…"
-                      : "Отправляем…"
+                      ? pageCopy("x011","Создаём…")
+                      : pageCopy("x012","Отправляем…")
                     : mode === "register"
-                      ? "Продолжить"
-                      : "Получить код"}
+                      ? pageCopy("x013","Продолжить")
+                      : pageCopy("x014","Получить код")}
                 </button>
                 {mode === "register" && (
                   <p className="text-center text-xs text-stone-400">
-                    Дев-режим: почта не проверяется, аккаунт создаётся сразу
-                  </p>
+                    <ContentText id="copy.app.auth.auth-client.004" fallback="Дев-режим: почта не проверяется, аккаунт создаётся сразу" /></p>
                 )}
               </form>
             </>
@@ -278,13 +286,11 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           {step === 2 && (
             <form onSubmit={confirmCode} className="space-y-4">
               <p className="text-sm text-stone-600">
-                Мы отправили 6-значный код на{" "}
-                <span className="font-medium text-stone-800">{email}</span>.
-                Введите его, чтобы подтвердить адрес.
-              </p>
+                <ContentText id="copy.app.auth.auth-client.005" fallback="Мы отправили 6-значный код на" />{" "}
+                <span className="font-medium text-stone-800">{email}</span><ContentText id="copy.app.auth.auth-client.006" fallback=". Введите его, чтобы подтвердить адрес." /></p>
               {demoCode && (
                 <p className="rounded-xl bg-amber-50 px-4 py-2.5 text-xs text-amber-800">
-                  Демо-режим: почтовый сервис не подключён, ваш код —{" "}
+                  <ContentText id="copy.app.auth.auth-client.007" fallback="Демо-режим: почтовый сервис не подключён, ваш код —" />{" "}
                   <span className="font-mono font-semibold tracking-widest">{demoCode}</span>
                 </p>
               )}
@@ -303,7 +309,7 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                 disabled={busy}
                 className="w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600 disabled:opacity-60"
               >
-                {busy ? "Проверяем…" : "Подтвердить"}
+                {busy ? pageCopy("x015","Проверяем…") : pageCopy("x016","Подтвердить")}
               </button>
               <div className="flex justify-between text-xs">
                 <button
@@ -314,15 +320,13 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
                   }}
                   className="text-stone-400 transition hover:text-stone-600"
                 >
-                  ← Изменить почту
-                </button>
+                  <ContentText id="copy.app.auth.auth-client.008" fallback="← Изменить почту" /></button>
                 <button
                   type="button"
                   onClick={(e) => sendCode(e)}
                   className="text-violet-600 transition hover:text-violet-700"
                 >
-                  Отправить код ещё раз
-                </button>
+                  <ContentText id="copy.app.auth.auth-client.009" fallback="Отправить код ещё раз" /></button>
               </div>
             </form>
           )}
@@ -331,19 +335,18 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
           {step === 3 && (
             <form onSubmit={finish} className="space-y-3">
               <p className="rounded-xl bg-teal-50 px-4 py-2.5 text-xs text-teal-700">
-                Аккаунт для {email} создан — осталось рассказать о себе
-              </p>
+                <ContentText id="copy.app.auth.auth-client.010" fallback="Аккаунт для " />{email} <ContentText id="copy.app.auth.auth-client.011" fallback=" создан — осталось рассказать о себе" /></p>
               <div className="grid grid-cols-2 gap-3">
                 <input
                   required
-                  placeholder="Имя"
+                  placeholder={pageCopy("x017","Имя")}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className={inputCls}
                 />
                 <input
                   required
-                  placeholder="Фамилия"
+                  placeholder={pageCopy("x018","Фамилия")}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className={inputCls}
@@ -352,42 +355,37 @@ export default function AuthClient({ googleEnabled }: { googleEnabled: boolean }
               <div className="grid grid-cols-2 gap-3">
                 <select required defaultValue="" className={inputCls}>
                   <option value="" disabled>
-                    Класс
-                  </option>
+                    {pageCopy("x019","Класс")}</option>
                   {["7", "8", "9", "10", "11", "12"].map((g) => (
                     <option key={g}>{g}</option>
                   ))}
                 </select>
                 <select required defaultValue="" className={inputCls}>
                   <option value="" disabled>
-                    Литера
-                  </option>
+                    {pageCopy("x020","Литера")}</option>
                   {letters.map((l) => (
                     <option key={l}>{l}</option>
                   ))}
                 </select>
               </div>
               <div className="rounded-xl bg-stone-50 px-4 py-3 text-xs text-stone-500">
-                Область: <span className="text-stone-700">г. Астана</span> · Город:{" "}
-                <span className="text-stone-700">Астана</span> · Школа:{" "}
-                <span className="text-stone-700">НИШ ФМН Астана</span>
+                <ContentText id="copy.app.auth.auth-client.012" fallback="Область: " /><span className="text-stone-700"><ContentText id="copy.app.auth.auth-client.013" fallback="г. Астана" /></span> <ContentText id="copy.app.auth.auth-client.014" fallback=" · Город:" />{" "}
+                <span className="text-stone-700"><ContentText id="copy.app.auth.auth-client.015" fallback="Астана" /></span> <ContentText id="copy.app.auth.auth-client.016" fallback=" · Школа:" />{" "}
+                <span className="text-stone-700"><ContentText id="copy.app.auth.auth-client.017" fallback="НИШ ФМН Астана" /></span>
                 <span className="mt-1 block text-stone-400">
-                  Определено автоматически по ссылке школы
-                </span>
+                  <ContentText id="copy.app.auth.auth-client.018" fallback="Определено автоматически по ссылке школы" /></span>
               </div>
               <button
                 type="submit"
                 className="w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
               >
-                Создать аккаунт
-              </button>
+                <ContentText id="copy.app.auth.auth-client.019" fallback="Создать аккаунт" /></button>
             </form>
           )}
         </div>
 
         <p className="mt-4 text-center text-xs text-stone-400">
-          Продолжая, вы соглашаетесь с условиями использования платформы
-        </p>
+          <ContentText id="copy.app.auth.auth-client.020" fallback="Продолжая, вы соглашаетесь с условиями использования платформы" /></p>
       </div>
     </div>
   );

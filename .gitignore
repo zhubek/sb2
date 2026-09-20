@@ -1,5 +1,9 @@
 node_modules
 .next
+.next-cms
+.next-cms-build
+.next-cms-verify
+.data/
 out
 *.tsbuildinfo
 next-env.d.ts
@@ -11,3 +15,5 @@ next-env.d.ts
 ref/
 index.html
 .mcp.json
+
+.next*/

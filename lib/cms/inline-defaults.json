@@ -1,0 +1,215 @@
+{
+  "inline.app.platform.chat.page.LONG_ANSWER": {
+    "file": "app/(platform)/chat/page.tsx",
+    "name": "LONG_ANSWER",
+    "value": "Отличный вопрос! Судя по результатам ваших тестов, у вас яркий креативно-коммуникативный профиль: DeBruce показал топ-навыки «Креативность», «Коммуникация» и «Эмпатия», а тип ENFJ это только подтверждает. Вам подойдут профессии, где нужно придумывать и рассказывать: PR-менеджер, журналист, бренд-стратег, продюсер медиапроектов. Рекомендую начать с направления «Журналистика и информация» и программы «Реклама и связи с общественностью» — её ведут КазНУ, ЕНУ и Туран, причём в двух из них есть гранты и общежития. Хотите, покажу эти вузы в навигаторе с уже настроенными фильтрами? А ещё могу объяснить, почему именно эти навыки так ценятся в медиа-индустрии."
+  },
+  "inline.app.auth.auth-client.letters": {
+    "file": "app/auth/auth-client.tsx",
+    "name": "letters",
+    "value": [
+      "А",
+      "Б",
+      "В",
+      "Г",
+      "Д",
+      "Е",
+      "Ж",
+      "З",
+      "И",
+      "К",
+      "Л",
+      "М",
+      "Н",
+      "О",
+      "П",
+      "Р",
+      "С",
+      "Т",
+      "У",
+      "Ф",
+      "Х",
+      "Ц",
+      "Ч",
+      "Ш",
+      "Щ",
+      "Ы",
+      "Э",
+      "Ю",
+      "Я"
+    ]
+  },
+  "inline.app.teacher.panel.analytics.page.periods": {
+    "file": "app/teacher/(panel)/analytics/page.tsx",
+    "name": "periods",
+    "value": [
+      {
+        "key": "week",
+        "label": "Неделя"
+      },
+      {
+        "key": "month",
+        "label": "Месяц"
+      },
+      {
+        "key": "quarter",
+        "label": "Четверть"
+      },
+      {
+        "key": "year",
+        "label": "Год"
+      }
+    ]
+  },
+  "inline.app.teacher.panel.analytics.students.page.testFilters": {
+    "file": "app/teacher/(panel)/analytics/students/page.tsx",
+    "name": "testFilters",
+    "value": [
+      {
+        "key": "all",
+        "label": "Все результаты"
+      },
+      {
+        "key": "full",
+        "label": "Полный профиль (3/3)"
+      },
+      {
+        "key": "partial",
+        "label": "Частично (1–2 теста)"
+      },
+      {
+        "key": "none",
+        "label": "Не начали"
+      }
+    ]
+  },
+  "inline.app.teacher.panel.page.severityStyles": {
+    "file": "app/teacher/(panel)/page.tsx",
+    "name": "severityStyles",
+    "value": {
+      "urgent": {
+        "chip": "bg-rose-100 text-rose-700",
+        "label": "срочно"
+      },
+      "important": {
+        "chip": "bg-amber-100 text-amber-800",
+        "label": "важно"
+      },
+      "info": {
+        "chip": "bg-sky-100 text-sky-700",
+        "label": "к сведению"
+      }
+    }
+  },
+  "inline.components.activity-chart.periods": {
+    "file": "components/activity-chart.tsx",
+    "name": "periods",
+    "value": [
+      {
+        "key": "week",
+        "label": "Неделя"
+      },
+      {
+        "key": "month",
+        "label": "Месяц"
+      },
+      {
+        "key": "quarter",
+        "label": "Четверть"
+      },
+      {
+        "key": "year",
+        "label": "Год"
+      }
+    ]
+  },
+  "inline.components.analytics-tabs.tabs": {
+    "file": "components/analytics-tabs.tsx",
+    "name": "tabs",
+    "value": [
+      {
+        "href": "/teacher/analytics",
+        "label": "Школа"
+      },
+      {
+        "href": "/teacher/analytics/classes",
+        "label": "Классы"
+      },
+      {
+        "href": "/teacher/analytics/students",
+        "label": "Ученики"
+      }
+    ]
+  },
+  "inline.components.info-shell.pages": {
+    "file": "components/info-shell.tsx",
+    "name": "pages",
+    "value": [
+      {
+        "href": "/popularuniversity",
+        "label": "Университеты"
+      },
+      {
+        "href": "/skills",
+        "label": "Навыки"
+      },
+      {
+        "href": "/professions",
+        "label": "Топ профессии"
+      },
+      {
+        "href": "/workingprofessionsgen",
+        "label": "Рабочие профессии"
+      }
+    ]
+  },
+  "inline.components.profession-carousel.skills": {
+    "file": "components/profession-carousel.tsx",
+    "name": "skills",
+    "value": [
+      {
+        "name": "Креативность",
+        "v": 92
+      },
+      {
+        "name": "Коммуникация",
+        "v": 88
+      },
+      {
+        "name": "Эмпатия",
+        "v": 85
+      }
+    ]
+  },
+  "inline.components.teacher-onboarding.steps": {
+    "file": "components/teacher-onboarding.tsx",
+    "name": "steps",
+    "value": [
+      {
+        "tour": null,
+        "title": "Добро пожаловать на платформу профориентатора!",
+        "text": "За 5 коротких шагов покажем основные разделы и функции: аналитику по школе, AI-помощника, отчёты и обучающий курс."
+      },
+      {
+        "tour": "analytics",
+        "title": "Аналитика: школа → классы → ученики",
+        "text": "Три уровня данных: сводка по школе за выбранный период, метрики классов и карточки учеников с результатами тестов. Любой уровень можно скачать отчётом."
+      },
+      {
+        "tour": "assistant",
+        "title": "AI-помощник",
+        "text": "Задавайте вопросы о своих учениках обычным текстом: «кто не прошёл тесты», «сравни 10 «А» и 10 «Б»», «подготовь характеристику ученика»."
+      },
+      {
+        "tour": "reports",
+        "title": "Отчёты",
+        "text": "Все сформированные отчёты хранятся здесь — и созданные вами вручную, и автоматические сводки системы. С фильтрами и поиском."
+      },
+      {
+        "tour": "course",
+        "title": "Обучающий курс и бонусы",
+        "text": "Пройдите модули курса, чтобы освоить платформу. За активность начисляются баллы — следите за ними в разделе «Бонусная система»."
+      }
+    ]
+  }
+}

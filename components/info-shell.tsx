@@ -1,3 +1,8 @@
+"use client";
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { LogoMark } from "@/components/compass-marks";
@@ -10,6 +15,8 @@ const pages = [
 ];
 
 // Общий каркас публичных инфо-страниц (без авторизации)
+const inlineDefault_pages = pages;
+
 export default function InfoShell({
   active,
   eyebrow,
@@ -23,6 +30,7 @@ export default function InfoShell({
   lede: string;
   children: React.ReactNode;
 }) {
+  const pages = useContent("inline.components.info-shell.pages", inlineDefault_pages);
   return (
     <div className="min-h-screen bg-[#faf9f7] text-stone-700">
       {/* Шапка */}
@@ -34,7 +42,7 @@ export default function InfoShell({
           >
             <LogoMark className="h-7 w-7" />
             <span>
-              профориентатор<span className="text-violet-600">.</span>
+              <ContentText id="copy.components.info-shell.001" fallback="профориентатор" /><span className="text-violet-600">.</span>
             </span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
@@ -56,8 +64,7 @@ export default function InfoShell({
             href="/auth"
             className="group flex items-center gap-1.5 rounded-2xl bg-orange-500 px-4 py-2 text-sm font-bold text-stone-800 transition hover:bg-orange-400"
           >
-            Начать диагностику
-            <ArrowRight
+            <ContentText id="copy.components.info-shell.002" fallback="Начать диагностику" /><ArrowRight
               size={15}
               className="transition-transform group-hover:translate-x-0.5"
             />
@@ -84,18 +91,14 @@ export default function InfoShell({
       <section className="px-4 pb-16 sm:px-6">
         <div className="mx-auto max-w-6xl rounded-[36px] border border-violet-200/70 bg-violet-100 px-6 py-14 text-center">
           <h2 className="font-display text-2xl text-violet-800 md:text-4xl">
-            Не знаешь, что выбрать?
-          </h2>
+            <ContentText id="copy.components.info-shell.003" fallback="Не знаешь, что выбрать?" /></h2>
           <p className="mx-auto mt-3 max-w-xl text-violet-800/70">
-            Пройди тест «Мои навыки» — и получи персональные рекомендации по
-            профессиям, программам и вузам.
-          </p>
+            <ContentText id="copy.components.info-shell.004" fallback="Пройди тест «Мои навыки» — и получи персональные рекомендации по профессиям, программам и вузам." /></p>
           <Link
             href="/auth"
             className="group mt-6 inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-8 py-3.5 font-bold text-stone-800 transition hover:bg-orange-400"
           >
-            Начать диагностику
-            <ArrowRight
+            <ContentText id="copy.components.info-shell.005" fallback="Начать диагностику" /><ArrowRight
               size={18}
               className="transition-transform group-hover:translate-x-1"
             />
@@ -103,7 +106,7 @@ export default function InfoShell({
         </div>
       </section>
       <footer className="border-t border-stone-100 py-8 text-center text-xs text-stone-400">
-        AI профориентатор ·{" "}
+        <ContentText id="copy.components.info-shell.006" fallback="AI профориентатор ·" />{" "}
         {pages.map((p, i) => (
           <span key={p.href}>
             {i > 0 && " · "}

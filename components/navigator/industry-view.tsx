@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { ArrowRight, ChevronDown, X } from "lucide-react";
 import Link from "next/link";
@@ -29,16 +33,20 @@ export interface IndustryView {
 
 // Страница отрасли: шапка со статистикой, направления с профессиями,
 // шторка профессии «Где учат», одна кнопка — в навигатор
-export default function IndustryPage({ ind }: { ind: IndustryView }) {
+export default function IndustryPage({ ind, initialGroup, initialProfession }: { ind: IndustryView; initialGroup?:string; initialProfession?:string }) {
+  const pageCopy = useCopy("copy.components.navigator.industry-view");
   const Icon = industryIcon(ind.name);
-  const [open, setOpen] = useState<string | null>(ind.groups[0]?.name ?? null);
-  const [prof, setProf] = useState<{ p: ProfView; g: string } | null>(null);
+  const [open, setOpen] = useState<string | null>(initialGroup ?? ind.groups[0]?.name ?? null);
+  const [prof, setProf] = useState<{ p: ProfView; g: string } | null>(()=>{
+    const group=ind.groups.find(g=>g.profs.some(p=>p.name===initialProfession));
+    const p=group?.profs.find(p=>p.name===initialProfession);
+    return group && p ? {p,g:group.name} : null;
+  });
 
   return (
     <div className="mx-auto max-w-3xl">
       <Link href="/universities/industries" className="text-sm text-stone-400 hover:text-stone-600">
-        ← Все отрасли
-      </Link>
+        <ContentText id="copy.components.navigator.industry-view.001" fallback="← Все отрасли" /></Link>
 
       {/* Шапка */}
       <div className="mt-5 rounded-3xl p-7 text-white" style={{ background: `linear-gradient(150deg, ${ind.c}, ${ind.c}CC)` }}>
@@ -50,9 +58,9 @@ export default function IndustryPage({ ind }: { ind: IndustryView }) {
         <div className="mt-5 grid grid-cols-3 gap-2.5">
           {(
             [
-              [ind.stats.p, "профессий"],
-              [ind.stats.g, "направлений"],
-              [ind.stats.vop + ind.stats.cop, "программ"],
+              [ind.stats.p, pageCopy("x001","профессий")],
+              [ind.stats.g, pageCopy("x002","направлений")],
+              [ind.stats.vop + ind.stats.cop, pageCopy("x003","программ")],
             ] as const
           ).map(([n, l]) => (
             <div key={l} className="rounded-2xl bg-white/15 px-4 py-3">
@@ -65,19 +73,18 @@ export default function IndustryPage({ ind }: { ind: IndustryView }) {
           href={`/universities?industry=${encodeURIComponent(ind.name)}`}
           className="group mt-5 inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-stone-900 transition hover:bg-stone-100"
         >
-          Смотреть, где этому учат
-          <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+          <ContentText id="copy.components.navigator.industry-view.002" fallback="Смотреть, где этому учат" /><ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
         </Link>
       </div>
 
       {/* Направления и профессии */}
-      <p className="mt-8 mb-3 text-xs font-semibold tracking-[0.12em] text-stone-400 uppercase">Направления и профессии</p>
+      <p className="mt-8 mb-3 text-xs font-semibold tracking-[0.12em] text-stone-400 uppercase"><ContentText id="copy.components.navigator.industry-view.003" fallback="Направления и профессии" /></p>
       <div className="space-y-2.5">
         {ind.groups.map((g) => {
           const on = open === g.name;
           return (
             <div key={g.name} className="rounded-2xl border border-stone-200 bg-white">
-              <button onClick={() => setOpen(on ? null : g.name)} className="flex w-full items-center gap-3 px-5 py-4 text-left">
+              <button data-cms-label={g.name} aria-expanded={on} onClick={() => setOpen(on ? null : g.name)} className="flex w-full items-center gap-3 px-5 py-4 text-left">
                 <span className="flex-1 font-medium">{g.name}</span>
                 <span className="rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold" style={{ background: ind.cl, color: ind.c }}>
                   {g.profs.length}
@@ -114,7 +121,7 @@ export default function IndustryPage({ ind }: { ind: IndustryView }) {
                 <h3 className="font-display text-xl font-semibold">{prof.p.name}</h3>
                 <p className="mt-0.5 text-xs text-stone-400">{prof.g} · {ind.name}</p>
               </div>
-              <button onClick={() => setProf(null)} aria-label="Закрыть" className="rounded-lg p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600">
+              <button onClick={() => setProf(null)} aria-label={pageCopy("x004","Закрыть")} className="rounded-lg p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600">
                 <X size={17} />
               </button>
             </div>
@@ -122,10 +129,9 @@ export default function IndustryPage({ ind }: { ind: IndustryView }) {
               {prof.p.desc ?? `«${prof.p.name}» — одна из профессий направления «${prof.g}».`}
             </p>
             <p className="mt-5 text-xs font-semibold tracking-[0.12em] uppercase" style={{ color: ind.c }}>
-              Где учат этой профессии
-            </p>
+              <ContentText id="copy.components.navigator.industry-view.004" fallback="Где учат этой профессии" /></p>
             <p className="mt-1 text-xs text-stone-400">
-              {prof.p.ops.length} {plural(prof.p.ops.length, ["программа", "программы", "программ"])}
+              {prof.p.ops.length} {plural(prof.p.ops.length, [pageCopy("x005","программа"), pageCopy("x006","программы"), pageCopy("x007","программ")])}
               {prof.p.uv ? `, вузов с такими программами — ${prof.p.uv}` : ""}
               {prof.p.uc ? `, колледжей — ${prof.p.uc}` : ""}
             </p>
@@ -137,22 +143,21 @@ export default function IndustryPage({ ind }: { ind: IndustryView }) {
                     <span className="text-sm font-medium">{o.name}</span>
                   </div>
                   <div className="mt-1.5 flex gap-1.5">
-                    {o.v > 0 && <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-800">{o.v} {plural(o.v, ["вуз", "вуза", "вузов"])}</span>}
-                    {o.c > 0 && <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[11px] font-medium text-teal-800">{o.c} {plural(o.c, ["колледж", "колледжа", "колледжей"])}</span>}
-                    {!o.v && !o.c && <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-stone-500">нет данных</span>}
+                    {o.v > 0 && <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-800">{o.v} {plural(o.v, [pageCopy("x008","вуз"), pageCopy("x009","вуза"), pageCopy("x010","вузов")])}</span>}
+                    {o.c > 0 && <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[11px] font-medium text-teal-800">{o.c} {plural(o.c, [pageCopy("x011","колледж"), pageCopy("x012","колледжа"), pageCopy("x013","колледжей")])}</span>}
+                    {!o.v && !o.c && <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-stone-500"><ContentText id="copy.components.navigator.industry-view.005" fallback="нет данных" /></span>}
                   </div>
                 </div>
               ))}
             </div>
             {prof.p.ops.length > 7 && (
-              <p className="mt-2 text-xs font-medium text-stone-400">и ещё {prof.p.ops.length - 7} {plural(prof.p.ops.length - 7, ["программа", "программы", "программ"])} — в навигаторе</p>
+              <p className="mt-2 text-xs font-medium text-stone-400"><ContentText id="copy.components.navigator.industry-view.006" fallback="и ещё " />{prof.p.ops.length - 7} {plural(prof.p.ops.length - 7, [pageCopy("x014","программа"), pageCopy("x015","программы"), pageCopy("x016","программ")])} <ContentText id="copy.components.navigator.industry-view.007" fallback=" — в навигаторе" /></p>
             )}
             <Link
               href={`/universities?industry=${encodeURIComponent(ind.name)}`}
               className="mt-5 block rounded-2xl bg-violet-500 py-3 text-center text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Открыть навигатор
-            </Link>
+              <ContentText id="copy.components.navigator.industry-view.008" fallback="Открыть навигатор" /></Link>
           </div>
         </div>
       )}

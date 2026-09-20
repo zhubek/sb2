@@ -1,5 +1,4 @@
-﻿"use client";
-
+"use client";
 import { useState } from "react";
 
 // Горизонтальные бары: одна серия, идентичность несут подписи строк

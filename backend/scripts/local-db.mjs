@@ -1,0 +1,15 @@
+import EmbeddedPostgres from 'embedded-postgres';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+const url=new URL(process.env.DATABASE_URL);
+if(!['localhost','127.0.0.1'].includes(url.hostname))throw new Error('Local database requires a loopback DATABASE_URL');
+const databaseDir=resolve('.local-postgres');
+const pg=new EmbeddedPostgres({databaseDir,user:decodeURIComponent(url.username),password:decodeURIComponent(url.password),port:Number(url.port),persistent:true,postgresFlags:['-h','127.0.0.1'],initdbFlags:['--encoding=UTF8','--locale=C'],onLog:()=>{},onError:()=>{}});
+if(!existsSync(resolve(databaseDir,'PG_VERSION')))await pg.initialise();
+await pg.start();
+const client=pg.getPgClient();await client.connect();
+const name=url.pathname.slice(1);
+if(!(await client.query('SELECT 1 FROM pg_database WHERE datname=$1',[name])).rowCount)await pg.createDatabase(name);
+await client.end();console.log(`Local PostgreSQL ready on 127.0.0.1:${url.port}`);
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,async()=>{await pg.stop();process.exit(0);});
+setInterval(()=>{},60000);

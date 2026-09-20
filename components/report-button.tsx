@@ -1,5 +1,5 @@
-﻿"use client";
-
+"use client";
+import { ContentText } from "@/lib/cms/client";
 import { useState } from "react";
 
 // Мок генерации отчёта (ТЗ: «Скачать» доступно на каждом уровне аналитики)
@@ -26,10 +26,9 @@ export default function ReportButton({ label }: { label: string }) {
       {state === "generating" && (
         <>
           <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-          Формируем документ…
-        </>
+          <ContentText id="copy.components.report-button.001" fallback="Формируем документ…" /></>
       )}
-      {state === "done" && <>✓ Отчёт скачан (демо)</>}
+      {state === "done" && <><ContentText id="copy.components.report-button.002" fallback="✓ Отчёт скачан (демо)" /></>}
     </button>
   );
 }

@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -6,15 +11,19 @@ import InfoShell from "@/components/info-shell";
 import { professionSectors } from "@/lib/info-data";
 
 // Атлас профессий: 12 отраслей, внутри каждой — востребованные профессии
+const cmsDefaults_professionSectors = professionSectors;
+
 export default function ProfessionsPage() {
+  const pageCopy = useCopy("copy.app.professions.page");
+  const professionSectors = useContent("info-data.professionSectors", cmsDefaults_professionSectors);
   const [open, setOpen] = useState<string | null>(professionSectors[0].id);
 
   return (
     <InfoShell
       active="/professions"
-      eyebrow="Атлас профессий"
-      title="Топ профессии по отраслям"
-      lede="12 ключевых отраслей экономики Казахстана: востребованные профессии и ориентиры по зарплатам."
+      eyebrow={pageCopy("x001","Атлас профессий")}
+      title={pageCopy("x002","Топ профессии по отраслям")}
+      lede={pageCopy("x003","12 ключевых отраслей экономики Казахстана: востребованные профессии и ориентиры по зарплатам.")}
     >
       <div className="grid gap-4 md:grid-cols-2">
         {professionSectors.map((s) => {
@@ -72,9 +81,7 @@ export default function ProfessionsPage() {
         })}
       </div>
       <p className="mt-8 text-center text-xs text-stone-400">
-        Диапазоны зарплат — ориентировочные, по открытым данным рынка труда
-        Казахстана.
-      </p>
+        <ContentText id="copy.app.professions.page.001" fallback="Диапазоны зарплат — ориентировочные, по открытым данным рынка труда Казахстана." /></p>
     </InfoShell>
   );
 }

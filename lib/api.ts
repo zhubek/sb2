@@ -1,3 +1,5 @@
+import { randomId } from "@/lib/random-id";
+import type { TestAnswer } from "@/lib/cms/types";
 // Клиент REST API бекенда (NestJS, backend/, порт 3002).
 // Все интеграции построены на apiSafe: при недоступном API страницы
 // откатываются на мок-данные и демо продолжает работать.
@@ -10,6 +12,7 @@ export const API_URL =
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
+    signal: init?.signal ?? AbortSignal.timeout(5000),
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
     cache: "no-store",
   });
@@ -102,45 +105,29 @@ export async function backendUserId(): Promise<number | null> {
 }
 
 // ── Запись прохождения теста ────────────────────────────────────────────────
-// values — ответы по шкале Ликерта (1–5) в порядке вопросов теста.
-// Fire-and-forget: сбой API не должен ломать сценарий прохождения.
+// values — typed answers in question order (scale, option IDs, or free text).
+// Снимок CMS сохраняется атомарно; при ошибке экран сохраняет ответы и предлагает повторить.
+const pendingAttempts = new Map<string, { payload: string; requestKey: string }>();
 
 export async function recordTestAttempt(
   slug: string,
-  values: number[],
-  result: Record<string, unknown>
+  values: TestAnswer[],
+  _result: Record<string, unknown>,
+  snapshot: import("./cms/types").TestContent
 ) {
-  try {
-    const uid = await backendUserId();
-    if (!uid) return;
-    const tests = await api<ApiTest[]>("/tests");
-    const meta = tests.find((t) => t.slug === slug);
-    if (!meta) return;
-    const test = await api<{
-      questions: { id: number; answers: { id: number }[] }[];
-    }>(`/tests/${meta.id}`);
-    const attempt = await api<{ id: number }>(`/tests/${meta.id}/attempts`, {
-      method: "POST",
-      body: JSON.stringify({ userId: uid }),
-    });
-    for (let i = 0; i < test.questions.length; i++) {
-      const value = values[i];
-      const question = test.questions[i];
-      const answer = question?.answers[value - 1];
-      if (!answer) continue;
-      await api(`/attempts/${attempt.id}/answers`, {
-        method: "POST",
-        body: JSON.stringify({
-          questionId: question.id,
-          answerIds: [answer.id],
-        }),
-      });
-    }
-    await api(`/attempts/${attempt.id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ state: "FINISHED", result }),
-    });
-  } catch (e) {
-    console.warn("recordTestAttempt:", e);
+  const payload = JSON.stringify({ slug, values, snapshot });
+  let pending = pendingAttempts.get(slug);
+  if (!pending || pending.payload !== payload) {
+    pending = { payload, requestKey: randomId() };
+    pendingAttempts.set(slug, pending);
   }
+  const res = await fetch("/api/test-attempts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug, values, snapshot, requestKey: pending.requestKey }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Не удалось сохранить ответы. Повторите попытку.");
+  if (pendingAttempts.get(slug) === pending) pendingAttempts.delete(slug);
+  return data;
 }

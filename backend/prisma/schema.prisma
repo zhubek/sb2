@@ -6,11 +6,86 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Content is authoritative here. JSON preserves the existing editor's document shapes.
+model ContentDocument {
+  id                String   @id
+  title             String
+  description       String
+  group             String
+  kind              String?
+  preview           String
+  defaultValue      Json
+  draft             Json?
+  published         Json?
+  revision          Int      @default(0)
+  publishedRevision Int      @default(0)
+  searchText        String
+  dirty             Boolean  @default(false)
+  updatedAt         DateTime?
+  publishedAt       DateTime?
+  history           ContentRevision[]
+
+  @@index([group, id])
+  @@index([dirty, updatedAt])
+}
+
+model ContentRevision {
+  id         String   @id @default(uuid())
+  documentId String
+  document   ContentDocument @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  title      String
+  action     String
+  at         DateTime @default(now())
+  value      Json
+
+  @@index([documentId, at(sort: Desc)])
+}
+
+model ContentAudit {
+  id         String   @id @default(uuid())
+  documentId String
+  actorId    String
+  action     String
+  revision   Int
+  requestId  String
+  at         DateTime @default(now())
+
+  @@unique([documentId, revision])
+  @@index([at])
+}
+
+model ContentAdministrator {
+  id      String  @id
+  enabled Boolean @default(true)
+}
+
+model DataImport {
+  id          String   @id
+  completedAt DateTime @default(now())
+  recordCount Int
+}
+
+model ContentTestAttempt {
+  id        String   @id @default(uuid())
+  ownerKey  String
+  slug      String
+  name      String
+  at        DateTime @default(now())
+  values    Json
+  snapshot  Json
+  summary   String
+  requestKey String?
+
+  @@unique([ownerKey, requestKey])
+  @@index([ownerKey, at(sort: Desc)])
 }
 
 // ─── Profile ─────────────────────────────────────────────────────────────────
@@ -58,6 +133,9 @@ model Organization {
 }
 
 model User {
+  credential     AuthCredential?
+  phone          String?
+  jobTitle       String?
   id             Int           @id @default(autoincrement())
   name           String
   surname        String
@@ -95,6 +173,15 @@ model Diploma {
   user     User        @relation(fields: [userId], references: [id])
 }
 
+model AuthCredential {
+  userId       Int @id
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwordHash String
+  enabled      Boolean @default(true)
+  version      Int @default(1)
+  contentAdmin Boolean @default(false)
+}
+
 model OrganizationAdmin {
   organizationId Int
   organization   Organization @relation(fields: [organizationId], references: [id])
@@ -110,6 +197,7 @@ enum QuestionType {
   SINGLE
   MULTIPLE
   LIKERT
+  TEXT
 }
 
 enum ProgressState {
@@ -242,6 +330,9 @@ model Program {
 }
 
 model InstitutionProgram {
+  contentKey    String?     @unique
+  contentRevision Int      @default(0)
+  threshold     Int?
   id            Int         @id @default(autoincrement())
   institutionId Int
   institution   Institution @relation(fields: [institutionId], references: [id])

@@ -13,7 +13,7 @@ import {
   ProgramLevel,
   QuestionType,
   InstitutionType,
-} from "@prisma/client";
+} from "../generated/prisma";
 import {
   checklist,
   debruceSections,

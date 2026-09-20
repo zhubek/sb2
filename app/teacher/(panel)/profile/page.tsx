@@ -1,6 +1,10 @@
 "use client";
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Award, BookOpen, Pencil } from "lucide-react";
+import { currentProfile } from "@/lib/current-profile";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -10,7 +14,16 @@ import {
   teacherBadges,
 } from "@/lib/teacher-mock-data";
 
+const cmsDefaults_courseModules = courseModules;
+const cmsDefaults_moduleStatusLabels = moduleStatusLabels;
+const cmsDefaults_teacher = teacher;
+const cmsDefaults_teacherBadges = teacherBadges;
+
 export default function TeacherProfilePage() {
+  const teacher = useContent("teacher-mock-data.teacher", cmsDefaults_teacher);
+  const teacherBadges = useContent("teacher-mock-data.teacherBadges", cmsDefaults_teacherBadges);
+  const courseModules = useContent("teacher-mock-data.courseModules", cmsDefaults_courseModules);
+  const moduleStatusLabels = useContent("teacher-mock-data.moduleStatusLabels", cmsDefaults_moduleStatusLabels);
   const [profile, setProfile] = useState({
     firstName: teacher.firstName,
     lastName: teacher.lastName,
@@ -20,9 +33,7 @@ export default function TeacherProfilePage() {
   });
 
   useEffect(() => {
-    // Правки из «Редактирование профиля» хранятся локально
-    const stored = localStorage.getItem("teacher-profile");
-    if (stored) setProfile((p) => ({ ...p, ...JSON.parse(stored) }));
+    currentProfile().then(p => setProfile(v => ({...v,firstName:p.name,lastName:p.surname,email:p.email,school:p.organization?.name ?? "—"}))).catch(() => {});
   }, []);
 
   const earnedBadges = teacherBadges.filter((b) => b.earned);
@@ -33,11 +44,9 @@ export default function TeacherProfilePage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Личный кабинет
-        </h1>
+          <ContentText id="copy.app.teacher.panel.profile.page.001" fallback="Личный кабинет" /></h1>
         <p className="mt-1 text-slate-500">
-          Ваш профессиональный прогресс на платформе
-        </p>
+          <ContentText id="copy.app.teacher.panel.profile.page.002" fallback="Ваш профессиональный прогресс на платформе" /></p>
       </div>
 
       {/* Профиль */}
@@ -63,8 +72,7 @@ export default function TeacherProfilePage() {
             className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
             <Pencil size={14} />
-            Редактировать
-          </Link>
+            <ContentText id="copy.app.teacher.panel.profile.page.003" fallback="Редактировать" /></Link>
         </div>
       </section>
 
@@ -72,7 +80,7 @@ export default function TeacherProfilePage() {
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="flex items-center gap-2 font-semibold">
           <Award size={16} className="text-slate-400" />
-          Достижения · {earnedBadges.length} из {teacherBadges.length}
+          <ContentText id="copy.app.teacher.panel.profile.page.004" fallback="Достижения · " />{earnedBadges.length} <ContentText id="copy.app.teacher.panel.profile.page.005" fallback=" из " />{teacherBadges.length}
         </h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {teacherBadges.map((b) => (
@@ -97,14 +105,13 @@ export default function TeacherProfilePage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="flex items-center gap-2 font-semibold">
             <BookOpen size={16} className="text-slate-400" />
-            Пройденные модули · {doneModules.length} из {courseModules.length}
+            <ContentText id="copy.app.teacher.panel.profile.page.006" fallback="Пройденные модули · " />{doneModules.length} <ContentText id="copy.app.teacher.panel.profile.page.007" fallback=" из " />{courseModules.length}
           </h2>
           <Link
             href="/teacher/course"
             className="text-sm font-medium text-teal-600 hover:text-teal-700"
           >
-            К курсу →
-          </Link>
+            <ContentText id="copy.app.teacher.panel.profile.page.008" fallback="К курсу →" /></Link>
         </div>
         <ul className="mt-3 divide-y divide-slate-100">
           {doneModules.map((m) => (

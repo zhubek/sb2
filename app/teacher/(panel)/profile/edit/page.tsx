@@ -1,6 +1,14 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { ArrowLeft, Camera, Check, Lock } from "lucide-react";
+import { type CurrentProfile, currentProfile } from "@/lib/current-profile";
+import { api } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { teacher } from "@/lib/teacher-mock-data";
@@ -32,13 +40,29 @@ const lockedFields = [
   { label: "Email", value: teacher.email },
 ];
 
+const inlineDefault_teacher = teacher;
+
 export default function ProfileEditPage() {
+  const pageCopy = useCopy("copy.app.teacher.panel.profile.edit.page");
+  const teacher = useContent("teacher-mock-data.teacher", inlineDefault_teacher);
+  const defaults = {
+  firstName: teacher.firstName,
+  lastName: teacher.lastName,
+  role: teacher.role,
+  phone: "+7 701 245 18 90",
+};
+  const [account, setAccount] = useState<CurrentProfile | null>(null);
+  const lockedFields = [
+    {label: "Школа", value: account?.organization?.name ?? "—"},
+    {label: "Город", value: account?.organization?.city?.name ?? "—"},
+    {label: "Email", value: account?.email ?? ""},
+  ];
   const [form, setForm] = useState<Profile>(defaults);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const stored = localStorage.getItem(PROFILE_KEY);
-    if (stored) setForm({ ...defaults, ...JSON.parse(stored) });
+    currentProfile().then(p => {setAccount(p); setForm(v => ({...v,firstName:p.name,lastName:p.surname,phone:p.phone??"",role:p.jobTitle??""}));}).catch(() => setError("Не удалось загрузить профиль."));
   }, []);
 
   function set<K extends keyof Profile>(key: K, value: Profile[K]) {
@@ -46,27 +70,29 @@ export default function ProfileEditPage() {
     setSaved(false);
   }
 
-  function handleSave() {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(form));
-    setSaved(true);
+  async function handleSave() {
+    setSaved(false); setError("");
+    try {
+      const profile = await currentProfile();
+      await api(`/users/${profile.id}`, {method:"PATCH",body:JSON.stringify({name:form.firstName,surname:form.lastName,phone:form.phone,jobTitle:form.role})});
+      setSaved(true);
+    } catch { setError("Не удалось сохранить профиль. Повторите попытку."); }
   }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      {error && <p role="alert" className="text-red-700">{error}</p>}
       <div>
         <Link
           href="/teacher/profile"
           className="flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-700"
         >
           <ArrowLeft size={15} />
-          Личный кабинет
-        </Link>
+          <ContentText id="copy.app.teacher.panel.profile.edit.page.001" fallback="Личный кабинет" /></Link>
         <h1 className="font-display mt-2 text-2xl font-semibold tracking-tight">
-          Редактирование профиля
-        </h1>
+          <ContentText id="copy.app.teacher.panel.profile.edit.page.002" fallback="Редактирование профиля" /></h1>
         <p className="mt-1 text-slate-500">
-          Эти данные видят ученики и родители при записи на консультацию
-        </p>
+          <ContentText id="copy.app.teacher.panel.profile.edit.page.003" fallback="Эти данные видят ученики и родители при записи на консультацию" /></p>
       </div>
 
       <section className="rounded-xl border border-slate-200 bg-white p-6">
@@ -77,52 +103,50 @@ export default function ProfileEditPage() {
               {(form.firstName[0] ?? "") + (form.lastName[0] ?? "")}
             </div>
             <button
-              aria-label="Изменить фото"
+              aria-label={pageCopy("x003","Изменить фото")}
               className="absolute -right-1 -bottom-1 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:text-teal-600"
             >
               <Camera size={14} />
             </button>
           </div>
           <div className="text-sm text-slate-500">
-            <p className="font-medium text-slate-700">Фото профиля</p>
+            <p className="font-medium text-slate-700"><ContentText id="copy.app.teacher.panel.profile.edit.page.004" fallback="Фото профиля" /></p>
             <p className="mt-0.5 text-xs">
-              JPG или PNG, до 2 МБ. Пока используются инициалы.
-            </p>
+              <ContentText id="copy.app.teacher.panel.profile.edit.page.005" fallback="JPG или PNG, до 2 МБ. Пока используются инициалы." /></p>
           </div>
         </div>
 
         {/* Редактируемые поля */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-xs font-medium text-slate-500">Имя</span>
+            <span className="text-xs font-medium text-slate-500"><ContentText id="copy.app.teacher.panel.profile.edit.page.006" fallback="Имя" /></span>
             <input
-              value={form.firstName}
+              disabled={!account} value={form.firstName}
               onChange={(e) => set("firstName", e.target.value)}
               className={`mt-1.5 ${fieldCls}`}
             />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-slate-500">Фамилия</span>
+            <span className="text-xs font-medium text-slate-500"><ContentText id="copy.app.teacher.panel.profile.edit.page.007" fallback="Фамилия" /></span>
             <input
-              value={form.lastName}
+              disabled={!account} value={form.lastName}
               onChange={(e) => set("lastName", e.target.value)}
               className={`mt-1.5 ${fieldCls}`}
             />
           </label>
           <label className="block">
             <span className="text-xs font-medium text-slate-500">
-              Должность
-            </span>
+              <ContentText id="copy.app.teacher.panel.profile.edit.page.008" fallback="Должность" /></span>
             <input
-              value={form.role}
+              disabled={!account} value={form.role}
               onChange={(e) => set("role", e.target.value)}
               className={`mt-1.5 ${fieldCls}`}
             />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-slate-500">Телефон</span>
+            <span className="text-xs font-medium text-slate-500"><ContentText id="copy.app.teacher.panel.profile.edit.page.009" fallback="Телефон" /></span>
             <input
-              value={form.phone}
+              disabled={!account} value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
               className={`mt-1.5 ${fieldCls}`}
             />
@@ -133,8 +157,7 @@ export default function ProfileEditPage() {
         <div className="mt-6 rounded-xl bg-slate-50 p-4">
           <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <Lock size={12} />
-            Данные учётной записи — изменяются администратором платформы
-          </p>
+            <ContentText id="copy.app.teacher.panel.profile.edit.page.010" fallback="Данные учётной записи — изменяются администратором платформы" /></p>
           <div className="mt-3 grid gap-4 sm:grid-cols-3">
             {lockedFields.map((f) => (
               <label key={f.label} className="block">
@@ -157,14 +180,13 @@ export default function ProfileEditPage() {
             className="flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
           >
             {saved && <Check size={15} />}
-            {saved ? "Сохранено" : "Сохранить изменения"}
+            {saved ? pageCopy("x004","Сохранено") : pageCopy("x005","Сохранить изменения")}
           </button>
           <Link
             href="/teacher/profile"
             className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
-            Отмена
-          </Link>
+            <ContentText id="copy.app.teacher.panel.profile.edit.page.011" fallback="Отмена" /></Link>
         </div>
       </section>
     </div>

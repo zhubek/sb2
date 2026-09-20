@@ -1,4 +1,10 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { Lightbulb, TrendingUp } from "lucide-react";
 import { useState } from "react";
@@ -26,16 +32,44 @@ const tabs = [
   },
 ] as const;
 
+const inlineDefault_mainSkills = mainSkills;
+const inlineDefault_softSkills = softSkills;
+const inlineDefault_hardSkills = hardSkills;
+
 export default function SkillsPage() {
+  const pageCopy = useCopy("copy.app.skills.page");
+  const mainSkills = useContent("info-data.mainSkills", inlineDefault_mainSkills);
+  const softSkills = useContent("info-data.softSkills", inlineDefault_softSkills);
+  const hardSkills = useContent("info-data.hardSkills", inlineDefault_hardSkills);
+  const tabs = [
+  {
+    key: "main",
+    label: pageCopy("x001","Основные навыки"),
+    desc: pageCopy("x002","База, которая нужна в любой профессии"),
+    skills: mainSkills,
+  },
+  {
+    key: "soft",
+    label: "Soft skills",
+    desc: pageCopy("x003","Гибкие навыки: общение, мышление, самоорганизация"),
+    skills: softSkills,
+  },
+  {
+    key: "hard",
+    label: "Hard skills",
+    desc: pageCopy("x004","Профессиональные навыки, которым можно обучиться"),
+    skills: hardSkills,
+  },
+] as const;
   const [active, setActive] = useState<(typeof tabs)[number]["key"]>("main");
   const tab = tabs.find((t) => t.key === active)!;
 
   return (
     <InfoShell
       active="/skills"
-      eyebrow="Справочник"
-      title="Необходимые навыки"
-      lede="Какие навыки ценят работодатели, где они пригодятся и как их развивать — основные, гибкие и профессиональные."
+      eyebrow={pageCopy("x005","Справочник")}
+      title={pageCopy("x006","Необходимые навыки")}
+      lede={pageCopy("x007","Какие навыки ценят работодатели, где они пригодятся и как их развивать — основные, гибкие и профессиональные.")}
     >
       <div className="mb-3 flex justify-center">
         <div className="flex rounded-2xl bg-stone-100 p-1 text-sm font-medium">
@@ -71,8 +105,7 @@ export default function SkillsPage() {
                 <Lightbulb size={15} className="mt-0.5 flex-none text-orange-400" />
                 <span>
                   <span className="font-medium text-stone-600">
-                    Где пригодится:
-                  </span>{" "}
+                    <ContentText id="copy.app.skills.page.001" fallback="Где пригодится:" /></span>{" "}
                   {s.example}
                 </span>
               </p>
@@ -80,8 +113,7 @@ export default function SkillsPage() {
                 <TrendingUp size={15} className="mt-0.5 flex-none text-violet-500" />
                 <span>
                   <span className="font-medium text-stone-600">
-                    Как развивать:
-                  </span>{" "}
+                    <ContentText id="copy.app.skills.page.002" fallback="Как развивать:" /></span>{" "}
                   {s.develop}
                 </span>
               </p>

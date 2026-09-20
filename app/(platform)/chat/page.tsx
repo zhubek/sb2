@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -18,7 +23,17 @@ const WORD_MS = 140; // скорость «стриминга» — слово �
 const LONG_ANSWER =
   "Отличный вопрос! Судя по результатам ваших тестов, у вас яркий креативно-коммуникативный профиль: DeBruce показал топ-навыки «Креативность», «Коммуникация» и «Эмпатия», а тип ENFJ это только подтверждает. Вам подойдут профессии, где нужно придумывать и рассказывать: PR-менеджер, журналист, бренд-стратег, продюсер медиапроектов. Рекомендую начать с направления «Журналистика и информация» и программы «Реклама и связи с общественностью» — её ведут КазНУ, ЕНУ и Туран, причём в двух из них есть гранты и общежития. Хотите, покажу эти вузы в навигаторе с уже настроенными фильтрами? А ещё могу объяснить, почему именно эти навыки так ценятся в медиа-индустрии.";
 
+const cmsDefaults_aiTemplateQuestions = aiTemplateQuestions;
+const cmsDefaults_currentUser = currentUser;
+
+const inlineDefault_LONG_ANSWER = LONG_ANSWER;
+
 export default function ChatPage() {
+  const pageCopy = useCopy("copy.app.platform.chat.page");
+  const editedReply = useContent<string | null>("inline.app.platform.chat.page.LONG_ANSWER", null);
+  const LONG_ANSWER = useContent("inline.app.platform.chat.page.LONG_ANSWER", inlineDefault_LONG_ANSWER);
+  const aiTemplateQuestions = useContent("mock-data.aiTemplateQuestions", cmsDefaults_aiTemplateQuestions);
+  const currentUser = useContent("mock-data.currentUser", cmsDefaults_currentUser);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [streaming, setStreaming] = useState<string | null>(null);
@@ -67,7 +82,7 @@ export default function ChatPage() {
       `/chats/${chatIdRef.current}/messages`,
       { method: "POST", body: JSON.stringify({ text }) }
     );
-    return res?.assistantMessage.text ?? LONG_ANSWER;
+    return editedReply ?? res?.assistantMessage.text ?? LONG_ANSWER;
   }
 
   function send(text: string) {
@@ -124,7 +139,7 @@ export default function ChatPage() {
             <IconAI className="mt-0.5 h-8 w-8 shrink-0" />
             <div className="max-w-[80%] rounded-2xl bg-white px-4 py-3 text-sm leading-relaxed text-stone-800 shadow-sm">
               {thinking ? (
-                <span className="text-stone-400">думает…</span>
+                <span className="text-stone-400"><ContentText id="copy.app.platform.chat.page.001" fallback="думает…" /></span>
               ) : (
                 <>
                   {streaming}
@@ -154,11 +169,10 @@ export default function ChatPage() {
           }`}
         >
           <h1 className="font-display text-3xl font-semibold tracking-tight">
-            Чем помочь, {currentUser.firstName}?
+            <ContentText id="copy.app.platform.chat.page.002" fallback="Чем помочь, " />{currentUser.firstName}?
           </h1>
           <p className="mt-2 text-sm text-stone-500">
-            Я знаю ваши результаты тестов и весь справочник вузов
-          </p>
+            <ContentText id="copy.app.platform.chat.page.003" fallback="Я знаю ваши результаты тестов и весь справочник вузов" /></p>
 
           {/* Подсказка с fade in / fade out; клик — отправить */}
           <div className="mt-7 flex h-9 items-center justify-center">
@@ -183,7 +197,7 @@ export default function ChatPage() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Задайте вопрос…"
+            placeholder={pageCopy("x001","Задайте вопрос…")}
             className="flex-1 rounded-2xl border border-stone-200 bg-white px-5 py-3.5 text-sm shadow-sm outline-none transition focus:border-violet-400"
           />
           <button

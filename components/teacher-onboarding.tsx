@@ -1,4 +1,10 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { useEffect, useState } from "react";
 
@@ -35,7 +41,11 @@ const steps: { tour: string | null; title: string; text: string }[] = [
   },
 ];
 
+const inlineDefault_steps = steps;
+
 export default function TeacherOnboarding() {
+  const pageCopy = useCopy("copy.components.teacher-onboarding");
+  const steps = useContent("inline.components.teacher-onboarding.steps", inlineDefault_steps);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -106,7 +116,7 @@ export default function TeacherOnboarding() {
         }
       >
         <p className="font-mono text-xs text-teal-600">
-          Шаг {step + 1} из {steps.length}
+          <ContentText id="copy.components.teacher-onboarding.001" fallback="Шаг " />{step + 1} <ContentText id="copy.components.teacher-onboarding.002" fallback=" из " />{steps.length}
         </p>
         <h2 className="font-display mt-2 text-lg font-semibold tracking-tight">
           {s.title}
@@ -129,22 +139,20 @@ export default function TeacherOnboarding() {
             onClick={finish}
             className="text-sm text-slate-400 hover:text-slate-600"
           >
-            Пропустить
-          </button>
+            <ContentText id="copy.components.teacher-onboarding.003" fallback="Пропустить" /></button>
           <div className="flex gap-2">
             {step > 0 && (
               <button
                 onClick={() => setStep(step - 1)}
                 className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
               >
-                Назад
-              </button>
+                <ContentText id="copy.components.teacher-onboarding.004" fallback="Назад" /></button>
             )}
             <button
               onClick={() => (last ? finish() : setStep(step + 1))}
               className="rounded-xl bg-teal-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-700"
             >
-              {last ? "Начать работу" : "Далее"}
+              {last ? pageCopy("x001","Начать работу") : pageCopy("x002","Далее")}
             </button>
           </div>
         </div>

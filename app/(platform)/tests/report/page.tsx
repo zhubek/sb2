@@ -1,3 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import DownloadPdf from "@/components/download-pdf";
@@ -25,33 +31,51 @@ export const metadata = { title: "Профориентационный отчё�
 
 // Комплексный отчёт по трём тестам — по структуре референсного PDF
 // «Профориентационный отчёт»
-export default function GeneralReportPage() {
+const cmsDefaults_hollandScales = hollandScales;
+const cmsDefaults_skills = skills;
+const cmsDefaults_debruceIndustries = debruceIndustries;
+const cmsDefaults_debruceWhatIs = debruceWhatIs;
+const cmsDefaults_generalReport = generalReport;
+const cmsDefaults_hollandProfessions = hollandProfessions;
+const cmsDefaults_hollandWhatIs = hollandWhatIs;
+const cmsDefaults_mbtiReport = mbtiReport;
+const cmsDefaults_mbtiWhatIs = mbtiWhatIs;
+
+function GeneralReportPage() {
+  const pageCopy = getCopy("copy.app.platform.tests.report.page");
+  const hollandScales = getContent("mock-data.hollandScales", cmsDefaults_hollandScales);
+  const skills = getContent("mock-data.skills", cmsDefaults_skills);
+  const mbtiReport = getContent("report-data.mbtiReport", cmsDefaults_mbtiReport);
+  const generalReport = getContent("report-data.generalReport", cmsDefaults_generalReport);
+  const debruceWhatIs = getContent("report-data.debruceWhatIs", cmsDefaults_debruceWhatIs);
+  const debruceIndustries = getContent("report-data.debruceIndustries", cmsDefaults_debruceIndustries);
+  const mbtiWhatIs = getContent("report-data.mbtiWhatIs", cmsDefaults_mbtiWhatIs);
+  const hollandWhatIs = getContent("report-data.hollandWhatIs", cmsDefaults_hollandWhatIs);
+  const hollandProfessions = getContent("report-data.hollandProfessions", cmsDefaults_hollandProfessions);
   const sortedHolland = [...hollandScales].sort((a, b) => b.score - a.score);
   const code = sortedHolland.slice(0, 3).map((s) => s.code).join("");
   const codeNames = sortedHolland.slice(0, 3).map((s) => s.name).join(", ");
 
   return (
     <ReportShell
-      eyebrow="AI Профориентатор · Профориентационный отчёт"
-      title="Комплексный отчёт"
-      subtitle="Сводный анализ по трём тестам: способности, тип личности и интересы"
+      eyebrow={pageCopy("x001","AI Профориентатор · Профориентационный отчёт")}
+      title={pageCopy("x002","Комплексный отчёт")}
+      subtitle={pageCopy("x003","Сводный анализ по трём тестам: способности, тип личности и интересы")}
     >
       {/* Хиро: три ключевых результата */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-7 md:p-8">
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Ведущая способность
-            </p>
+              <ContentText id="copy.app.platform.tests.report.page.001" fallback="Ведущая способность" /></p>
             <p className="font-display mt-1 text-2xl text-violet-700">
               {skills[0].name}
             </p>
-            <p className="mt-1 text-xs text-stone-500">тест DeBruce</p>
+            <p className="mt-1 text-xs text-stone-500"><ContentText id="copy.app.platform.tests.report.page.002" fallback="тест DeBruce" /></p>
           </div>
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Тип личности
-            </p>
+              <ContentText id="copy.app.platform.tests.report.page.003" fallback="Тип личности" /></p>
             <p className="font-display mt-1 text-2xl text-violet-700">
               {mbtiReport.type}
             </p>
@@ -59,8 +83,7 @@ export default function GeneralReportPage() {
           </div>
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Код Холланда
-            </p>
+              <ContentText id="copy.app.platform.tests.report.page.004" fallback="Код Холланда" /></p>
             <p className="font-display mt-1 text-2xl tracking-[0.15em] text-violet-700">
               {code}
             </p>
@@ -69,8 +92,7 @@ export default function GeneralReportPage() {
         </div>
         <div className="mt-5 rounded-2xl bg-white/70 px-5 py-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-violet-600 uppercase">
-            Твой профиль
-          </p>
+            <ContentText id="copy.app.platform.tests.report.page.005" fallback="Твой профиль" /></p>
           <p className="mt-2 text-sm leading-relaxed text-violet-900/80">
             {generalReport.profile}
           </p>
@@ -78,13 +100,12 @@ export default function GeneralReportPage() {
       </section>
 
       {/* Тест 1. DeBruce */}
-      <Sect kicker="Тест 1 · DeBruce" title="Профессиональные способности">
+      <Sect kicker={pageCopy("x004","Тест 1 · DeBruce")} title={pageCopy("x005","Профессиональные способности")}>
         <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
           {debruceWhatIs}
         </p>
         <p className="mt-4 text-sm font-semibold text-stone-700">
-          По итогам теста выявлены три ведущие способности
-        </p>
+          <ContentText id="copy.app.platform.tests.report.page.006" fallback="По итогам теста выявлены три ведущие способности" /></p>
         <div className="mt-3">
           <TopSkillCards />
         </div>
@@ -102,7 +123,7 @@ export default function GeneralReportPage() {
                 <div>
                   <p className={`text-sm font-semibold ${m.title}`}>{ind.name}</p>
                   <p className="mt-1 text-xs leading-relaxed text-stone-500">
-                    Рекомендуемые профессии: {ind.professions.join(" · ")}
+                    <ContentText id="copy.app.platform.tests.report.page.007" fallback="Рекомендуемые профессии: " />{ind.professions.join(" · ")}
                   </p>
                 </div>
               </div>
@@ -113,12 +134,11 @@ export default function GeneralReportPage() {
           href="/tests/debruce/report"
           className="mt-4 inline-block text-sm font-medium underline decoration-stone-300 underline-offset-4 hover:decoration-violet-600"
         >
-          Полный отчёт по способностям →
-        </Link>
+          <ContentText id="copy.app.platform.tests.report.page.008" fallback="Полный отчёт по способностям →" /></Link>
       </Sect>
 
       {/* Тест 2. MBTI */}
-      <Sect kicker="Тест 2 · MBTI" title="Тип личности">
+      <Sect kicker={pageCopy("x006","Тест 2 · MBTI")} title={pageCopy("x007","Тип личности")}>
         <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
           {mbtiWhatIs}
         </p>
@@ -131,8 +151,7 @@ export default function GeneralReportPage() {
             {mbtiReport.descParas[0]}
           </p>
           <p className="mt-5 text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-            Показатели по шкалам
-          </p>
+            <ContentText id="copy.app.platform.tests.report.page.009" fallback="Показатели по шкалам" /></p>
           <div className="mt-3">
             <MbtiBars />
           </div>
@@ -141,12 +160,11 @@ export default function GeneralReportPage() {
           href="/tests/mbti/report"
           className="mt-4 inline-block text-sm font-medium underline decoration-stone-300 underline-offset-4 hover:decoration-violet-600"
         >
-          Полный отчёт по типу личности →
-        </Link>
+          <ContentText id="copy.app.platform.tests.report.page.010" fallback="Полный отчёт по типу личности →" /></Link>
       </Sect>
 
       {/* Тест 3. Holland */}
-      <Sect kicker="Тест 3 · Holland RIASEC" title="Профессиональные интересы">
+      <Sect kicker={pageCopy("x008","Тест 3 · Holland RIASEC")} title={pageCopy("x009","Профессиональные интересы")}>
         <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
           {hollandWhatIs}
         </p>
@@ -158,7 +176,7 @@ export default function GeneralReportPage() {
         </div>
         <div className="mt-3 rounded-2xl border border-stone-200 bg-white px-5 py-4">
           <p className="text-sm font-semibold text-stone-800">
-            Рекомендуемые профессии по коду {code}
+            <ContentText id="copy.app.platform.tests.report.page.011" fallback="Рекомендуемые профессии по коду " />{code}
           </p>
           <p className="mt-1 text-xs leading-relaxed text-stone-500">
             {hollandProfessions
@@ -171,21 +189,16 @@ export default function GeneralReportPage() {
           href="/tests/holland/report"
           className="mt-4 inline-block text-sm font-medium underline decoration-stone-300 underline-offset-4 hover:decoration-violet-600"
         >
-          Полный отчёт по интересам →
-        </Link>
+          <ContentText id="copy.app.platform.tests.report.page.012" fallback="Полный отчёт по интересам →" /></Link>
       </Sect>
 
       {/* Комплексный ИИ-анализ */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-7 md:p-8">
         <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-violet-600 uppercase">
           <Sparkles size={14} />
-          Комплексный ИИ-анализ
-        </p>
+          <ContentText id="copy.app.platform.tests.report.page.013" fallback="Комплексный ИИ-анализ" /></p>
         <p className="mt-3 text-sm leading-relaxed text-violet-900/75">
-          Три теста вместе помогают лучше понять твои сильные стороны. Каждый из
-          них показывает разные стороны твоих способностей, а вместе они дают
-          более полную картину.
-        </p>
+          <ContentText id="copy.app.platform.tests.report.page.014" fallback="Три теста вместе помогают лучше понять твои сильные стороны. Каждый из них показывает разные стороны твоих способностей, а вместе они дают более полную картину." /></p>
         <div className="mt-4 space-y-2.5">
           {generalReport.synthesis.map((s) => (
             <div key={s.test} className="rounded-2xl bg-white px-5 py-4">
@@ -207,10 +220,11 @@ export default function GeneralReportPage() {
           href="/universities"
           className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
-          Подобрать программы и вузы
-        </Link>
+          <ContentText id="copy.app.platform.tests.report.page.015" fallback="Подобрать программы и вузы" /></Link>
         <DownloadPdf />
       </div>
     </ReportShell>
   );
 }
+
+export default withPublishedContent(GeneralReportPage);

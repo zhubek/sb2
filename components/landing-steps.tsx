@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { Bot, FileCheck2, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +13,7 @@ import { IconAI, IconDone, IconRobot } from "@/components/compass-marks";
 
 // ── Мокап 1: три теста проходятся по очереди ────────────────────────────────
 function TestsMockup({ isActive }: { isActive: boolean }) {
+  const pageCopy = useCopy("copy.components.landing-steps");
   const [stage, setStage] = useState(0); // 0..3 — сколько тестов завершено
 
   useEffect(() => {
@@ -26,9 +31,9 @@ function TestsMockup({ isActive }: { isActive: boolean }) {
   }, [isActive]);
 
   const tests = [
-    { name: "DeBruce", tag: "10 навыков" },
-    { name: "MBTI", tag: "тип личности" },
-    { name: "Голланд", tag: "интересы" },
+    { name: "DeBruce", tag: pageCopy("x001","10 навыков") },
+    { name: "MBTI", tag: pageCopy("x002","тип личности") },
+    { name: pageCopy("x003","Голланд"), tag: pageCopy("x004","интересы") },
   ];
 
   return (
@@ -50,14 +55,12 @@ function TestsMockup({ isActive }: { isActive: boolean }) {
               </span>
               {done ? (
                 <span className="animate-[lp-pop_0.4s_ease-out] font-mono text-xs font-bold text-teal-600">
-                  ✓ пройден
-                </span>
+                  <ContentText id="copy.components.landing-steps.001" fallback="✓ пройден" /></span>
               ) : running ? (
                 <span className="animate-pulse font-mono text-xs text-violet-500">
-                  идёт тест…
-                </span>
+                  <ContentText id="copy.components.landing-steps.002" fallback="идёт тест…" /></span>
               ) : (
-                <span className="font-mono text-xs text-stone-400">ожидает</span>
+                <span className="font-mono text-xs text-stone-400"><ContentText id="copy.components.landing-steps.003" fallback="ожидает" /></span>
               )}
             </div>
             <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-stone-200">
@@ -75,6 +78,7 @@ function TestsMockup({ isActive }: { isActive: boolean }) {
 
 // ── Мокап 2: ИИ собирает комплексный отчёт ──────────────────────────────────
 function ReportMockup({ isActive }: { isActive: boolean }) {
+  const pageCopy = useCopy("copy.components.landing-steps");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -88,9 +92,9 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
   }, [isActive]);
 
   const skills = [
-    { name: "Креативность", v: 92 },
-    { name: "Коммуникация", v: 88 },
-    { name: "Эмпатия", v: 85 },
+    { name: pageCopy("x005","Креативность"), v: 92 },
+    { name: pageCopy("x006","Коммуникация"), v: 88 },
+    { name: pageCopy("x007","Эмпатия"), v: 85 },
   ];
 
   return (
@@ -102,8 +106,7 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
         }`}
       >
         <Sparkles size={13} />
-        ИИ анализирует результаты трёх тестов…
-      </div>
+        <ContentText id="copy.components.landing-steps.004" fallback="ИИ анализирует результаты трёх тестов…" /></div>
 
       {/* Готовый отчёт */}
       <div
@@ -114,20 +117,16 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
         {/* Запрос ученика */}
         <div className="rounded-2xl border border-stone-100 bg-stone-50 p-3">
           <p className="font-mono text-xs text-stone-600">
-            <span className="text-violet-600">Ученик:</span> собери мой полный
-            портрет по трём тестам
-          </p>
+            <span className="text-violet-600"><ContentText id="copy.components.landing-steps.005" fallback="Ученик:" /></span> <ContentText id="copy.components.landing-steps.006" fallback=" собери мой полный портрет по трём тестам" /></p>
         </div>
 
         <div className="rounded-2xl bg-violet-100 p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="flex items-center gap-2 text-sm font-semibold text-violet-800">
               <FileCheck2 size={14} className="text-violet-600" />
-              Комплексный отчёт готов
-            </span>
+              <ContentText id="copy.components.landing-steps.007" fallback="Комплексный отчёт готов" /></span>
             <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-violet-700">
-              ENFJ · Артистичный
-            </span>
+              <ContentText id="copy.components.landing-steps.008" fallback="ENFJ · Артистичный" /></span>
           </div>
           <div className="space-y-2">
             {skills.map((s, i) => (
@@ -149,7 +148,7 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {["PR-менеджер", "Журналист", "Дизайнер"].map((p) => (
+            {[pageCopy("x008","PR-менеджер"), pageCopy("x009","Журналист"), pageCopy("x010","Дизайнер")].map((p) => (
               <span
                 key={p}
                 className="rounded-full bg-white px-2 py-0.5 text-[10px] text-stone-600"
@@ -164,16 +163,14 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-stone-100 bg-stone-50 p-3">
             <p className="text-[10px] tracking-wider text-stone-400 uppercase">
-              Подходящих программ
-            </p>
+              <ContentText id="copy.components.landing-steps.009" fallback="Подходящих программ" /></p>
             <p className="font-display mt-0.5 text-lg text-stone-800">
               12
             </p>
           </div>
           <div className="rounded-2xl border border-stone-100 bg-stone-50 p-3">
             <p className="text-[10px] tracking-wider text-stone-400 uppercase">
-              Вузов с грантами
-            </p>
+              <ContentText id="copy.components.landing-steps.010" fallback="Вузов с грантами" /></p>
             <p className="font-display mt-0.5 text-lg text-stone-800">
               5
             </p>
@@ -186,7 +183,8 @@ function ReportMockup({ isActive }: { isActive: boolean }) {
 
 // ── Мокап 3: чат с ИИ ───────────────────────────────────────────────────────
 function ChatMockup({ isActive }: { isActive: boolean }) {
-  const question = "Какие профессии мне подходят?";
+  const pageCopy = useCopy("copy.components.landing-steps");
+  const question = pageCopy("x011","Какие профессии мне подходят?");
   const [typed, setTyped] = useState("");
   const [phase, setPhase] = useState(0); // 0: печатает, 1: думает, 2: ответ
 
@@ -230,8 +228,7 @@ function ChatMockup({ isActive }: { isActive: boolean }) {
         }`}
       >
         <Bot size={13} />
-        ассистент печатает…
-      </div>
+        <ContentText id="copy.components.landing-steps.011" fallback="ассистент печатает…" /></div>
 
       {/* Ответ ИИ */}
       <div
@@ -240,12 +237,9 @@ function ChatMockup({ isActive }: { isActive: boolean }) {
         }`}
       >
         <div className="max-w-[92%] rounded-2xl rounded-bl-md border border-stone-100 bg-stone-50 px-3.5 py-3 text-sm leading-relaxed text-stone-700">
-          Судя по вашим топ-навыкам — креативность и коммуникация — вам подходят
-          медиа и коммуникации. Начните с «Реклама и связи с общественностью»:
-          её ведут 3 вуза с грантами.
-        </div>
+          <ContentText id="copy.components.landing-steps.012" fallback="Судя по вашим топ-навыкам — креативность и коммуникация — вам подходят медиа и коммуникации. Начните с «Реклама и связи с общественностью»: её ведут 3 вуза с грантами." /></div>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {["Показать вузы", "Почему именно PR?", "А что ещё?"].map((c) => (
+          {[pageCopy("x012","Показать вузы"), pageCopy("x013","Почему именно PR?"), pageCopy("x014","А что ещё?")].map((c) => (
             <span
               key={c}
               className="rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-medium text-violet-700"
@@ -261,6 +255,7 @@ function ChatMockup({ isActive }: { isActive: boolean }) {
 
 // ── Основной блок ───────────────────────────────────────────────────────────
 export default function LandingSteps() {
+  const pageCopy = useCopy("copy.components.landing-steps");
   const [activeStep, setActiveStep] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -271,22 +266,22 @@ export default function LandingSteps() {
   const steps = [
     {
       id: "tests",
-      title: "Пройди три теста",
-      desc: "DeBruce, MBTI и Голланд — около 30 минут суммарно. Уже после первого теста открываются рекомендации.",
+      title: pageCopy("x015","Пройди три теста"),
+      desc: pageCopy("x016","DeBruce, MBTI и Голланд — около 30 минут суммарно. Уже после первого теста открываются рекомендации."),
       icon: <IconDone className="h-10 w-10" />,
       Mockup: TestsMockup,
     },
     {
       id: "report",
-      title: "Получи комплексный отчёт",
-      desc: "ИИ сводит результаты всех трёх тестов в один портрет: сильные стороны, тип личности, подходящие профессии и программы.",
+      title: pageCopy("x017","Получи комплексный отчёт"),
+      desc: pageCopy("x018","ИИ сводит результаты всех трёх тестов в один портрет: сильные стороны, тип личности, подходящие профессии и программы."),
       icon: <IconAI className="h-10 w-10" />,
       Mockup: ReportMockup,
     },
     {
       id: "chat",
-      title: "Спроси AI о чём угодно",
-      desc: "Ассистент знает твои результаты и справочник вузов. Любой вопрос — от «почему мне это подходит» до «где учиться».",
+      title: pageCopy("x019","Спроси AI о чём угодно"),
+      desc: pageCopy("x020","Ассистент знает твои результаты и справочник вузов. Любой вопрос — от «почему мне это подходит» до «где учиться»."),
       icon: <IconRobot className="h-10 w-10" />,
       Mockup: ChatMockup,
     },
@@ -327,15 +322,12 @@ export default function LandingSteps() {
         <div className="mb-16 md:text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-xs font-semibold tracking-wider text-violet-700 uppercase">
             <span className="h-1.5 w-1.5 rounded-2xl bg-violet-500" />
-            Твоё нечестное преимущество
-          </span>
+            <ContentText id="copy.components.landing-steps.013" fallback="Твоё нечестное преимущество" /></span>
           <h2 className="font-display mt-4 mb-4 text-3xl text-stone-800 md:text-5xl">
-            Не гадай. <span className="text-violet-600">Узнай.</span>
+            <ContentText id="copy.components.landing-steps.014" fallback="Не гадай. " /><span className="text-violet-600"><ContentText id="copy.components.landing-steps.015" fallback="Узнай." /></span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-stone-600">
-            Большинство выбирает профессию наугад. Платформа выстраивает путь из
-            трёх шагов — от диагностики до конкретных вузов.
-          </p>
+            <ContentText id="copy.components.landing-steps.016" fallback="Большинство выбирает профессию наугад. Платформа выстраивает путь из трёх шагов — от диагностики до конкретных вузов." /></p>
         </div>
 
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
@@ -420,8 +412,7 @@ export default function LandingSteps() {
                   <div className="h-3 w-3 rounded-full bg-stone-200" />
                   <div className="h-3 w-3 rounded-full bg-stone-200" />
                   <div className="ml-4 font-mono text-xs tracking-widest text-stone-400 uppercase">
-                    профориентатор
-                  </div>
+                    <ContentText id="copy.components.landing-steps.017" fallback="профориентатор" /></div>
                 </div>
 
                 {/* Контент шага */}

@@ -1,7 +1,9 @@
 "use client";
+import { useContent } from "@/lib/cms/client";
+
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useContentPathname as usePathname } from "@/lib/cms/client";
 
 const tabs = [
   { href: "/teacher/analytics", label: "Школа" },
@@ -10,7 +12,10 @@ const tabs = [
 ];
 
 // Подразделы аналитики: Школа · Классы · Ученики
+const inlineDefault_tabs = tabs;
+
 export default function AnalyticsTabs() {
+  const tabs = useContent("inline.components.analytics-tabs.tabs", inlineDefault_tabs);
   const pathname = usePathname();
 
   return (

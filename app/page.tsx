@@ -1,4 +1,10 @@
 "use client";
+import { LanguageSwitcher } from "@/components/content-language";
+import { useCopy, useContentLocale } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import {
   ArrowRight,
@@ -515,6 +521,18 @@ const finalCta = {
 
 // Экран приложения: лёгкая белая карточка с мягкой тенью — без тёмного
 // «корпуса» телефона
+const cmsDefaults_nav = nav;
+const cmsDefaults_hero = hero;
+const cmsDefaults_skills = skills;
+const cmsDefaults_how = how;
+const cmsDefaults_what = what;
+const cmsDefaults_panes = panes;
+const cmsDefaults_paneScreens = paneScreens;
+const cmsDefaults_privacy = privacy;
+const cmsDefaults_faq = faq;
+const cmsDefaults_codes = codes;
+const cmsDefaults_finalCta = finalCta;
+
 function Phone({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full max-w-[330px] rounded-[28px] border border-stone-100 bg-white p-5 shadow-[0_1px_2px_rgba(38,36,89,0.06),0_24px_60px_rgba(38,36,89,0.14)]">
@@ -577,6 +595,7 @@ function ScreenTag({ children }: { children: React.ReactNode }) {
 
 // Полосы навыков вырастают, когда карточка становится активной
 function SkillBars({ lang, active = true }: { lang: Lang; active?: boolean }) {
+  const skills = useContent("landing.skills", cmsDefaults_skills);
   return (
     <>
       {skills.map((s, i) => (
@@ -627,13 +646,25 @@ function NavRow({
 /* ─────────────────────────────── Страница ──────────────────────────────── */
 
 export default function WelcomePage() {
-  const [lang, setLang] = useState<Lang>("ru");
+  const pageCopy = useCopy("copy.app.page");
+  const panes = useContent("landing.panes", cmsDefaults_panes);
+  const paneScreens = useContent("landing.paneScreens", cmsDefaults_paneScreens);
+  const nav = useContent("landing.nav", cmsDefaults_nav);
+  const hero = useContent("landing.hero", cmsDefaults_hero);
+  const how = useContent("landing.how", cmsDefaults_how);
+  const what = useContent("landing.what", cmsDefaults_what);
+  const privacy = useContent("landing.privacy", cmsDefaults_privacy);
+  const faq = useContent("landing.faq", cmsDefaults_faq);
+  const codes = useContent("landing.codes", cmsDefaults_codes);
+  const finalCta = useContent("landing.finalCta", cmsDefaults_finalCta);
+  const visitorLocale = useContentLocale();
+  const lang: Lang = visitorLocale === "kk" ? "kk" : "ru";
   const [pane, setPane] = useState(0);
   const [menu, setMenu] = useState(false);
   const dragX = useRef<number | null>(null);
 
   useEffect(() => {
-    document.documentElement.lang = lang;
+    // The root layout owns the selected document language.
   }, [lang]);
 
   // Появление блоков при скролле
@@ -817,8 +848,7 @@ export default function WelcomePage() {
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-3.5">
           <span className="font-display mr-auto flex items-center gap-2 text-sm tracking-tight text-stone-800">
             <LogoMark className="h-6 w-6" />
-            AI профориентатор
-          </span>
+            <ContentText id="copy.app.page.001" fallback="AI профориентатор" /></span>
           <nav className="hidden gap-6 text-sm text-stone-500 lg:flex">
             {nav.map((n) => (
               <a key={n.href} href={n.href} className="transition hover:text-stone-800">
@@ -826,28 +856,16 @@ export default function WelcomePage() {
               </a>
             ))}
           </nav>
-          <div className="flex overflow-hidden rounded-full border border-stone-200 text-[13px] font-medium">
-            {(["kk", "ru"] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`px-2.5 py-1.5 tracking-wide transition sm:px-3 ${
-                  lang === l ? "bg-stone-800 text-white" : "text-stone-500 hover:text-stone-800"
-                }`}
-              >
-                {l === "kk" ? "ҚАЗ" : "РУС"}
-              </button>
-            ))}
-          </div>
+          <LanguageSwitcher/>
           <Link
             href="/auth"
             className="hidden rounded-2xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 sm:block"
           >
-            {lang === "kk" ? "Кіру" : "Войти"}
+            {lang === "kk" ? pageCopy("x003","Кіру") : pageCopy("x004","Войти")}
           </Link>
           <button
             onClick={() => setMenu(!menu)}
-            aria-label={menu ? "Закрыть меню" : "Открыть меню"}
+            aria-label={menu ? pageCopy("x005","Закрыть меню") : pageCopy("x006","Открыть меню")}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 text-stone-600 lg:hidden"
           >
             {menu ? <X size={18} /> : <Menu size={18} />}
@@ -872,7 +890,7 @@ export default function WelcomePage() {
               href="/auth"
               className="mt-3 flex items-center justify-center gap-2 rounded-2xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white"
             >
-              {lang === "kk" ? "Кіру" : "Войти"}
+              {lang === "kk" ? pageCopy("x007","Кіру") : pageCopy("x008","Войти")}
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -1082,14 +1100,14 @@ export default function WelcomePage() {
             </div>
             <div className="flex items-center gap-2.5">
               <button
-                aria-label="Предыдущая карточка"
+                aria-label={pageCopy("x009","Предыдущая карточка")}
                 onClick={() => pickPane(pane - 1)}
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <button
-                aria-label="Следующая карточка"
+                aria-label={pageCopy("x010","Следующая карточка")}
                 onClick={() => pickPane(pane + 1)}
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
               >
@@ -1238,18 +1256,15 @@ export default function WelcomePage() {
 
       {/* Футер */}
       <footer className="border-t border-stone-100 py-8 text-center text-xs text-stone-400">
-        AI профориентатор ·{" "}
+        <ContentText id="copy.app.page.002" fallback="AI профориентатор ·" />{" "}
         <Link href="/teacher/login" className="transition hover:text-stone-600">
-          Для педагогов
-        </Link>{" "}
+          <ContentText id="copy.app.page.003" fallback="Для педагогов" /></Link>{" "}
         ·{" "}
         <Link href="/admin" className="transition hover:text-stone-600">
-          Для администраторов
-        </Link>{" "}
+          <ContentText id="copy.app.page.004" fallback="Для администраторов" /></Link>{" "}
         ·{" "}
         <Link href="/design" className="transition hover:text-stone-600">
-          Дизайн-система
-        </Link>
+          <ContentText id="copy.app.page.005" fallback="Дизайн-система" /></Link>
       </footer>
     </div>
   );

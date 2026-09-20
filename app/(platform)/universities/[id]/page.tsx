@@ -1,9 +1,10 @@
+import { withPublishedContent } from "@/lib/cms/server";
 import { notFound } from "next/navigation";
 import InstitutionView from "@/components/navigator/institution-view";
 import { buildInstitutionGroups, getDetail, getInstitution } from "@/lib/nav/server";
 
 // Страница заведения: данные собираются на сервере из lib/nav/*.json
-export default async function InstitutionPage({
+async function InstitutionPage({
   params,
   searchParams,
 }: {
@@ -26,3 +27,5 @@ export default async function InstitutionPage({
     />
   );
 }
+
+export default withPublishedContent(InstitutionPage);

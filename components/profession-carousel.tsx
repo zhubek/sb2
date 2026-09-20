@@ -1,4 +1,8 @@
 "use client";
+import { useContent } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import {
   BarChart3,
@@ -62,6 +66,8 @@ const SLOT = 54; // шаг ленты карточек, px
 const TICK_MS = 1700;
 const CHART_MS = 3600;
 
+const inlineDefault_skills = skills;
+
 function radarPoint(i: number, r: number, cx = 50, cy = 40, R = 34) {
   const a = (Math.PI * 2 * i) / radar.length - Math.PI / 2;
   return [cx + Math.cos(a) * R * r, cy + Math.sin(a) * R * r] as const;
@@ -77,6 +83,7 @@ function radarPath(scale: number) {
 }
 
 export default function ProfessionCarousel() {
+  const skills = useContent("inline.components.profession-carousel.skills", inlineDefault_skills);
   const [idx, setIdx] = useState(0);
   const [chartIdx, setChartIdx] = useState(0);
   const [drag, setDrag] = useState<{ startY: number; offset: number } | null>(
@@ -123,8 +130,7 @@ export default function ProfessionCarousel() {
           <div className="h-2.5 w-2.5 rounded-full bg-stone-200" />
           <div className="ml-3 flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-stone-400 uppercase">
             <Sparkles size={10} className="text-orange-500" />
-            комплексный отчёт
-          </div>
+            <ContentText id="copy.components.profession-carousel.001" fallback="комплексный отчёт" /></div>
         </div>
 
         {/* Переключатель типов графиков — кликабельный */}
@@ -264,8 +270,7 @@ export default function ProfessionCarousel() {
         {/* Лента карточек профессий: 3D-барабан с перетаскиванием */}
         <div className="mt-4 border-t border-stone-100 pt-3">
           <p className="text-[10px] tracking-wider text-stone-400 uppercase">
-            Подходящие профессии
-          </p>
+            <ContentText id="copy.components.profession-carousel.002" fallback="Подходящие профессии" /></p>
           <div
             className={`relative mt-1.5 h-[168px] touch-none select-none ${
               drag ? "cursor-grabbing" : "cursor-grab"

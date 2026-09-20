@@ -1,5 +1,4 @@
 "use client";
-
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 // Обёртка для использования Lottie в серверных компонентах

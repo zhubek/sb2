@@ -1,5 +1,6 @@
-﻿"use client";
-
+"use client";
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
 import { useState } from "react";
 import { activityData, type Period } from "@/lib/teacher-mock-data";
 
@@ -10,7 +11,13 @@ const periods: { key: Period; label: string }[] = [
   { key: "year", label: "Год" },
 ];
 
+const cmsDefaults_activityData = activityData;
+
+const inlineDefault_periods = periods;
+
 export default function ActivityChart() {
+  const periods = useContent("inline.components.activity-chart.periods", inlineDefault_periods);
+  const activityData = useContent("teacher-mock-data.activityData", cmsDefaults_activityData);
   const [period, setPeriod] = useState<Period>("week");
   const [hover, setHover] = useState<number | null>(null);
   const data = activityData[period];
@@ -20,10 +27,9 @@ export default function ActivityChart() {
     <section className="rounded-xl border border-slate-200 bg-white p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-semibold">Активность учеников</h2>
+          <h2 className="font-semibold"><ContentText id="copy.components.activity-chart.001" fallback="Активность учеников" /></h2>
           <p className="text-sm text-slate-500">
-            Действия на платформе: тесты, разделы, AI-чат
-          </p>
+            <ContentText id="copy.components.activity-chart.002" fallback="Действия на платформе: тесты, разделы, AI-чат" /></p>
         </div>
         <div className="flex rounded-xl bg-slate-100 p-1 text-sm font-medium">
           {periods.map((p) => (

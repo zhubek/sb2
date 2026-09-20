@@ -1,4 +1,10 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+import { LanguageSwitcher } from "./content-language";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import {
   BarChart3,
@@ -14,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useContentPathname as usePathname } from "@/lib/cms/client";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { teacher } from "@/lib/teacher-mock-data";
@@ -31,36 +37,17 @@ const links = [
   { href: "/teacher/profile", label: "Личный кабинет", icon: UserRound, tour: "profile" },
 ];
 
+const cmsDefaults_teacher = teacher;
+
 export default function TeacherNav() {
+  const pageCopy = useCopy("copy.components.teacher-nav");
+  const teacher = useContent("teacher-mock-data.teacher", cmsDefaults_teacher);
   const pathname = usePathname();
-  // Переключатель языка платформы — в шапке (демо)
-  const [lang, setLang] = useState<"ru" | "kk">("ru");
   // Мобильное меню (выдвижная панель)
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
 
-  const langToggle = (
-    <div className="flex flex-col rounded-lg bg-slate-100 p-0.5 text-[10px] font-bold">
-      {(
-        [
-          ["ru", "РУС"],
-          ["kk", "ҚАЗ"],
-        ] as const
-      ).map(([key, label]) => (
-        <button
-          key={key}
-          onClick={() => setLang(key)}
-          className={`rounded-md px-1.5 py-0.5 transition ${
-            lang === key
-              ? "bg-white text-teal-700 shadow-sm"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
+  const langToggle = <LanguageSwitcher labels={{ru:pageCopy("x001","РУС"),kk:pageCopy("x002","ҚАЗ")}}/>;
 
   const menu = (
     <>
@@ -105,11 +92,11 @@ export default function TeacherNav() {
           </div>
         </div>
         <button
+          data-cms-navigation="true"
           onClick={() => signOut({ redirectTo: "/teacher/login" })}
           className="mt-3 block text-xs text-slate-400 hover:text-slate-600"
         >
-          Выйти
-        </button>
+          <ContentText id="copy.components.teacher-nav.001" fallback="Выйти" /></button>
       </div>
     </>
   );
@@ -124,14 +111,14 @@ export default function TeacherNav() {
           </span>
           <div>
             <p className="font-display text-sm leading-tight tracking-tight text-slate-800">
-              профориентатор<span className="text-teal-600">.</span>
+              <ContentText id="copy.components.teacher-nav.002" fallback="профориентатор" /><span className="text-teal-600">.</span>
             </p>
-            <p className="text-[11px] text-slate-400">Платформа педагога</p>
+            <p className="text-[11px] text-slate-400"><ContentText id="copy.components.teacher-nav.003" fallback="Платформа педагога" /></p>
           </div>
         </div>
         <button
           onClick={() => setOpen(true)}
-          aria-label="Открыть меню"
+          aria-label={pageCopy("x003","Открыть меню")}
           className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600"
         >
           <Menu size={18} />
@@ -152,20 +139,20 @@ export default function TeacherNav() {
                   AI
                 </span>
                 <p className="font-display text-sm tracking-tight text-slate-800">
-                  профориентатор<span className="text-teal-600">.</span>
+                  <ContentText id="copy.components.teacher-nav.004" fallback="профориентатор" /><span className="text-teal-600">.</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {langToggle}
                 <button
                   onClick={() => setOpen(false)}
-                  aria-label="Закрыть меню"
+                  aria-label={pageCopy("x004","Закрыть меню")}
                   className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100"
                 >
                   <X size={18} />
                 </button>
               </div>
             </div>
+            <div className="flex px-5 pb-4">{langToggle}</div>
             {menu}
           </aside>
         </div>
@@ -173,16 +160,16 @@ export default function TeacherNav() {
 
       {/* Десктоп: боковое меню */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-100 bg-white text-slate-600 lg:flex">
-      <div className="flex items-center justify-between gap-2.5 px-5 py-5">
+      <div className="flex flex-col items-start gap-3 px-5 py-5">
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-500 text-xs font-bold text-white">
             AI
           </span>
           <div>
             <p className="font-display text-sm leading-tight tracking-tight text-slate-800">
-              профориентатор<span className="text-teal-600">.</span>
+              <ContentText id="copy.components.teacher-nav.005" fallback="профориентатор" /><span className="text-teal-600">.</span>
             </p>
-            <p className="text-[11px] text-slate-400">Платформа педагога</p>
+            <p className="text-[11px] text-slate-400"><ContentText id="copy.components.teacher-nav.006" fallback="Платформа педагога" /></p>
           </div>
         </div>
         {langToggle}

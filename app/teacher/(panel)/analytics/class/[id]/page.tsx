@@ -1,14 +1,26 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReportButton from "@/components/report-button";
 import ReportPreview from "@/components/report-preview";
 import { schoolClasses, teacherStudents } from "@/lib/teacher-mock-data";
 
-export default async function ClassAnalyticsPage({
+const cmsDefaults_schoolClasses = schoolClasses;
+const cmsDefaults_teacherStudents = teacherStudents;
+
+async function ClassAnalyticsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const pageCopy = getCopy("copy.app.teacher.panel.analytics.class.id.page");
+  const schoolClasses = getContent("teacher-mock-data.schoolClasses", cmsDefaults_schoolClasses);
+  const teacherStudents = getContent("teacher-mock-data.teacherStudents", cmsDefaults_teacherStudents);
   const { id } = await params;
   const cls = schoolClasses.find((c) => c.id === id);
   if (!cls) notFound();
@@ -22,28 +34,26 @@ export default async function ClassAnalyticsPage({
         href="/teacher/analytics/classes"
         className="text-sm text-slate-400 hover:text-slate-600"
       >
-        ← К списку классов
-      </Link>
+        <ContentText id="copy.app.teacher.panel.analytics.class.id.page.001" fallback="← К списку классов" /></Link>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-400">Аналитика · уровень «Класс»</p>
-          <h1 className="mt-0.5 text-2xl font-bold">Класс {cls.name}</h1>
+          <p className="text-sm text-slate-400"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.002" fallback="Аналитика · уровень «Класс»" /></p>
+          <h1 className="mt-0.5 text-2xl font-bold"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.003" fallback="Класс " />{cls.name}</h1>
           <p className="mt-1 text-slate-500">
-            Классный руководитель: Жанар Касымова
-          </p>
+            <ContentText id="copy.app.teacher.panel.analytics.class.id.page.004" fallback="Классный руководитель: Жанар Касымова" /></p>
         </div>
         <div className="flex flex-wrap gap-2">
           <ReportPreview
             title={`Отчёт по классу ${cls.name}`}
             rows={[
-              { label: "Учеников в классе", value: String(cls.students) },
+              { label: pageCopy("x001","Учеников в классе"), value: String(cls.students) },
               {
-                label: "Начали диагностику",
+                label: pageCopy("x002","Начали диагностику"),
                 value: `${cls.tested} (${Math.round((cls.tested / cls.students) * 100)}%)`,
               },
-              { label: "Полные профили (3/3)", value: String(cls.fullProfiles) },
-              { label: "Ведущее направление", value: cls.topDirection },
+              { label: pageCopy("x003","Полные профили (3/3)"), value: String(cls.fullProfiles) },
+              { label: pageCopy("x004","Ведущее направление"), value: cls.topDirection },
             ]}
           />
           <ReportButton label={`Скачать отчёт по ${cls.name}`} />
@@ -52,35 +62,34 @@ export default async function ClassAnalyticsPage({
 
       {/* Средние показатели */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat value={cls.students} label="Учеников в классе" />
+        <Stat value={cls.students} label={pageCopy("x005","Учеников в классе")} />
         <Stat
           value={`${Math.round((cls.tested / cls.students) * 100)}%`}
-          label="Начали диагностику"
+          label={pageCopy("x006","Начали диагностику")}
         />
-        <Stat value={cls.fullProfiles} label="Полные профили (3/3)" />
+        <Stat value={cls.fullProfiles} label={pageCopy("x007","Полные профили (3/3)")} />
       </div>
 
       <div className="rounded-xl border border-teal-200 bg-teal-50 px-5 py-3.5 text-sm text-teal-900">
-        Ведущее направление класса:{" "}
+        <ContentText id="copy.app.teacher.panel.analytics.class.id.page.005" fallback="Ведущее направление класса:" />{" "}
         <span className="font-semibold">{cls.topDirection}</span>
       </div>
 
       {/* Сравнение учеников */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Ученики класса</h2>
+        <h2 className="font-semibold"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.006" fallback="Ученики класса" /></h2>
         <p className="text-sm text-slate-500">
-          Сравнение результатов · нажмите на ученика для перехода в карточку
-        </p>
+          <ContentText id="copy.app.teacher.panel.analytics.class.id.page.007" fallback="Сравнение результатов · нажмите на ученика для перехода в карточку" /></p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                <th className="py-2.5 pr-4 font-medium">Ученик</th>
-                <th className="py-2.5 pr-4 font-medium">Тесты</th>
-                <th className="py-2.5 pr-4 font-medium">Топ-навык</th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.008" fallback="Ученик" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.009" fallback="Тесты" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.010" fallback="Топ-навык" /></th>
                 <th className="py-2.5 pr-4 font-medium">MBTI</th>
-                <th className="py-2.5 pr-4 font-medium">Отрасль</th>
-                <th className="py-2.5 font-medium">Активность</th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.011" fallback="Отрасль" /></th>
+                <th className="py-2.5 font-medium"><ContentText id="copy.app.teacher.panel.analytics.class.id.page.012" fallback="Активность" /></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -129,13 +138,12 @@ export default async function ClassAnalyticsPage({
       {/* Пустые данные: реакция системы */}
       {notStarted > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3.5 text-sm text-amber-900">
-          ⚠ Не начали диагностику: {notStarted} ·{" "}
+          <ContentText id="copy.app.teacher.panel.analytics.class.id.page.013" fallback="⚠ Не начали диагностику: " />{notStarted} ·{" "}
           <Link
             href="/teacher/assistant"
             className="font-medium underline underline-offset-2"
           >
-            Спросить AI, как вовлечь
-          </Link>
+            <ContentText id="copy.app.teacher.panel.analytics.class.id.page.014" fallback="Спросить AI, как вовлечь" /></Link>
         </div>
       )}
     </div>
@@ -150,3 +158,5 @@ function Stat({ value, label }: { value: string | number; label: string }) {
     </div>
   );
 }
+
+export default withPublishedContent(ClassAnalyticsPage);

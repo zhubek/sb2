@@ -1,8 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
 import { notFound } from "next/navigation";
 import GopView from "@/components/navigator/gop-view";
 import { buildGopUnis, getGop } from "@/lib/nav/server";
 
-export default async function TeacherGopPage({ params }: { params: Promise<{ code: string }> }) {
+async function TeacherGopPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const g = getGop(code);
   if (!g) notFound();
@@ -10,3 +11,5 @@ export default async function TeacherGopPage({ params }: { params: Promise<{ cod
   void _univ;
   return <GopView g={info} unis={buildGopUnis(g)} base="/teacher/handbook" savable={false} />;
 }
+
+export default withPublishedContent(TeacherGopPage);

@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Search } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +23,16 @@ const testFilters: { key: TestFilter; label: string }[] = [
 const selectCls =
   "rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-teal-400";
 
+const cmsDefaults_schoolClasses = schoolClasses;
+const cmsDefaults_teacherStudents = teacherStudents;
+
+const inlineDefault_testFilters = testFilters;
+
 export default function StudentsAnalyticsPage() {
+  const pageCopy = useCopy("copy.app.teacher.panel.analytics.students.page");
+  const testFilters = useContent("inline.app.teacher.panel.analytics.students.page.testFilters", inlineDefault_testFilters);
+  const teacherStudents = useContent("teacher-mock-data.teacherStudents", cmsDefaults_teacherStudents);
+  const schoolClasses = useContent("teacher-mock-data.schoolClasses", cmsDefaults_schoolClasses);
   const [search, setSearch] = useState("");
   const [classId, setClassId] = useState("all");
   const [grade, setGrade] = useState("all");
@@ -41,11 +55,10 @@ export default function StudentsAnalyticsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <p className="text-sm text-slate-400">Аналитика · уровень «Ученики»</p>
-        <h1 className="mt-0.5 text-2xl font-bold">Ученики</h1>
+        <p className="text-sm text-slate-400"><ContentText id="copy.app.teacher.panel.analytics.students.page.001" fallback="Аналитика · уровень «Ученики»" /></p>
+        <h1 className="mt-0.5 text-2xl font-bold"><ContentText id="copy.app.teacher.panel.analytics.students.page.002" fallback="Ученики" /></h1>
         <p className="mt-1 text-slate-500">
-          Все ученики школы · отчёт по каждому доступен в его карточке
-        </p>
+          <ContentText id="copy.app.teacher.panel.analytics.students.page.003" fallback="Все ученики школы · отчёт по каждому доступен в его карточке" /></p>
       </div>
 
       <AnalyticsTabs />
@@ -60,7 +73,7 @@ export default function StudentsAnalyticsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск по имени и фамилии…"
+            placeholder={pageCopy("x001","Поиск по имени и фамилии…")}
             className="w-64 rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm outline-none transition focus:border-teal-400"
           />
         </div>
@@ -72,11 +85,10 @@ export default function StudentsAnalyticsPage() {
           }}
           className={selectCls}
         >
-          <option value="all">Все параллели</option>
+          <option value="all">{pageCopy("x002","Все параллели")}</option>
           {grades.map((g) => (
             <option key={g} value={g}>
-              {g}-я параллель
-            </option>
+              {g}{pageCopy("x003","-я параллель")}</option>
           ))}
         </select>
         <select
@@ -84,7 +96,7 @@ export default function StudentsAnalyticsPage() {
           onChange={(e) => setClassId(e.target.value)}
           className={selectCls}
         >
-          <option value="all">Все классы</option>
+          <option value="all">{pageCopy("x004","Все классы")}</option>
           {schoolClasses
             .filter((c) => grade === "all" || c.name.startsWith(grade))
             .map((c) => (
@@ -108,17 +120,17 @@ export default function StudentsAnalyticsPage() {
 
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="font-semibold">
-          Найдено учеников: {filtered.length}
+          <ContentText id="copy.app.teacher.panel.analytics.students.page.004" fallback="Найдено учеников: " />{filtered.length}
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                <th className="py-2.5 pr-4 font-medium">Ученик</th>
-                <th className="py-2.5 pr-4 font-medium">Класс</th>
-                <th className="py-2.5 pr-4 font-medium">Тесты</th>
-                <th className="py-2.5 pr-4 font-medium">Отрасль</th>
-                <th className="py-2.5 pr-4 font-medium">Активность</th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.students.page.005" fallback="Ученик" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.students.page.006" fallback="Класс" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.students.page.007" fallback="Тесты" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.students.page.008" fallback="Отрасль" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.analytics.students.page.009" fallback="Активность" /></th>
                 <th className="py-2.5 font-medium" />
               </tr>
             </thead>
@@ -160,8 +172,7 @@ export default function StudentsAnalyticsPage() {
                       href={`/teacher/analytics/student/${s.id}`}
                       className="text-sm font-medium text-teal-600 hover:text-teal-700"
                     >
-                      Карточка →
-                    </Link>
+                      <ContentText id="copy.app.teacher.panel.analytics.students.page.010" fallback="Карточка →" /></Link>
                   </td>
                 </tr>
               ))}
@@ -171,8 +182,7 @@ export default function StudentsAnalyticsPage() {
                     colSpan={6}
                     className="py-10 text-center text-sm text-slate-400"
                   >
-                    По заданным фильтрам ученики не найдены
-                  </td>
+                    <ContentText id="copy.app.teacher.panel.analytics.students.page.011" fallback="По заданным фильтрам ученики не найдены" /></td>
                 </tr>
               )}
             </tbody>

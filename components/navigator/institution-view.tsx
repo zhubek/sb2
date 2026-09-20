@@ -1,10 +1,15 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import {
   BedDouble,
   Check,
   ChevronDown,
   Globe,
+  Camera,
   Mail,
   MapPin,
   Phone,
@@ -14,9 +19,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { instagramUrl } from "@/lib/nav/instagram";
 import { KIND, type NavInst, fmt, initials, langAbbr, plural, priceLabel } from "@/lib/nav/types";
 
 export interface ViewOp {
+  contentId?: string;
   code: string;
   name: string;
   p?: number | null;
@@ -49,6 +56,7 @@ export interface ViewDetail {
   phone?: string | null;
   email?: string | null;
   site?: string | null;
+  ig?: string | null;
   spec?: string | null;
   priceTxt?: string | null;
   lang?: string | null;
@@ -76,6 +84,7 @@ export default function InstitutionView({
   base?: string;
   savable?: boolean;
 }) {
+  const pageCopy = useCopy("copy.components.navigator.institution-view");
   const [tab, setTab] = useState<"about" | "programs">(initialTab);
   const [fav, setFav] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
@@ -83,11 +92,12 @@ export default function InstitutionView({
   const isA = d.kind === "a";
   const isV = d.kind === "v";
   const nOps = groups.reduce((a, g) => a + g.ops.length, 0);
+  const instagram = instagramUrl(detail.ig);
 
   return (
     <div className="mx-auto max-w-3xl">
       <Link href={base} className="text-sm text-stone-400 hover:text-stone-600">
-        ← {base === "/universities" ? "К навигатору" : "К справочнику"}
+        ← {base === "/universities" ? pageCopy("x001","К навигатору") : pageCopy("x002","К справочнику")}
       </Link>
 
       {/* Шапка */}
@@ -108,7 +118,7 @@ export default function InstitutionView({
             <button
               onClick={() => setFav(!fav)}
               className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
-              aria-label="В избранное"
+              aria-label={pageCopy("x003","В избранное")}
             >
               <Star size={17} fill={fav ? "currentColor" : "none"} />
             </button>
@@ -120,7 +130,7 @@ export default function InstitutionView({
       <div className="mt-5 flex gap-6 border-b border-stone-200">
         {(
           [
-            ["about", "О заведении"],
+            ["about", pageCopy("x004","О заведении")],
             ["programs", `Программы · ${nOps}`],
           ] as const
         ).map(([key, label]) => (
@@ -142,15 +152,15 @@ export default function InstitutionView({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {isA ? (
               <>
-                <Fact label="Стоимость" value={(detail.priceTxt ?? "см. на сайте").split(";")[0]} wide />
-                <Fact label="Язык обучения" value={(detail.lang ?? "—").split(/[.(]/)[0]} wide />
+                <Fact label={pageCopy("x005","Стоимость")} value={(detail.priceTxt ?? pageCopy("x006","см. на сайте")).split(";")[0]} wide />
+                <Fact label={pageCopy("x007","Язык обучения")} value={(detail.lang ?? "—").split(/[.(]/)[0]} wide />
               </>
             ) : (
               <>
-                <Fact label="Стоимость в год" value={priceLabel(d.price)} />
-                {isV && <Fact label="Порог гранта" value={d.th != null ? `от ${d.th} б.` : "—"} />}
-                <Fact label="Общежитие" value={d.dorm ? "Есть" : "Нет"} icon={<BedDouble size={14} />} ok={d.dorm} />
-                {isV && <Fact label="Военная кафедра" value={d.mil ? "Есть" : "Нет"} icon={<Shield size={14} />} ok={d.mil} />}
+                <Fact label={pageCopy("x008","Стоимость в год")} value={priceLabel(d.price)} />
+                {isV && <Fact label={pageCopy("x009","Порог гранта")} value={d.th != null ? `от ${d.th} б.` : "—"} />}
+                <Fact label={pageCopy("x010","Общежитие")} value={d.dorm ? pageCopy("x011","Есть") : pageCopy("x012","Нет")} icon={<BedDouble size={14} />} ok={d.dorm} />
+                {isV && <Fact label={pageCopy("x013","Военная кафедра")} value={d.mil ? pageCopy("x014","Есть") : pageCopy("x015","Нет")} icon={<Shield size={14} />} ok={d.mil} />}
               </>
             )}
           </div>
@@ -158,12 +168,12 @@ export default function InstitutionView({
           <p className="leading-relaxed text-stone-600">{detail.about}</p>
 
           {isA && detail.spec && (
-            <Section title="Сильные направления">
+            <Section title={pageCopy("x016","Сильные направления")}>
               <p className="text-sm leading-relaxed text-stone-600">{detail.spec}</p>
             </Section>
           )}
           {isA && detail.docs && (
-            <Section title="Документы для поступления">
+            <Section title={pageCopy("x017","Документы для поступления")}>
               <ul className="space-y-1.5">
                 {detail.docs.split(/\n|•/).map((x) => x.trim()).filter(Boolean).map((x) => (
                   <li key={x} className="flex gap-2 text-sm text-stone-600">
@@ -180,17 +190,14 @@ export default function InstitutionView({
             <section className="rounded-2xl border border-sky-200 bg-sky-100/50 p-5">
               <h2 className="flex items-center gap-2 font-semibold text-sky-900">
                 <Plane size={16} className="text-sky-600" />
-                Академическая мобильность
-              </h2>
+                <ContentText id="copy.components.navigator.institution-view.001" fallback="Академическая мобильность" /></h2>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                Вуз участвует в программах академической мобильности: семестр или год в вузе-партнёре с перезачётом кредитов,
-                двудипломные треки и летние школы. Отбор — по GPA и мотивационному письму.
-              </p>
+                <ContentText id="copy.components.navigator.institution-view.002" fallback="Вуз участвует в программах академической мобильности: семестр или год в вузе-партнёре с перезачётом кредитов, двудипломные треки и летние школы. Отбор — по GPA и мотивационному письму." /></p>
             </section>
           )}
 
-          {(detail.addr || detail.phone || detail.email || detail.site) && (
-            <Section title="Контакты">
+          {(detail.addr || detail.phone || detail.email || detail.site || detail.ig) && (
+            <Section title={pageCopy("x018","Контакты")}>
               <div className="space-y-2 text-sm text-stone-600">
                 {detail.addr && <p className="flex items-start gap-2"><MapPin size={15} className="mt-0.5 flex-none text-stone-400" />{detail.addr}</p>}
                 {detail.phone && <p className="flex items-center gap-2"><Phone size={15} className="text-stone-400" />{detail.phone}</p>}
@@ -201,6 +208,12 @@ export default function InstitutionView({
                     <span className="font-medium text-violet-600">{detail.site.replace(/^https?:\/\//, "")}</span>
                   </p>
                 )}
+                {detail.ig && (
+                  <p className="flex items-start gap-2">
+                    <Camera size={15} aria-label="Instagram" className="mt-0.5 flex-none text-stone-400" />
+                    {instagram ? <a href={instagram} target="_blank" rel="noopener noreferrer" className="min-w-0 break-all font-medium text-violet-600 hover:underline">{detail.ig.trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "")}</a> : <span className="min-w-0 break-all">{detail.ig}</span>}
+                  </p>
+                )}
               </div>
             </Section>
           )}
@@ -209,7 +222,7 @@ export default function InstitutionView({
         <div className="mt-5 space-y-3">
           {groups.length === 0 && (
             <p className="rounded-2xl border border-dashed border-stone-200 py-10 text-center text-sm text-stone-400">
-              {isA ? "Программы зарубежного вуза — на его сайте." : "Список программ уточняется."}
+              {isA ? pageCopy("x019","Программы зарубежного вуза — на его сайте.") : pageCopy("x020","Список программ уточняется.")}
             </p>
           )}
           {groups.map((g) => (
@@ -241,6 +254,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 // ГОП внутри вуза: строка → раскрытие с вкладками «О группе» / «Программы»
 function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["kind"]; open: boolean; onToggle: () => void }) {
+  const pageCopy = useCopy("copy.components.navigator.institution-view");
   const [sub, setSub] = useState<"about" | "ops">("about");
   const accent = g.accent ?? (kind === "c" ? "#0E8A6B" : "#5A5FE8");
   const hasAbout = Boolean(g.about || g.fit || g.skills);
@@ -251,11 +265,11 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
         <span className="h-10 w-1.5 flex-none rounded-full" style={{ background: accent }} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[11px] font-semibold tracking-wide uppercase" style={{ color: accent }}>
-            {g.label ?? (g.code ? `ГОП ${g.code}` : "Программы")}{g.ind ? ` · ${g.ind}` : ""}
+            {g.label ?? (g.code ? `ГОП ${g.code}` : pageCopy("x021","Программы"))}{g.ind ? ` · ${g.ind}` : ""}
           </p>
           <p className="font-display mt-0.5 font-medium">{g.name}</p>
           <p className="mt-0.5 font-mono text-xs text-stone-400">
-            {g.ops.length} {plural(g.ops.length, ["программа", "программы", "программ"])}
+            {g.ops.length} {plural(g.ops.length, [pageCopy("x022","программа"), pageCopy("x023","программы"), pageCopy("x024","программ")])}
             {g.dur && ` · ${g.dur}`}
           </p>
         </div>
@@ -268,7 +282,7 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
             <div className="mb-3 flex gap-5 border-b border-stone-100">
               {(
                 [
-                  ["about", "О группе"],
+                  ["about", pageCopy("x025","О группе")],
                   ["ops", `Программы · ${g.ops.length}`],
                 ] as const
               ).map(([key, label]) => (
@@ -286,14 +300,14 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
           {hasAbout && sub === "about" ? (
             <div className="space-y-3.5">
               <div className="grid gap-2.5 text-sm sm:grid-cols-3">
-                {g.dur && <Q label="Срок" value={g.dur} />}
-                {g.langs && g.langs.length > 0 && <Q label="Языки" value={g.langs.map(langAbbr).join(" · ")} />}
-                {g.ent && <Q label="Предметы ЕНТ" value={g.ent} />}
+                {g.dur && <Q label={pageCopy("x026","Срок")} value={g.dur} />}
+                {g.langs && g.langs.length > 0 && <Q label={pageCopy("x027","Языки")} value={g.langs.map(langAbbr).join(" · ")} />}
+                {g.ent && <Q label={pageCopy("x028","Предметы ЕНТ")} value={g.ent} />}
               </div>
-              {g.about && <Block title="О чём эта группа">{g.about}</Block>}
+              {g.about && <Block title={pageCopy("x029","О чём эта группа")}>{g.about}</Block>}
               {g.fit && (
                 <div className="rounded-xl px-4 py-3.5" style={{ background: g.tint ?? "#ECEAFD" }}>
-                  <p className="text-xs font-semibold" style={{ color: accent }}>Стоит присмотреться, если</p>
+                  <p className="text-xs font-semibold" style={{ color: accent }}><ContentText id="copy.components.navigator.institution-view.003" fallback="Стоит присмотреться, если" /></p>
                   <ul className="mt-2 space-y-1.5">
                     {bullets(g.fit).map((x) => (
                       <li key={x} className="flex gap-2 text-sm text-stone-700">
@@ -304,11 +318,11 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
                   </ul>
                 </div>
               )}
-              {g.skills && <Block title="Чему конкретно научат">{g.skills}</Block>}
-              {g.format && <Block title="Формат работы">{g.format}</Block>}
+              {g.skills && <Block title={pageCopy("x030","Чему конкретно научат")}>{g.skills}</Block>}
+              {g.format && <Block title={pageCopy("x031","Формат работы")}>{g.format}</Block>}
               {g.roles && (
                 <div>
-                  <p className="text-sm font-semibold">Кем можно работать</p>
+                  <p className="text-sm font-semibold"><ContentText id="copy.components.navigator.institution-view.004" fallback="Кем можно работать" /></p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {g.roles.split(/\s*;\s*/).filter(Boolean).map((r) => (
                       <span key={r} className="rounded-full bg-violet-100 px-3 py-1 text-xs text-violet-800">{r}</span>
@@ -318,7 +332,7 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
               )}
               {g.notfor && (
                 <div className="rounded-xl bg-amber-50 px-4 py-3">
-                  <p className="text-xs font-semibold text-amber-800">Кому точно не подойдёт</p>
+                  <p className="text-xs font-semibold text-amber-800"><ContentText id="copy.components.navigator.institution-view.005" fallback="Кому точно не подойдёт" /></p>
                   <p className="mt-1 text-sm leading-relaxed text-amber-900/80">{g.notfor}</p>
                 </div>
               )}
@@ -328,7 +342,7 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
               {ops.map((o) => (
                 <li key={o.code + o.name} className="flex items-start justify-between gap-4 py-2.5">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">{o.name}</p>
+                    <p className="text-sm font-medium">{o.contentId?<Link className="hover:text-violet-600 hover:underline" href={`/universities/program/${o.contentId}`}>{o.name}</Link>:o.name}</p>
                     <p className="mt-0.5 font-mono text-[11px] text-stone-400">
                       {o.code && <span className="font-semibold text-stone-500">{o.code}</span>}
                       {o.code && (o.l || o.dur || (o.e && o.e.length > 0)) ? " · " : ""}
@@ -341,10 +355,10 @@ function GroupCard({ g, kind, open, onToggle }: { g: ViewGroup; kind: NavInst["k
                   <div className="flex flex-none flex-col items-end gap-1">
                     {o.p != null && (
                       <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${o.p === 0 ? "bg-teal-100 text-teal-800" : "bg-stone-100 text-stone-600"}`}>
-                        {o.p === 0 ? "бесплатно" : `${fmt(o.p)} ₸`}
+                        {o.p === 0 ? pageCopy("x032","бесплатно") : `${fmt(o.p)} ₸`}
                       </span>
                     )}
-                    {o.t != null && <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-medium text-violet-700">грант от {o.t}</span>}
+                    {o.t != null && <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-medium text-violet-700"><ContentText id="copy.components.navigator.institution-view.006" fallback="грант от " />{o.t}</span>}
                   </div>
                 </li>
               ))}

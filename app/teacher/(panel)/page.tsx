@@ -1,3 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import Link from "next/link";
 import ActivityChart from "@/components/activity-chart";
 import {
@@ -57,16 +63,71 @@ const severityStyles = {
   info: { chip: "bg-sky-100 text-sky-700", label: "к сведению" },
 };
 
-export default function TeacherDashboard() {
+const cmsDefaults_attentionSignals = attentionSignals;
+const cmsDefaults_schoolClasses = schoolClasses;
+const cmsDefaults_schoolStats = schoolStats;
+const cmsDefaults_teacher = teacher;
+
+const inlineDefault_schoolStats = schoolStats;
+const inlineDefault_severityStyles = severityStyles;
+
+function TeacherDashboard() {
+  const pageCopy = getCopy("copy.app.teacher.panel.page");
+  const schoolStats = getContent("teacher-mock-data.schoolStats", inlineDefault_schoolStats);
+  const severityStyles = getContent("inline.app.teacher.panel.page.severityStyles", inlineDefault_severityStyles);
+  const kpis = [
+  {
+    label: pageCopy("x001","Общее количество учеников"),
+    value: schoolStats.total,
+    sub: pageCopy("x002","7–11 классы школы"),
+    pct: null as number | null,
+    href: "/teacher/analytics",
+    link: pageCopy("x003","Аналитика школы"),
+  },
+  {
+    label: pageCopy("x004","Зарегистрированы"),
+    value: schoolStats.registered,
+    sub: `${Math.round((schoolStats.registered / schoolStats.total) * 100)}% от общего числа`,
+    pct: Math.round((schoolStats.registered / schoolStats.total) * 100),
+    href: "/teacher/analytics/students",
+    link: pageCopy("x005","Открыть список"),
+  },
+  {
+    label: pageCopy("x006","Прошли DeBruce"),
+    value: schoolStats.test1,
+    sub: `${Math.round((schoolStats.test1 / schoolStats.registered) * 100)}% от зарегистрированных`,
+    pct: Math.round((schoolStats.test1 / schoolStats.registered) * 100),
+    href: "/teacher/analytics/students",
+    link: pageCopy("x007","Открыть список"),
+  },
+  {
+    label: pageCopy("x008","Прошли MBTI"),
+    value: schoolStats.test2,
+    sub: `${Math.round((schoolStats.test2 / schoolStats.registered) * 100)}% от зарегистрированных`,
+    pct: Math.round((schoolStats.test2 / schoolStats.registered) * 100),
+    href: "/teacher/analytics/students",
+    link: pageCopy("x009","Открыть список"),
+  },
+  {
+    label: pageCopy("x010","Прошли тест Голланда"),
+    value: schoolStats.test3,
+    sub: `${Math.round((schoolStats.test3 / schoolStats.registered) * 100)}% от зарегистрированных`,
+    pct: Math.round((schoolStats.test3 / schoolStats.registered) * 100),
+    href: "/teacher/analytics/students",
+    link: pageCopy("x011","Открыть список"),
+  },
+];
+  const teacher = getContent("teacher-mock-data.teacher", cmsDefaults_teacher);
+  const attentionSignals = getContent("teacher-mock-data.attentionSignals", cmsDefaults_attentionSignals);
+  const schoolClasses = getContent("teacher-mock-data.schoolClasses", cmsDefaults_schoolClasses);
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h1 className="text-xl font-bold sm:text-2xl">
-          Добрый день, {teacher.firstName}!
+          <ContentText id="copy.app.teacher.panel.page.001" fallback="Добрый день, " />{teacher.firstName}!
         </h1>
         <p className="mt-1 text-slate-500">
-          {teacher.school} · данные на 18.08.2026
-        </p>
+          {teacher.school} <ContentText id="copy.app.teacher.panel.page.002" fallback=" · данные на 18.08.2026" /></p>
       </div>
 
       {/* Ключевые показатели */}
@@ -100,7 +161,7 @@ export default function TeacherDashboard() {
       {/* Требуют внимания — горизонтально между KPI и графиком */}
       <section>
         <div className="flex items-center gap-2">
-          <h2 className="font-semibold">Требуют внимания</h2>
+          <h2 className="font-semibold"><ContentText id="copy.app.teacher.panel.page.003" fallback="Требуют внимания" /></h2>
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
             {attentionSignals.length}
           </span>
@@ -139,20 +200,19 @@ export default function TeacherDashboard() {
 
       {/* Охват диагностикой по классам */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Охват диагностикой по классам</h2>
+        <h2 className="font-semibold"><ContentText id="copy.app.teacher.panel.page.004" fallback="Охват диагностикой по классам" /></h2>
         <p className="text-sm text-slate-500">
-          Нажмите на строку, чтобы открыть аналитику класса
-        </p>
+          <ContentText id="copy.app.teacher.panel.page.005" fallback="Нажмите на строку, чтобы открыть аналитику класса" /></p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                <th className="py-2.5 pr-4 font-medium">Класс</th>
-                <th className="py-2.5 pr-4 font-medium">Зарегистрированы</th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.page.006" fallback="Класс" /></th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.page.007" fallback="Зарегистрированы" /></th>
                 <th className="py-2.5 pr-4 font-medium">DeBruce</th>
                 <th className="py-2.5 pr-4 font-medium">MBTI</th>
-                <th className="py-2.5 pr-4 font-medium">Голланд</th>
-                <th className="py-2.5 font-medium">Доля прошедших</th>
+                <th className="py-2.5 pr-4 font-medium"><ContentText id="copy.app.teacher.panel.page.008" fallback="Голланд" /></th>
+                <th className="py-2.5 font-medium"><ContentText id="copy.app.teacher.panel.page.009" fallback="Доля прошедших" /></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -185,8 +245,7 @@ export default function TeacherDashboard() {
                         </span>
                         {pct < 35 && (
                           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
-                            низкий охват
-                          </span>
+                            <ContentText id="copy.app.teacher.panel.page.010" fallback="низкий охват" /></span>
                         )}
                       </div>
                     </td>
@@ -200,3 +259,5 @@ export default function TeacherDashboard() {
     </div>
   );
 }
+
+export default withPublishedContent(TeacherDashboard);

@@ -1,12 +1,18 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { CompassArt } from "@/components/brand-art";
 import { IconAI } from "@/components/compass-marks";
 import { Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { QuizSection } from "@/lib/mock-data";
+import type { TestAnswer, TestContent } from "@/lib/cms/types";
+import { questionOf, validAnswer } from "@/lib/cms/questions";
+import QuestionInput from "./question-input";
 
-const scale = [
+const defaultScale = [
   { value: 1, label: "Совсем не про меня" },
   { value: 2, label: "Скорее нет" },
   { value: 3, label: "Нейтрально" },
@@ -20,16 +26,25 @@ export default function SectionQuiz({
   title,
   sections,
   onFinish,
+  scale = defaultScale,
+  preview = false,
+  activeSection,
 }: {
   title: string;
-  sections: QuizSection[];
+  sections: TestContent["sections"];
   // values — ответы 1–5 в сквозном порядке вопросов (для записи в бекенд)
-  onFinish: (values: number[]) => void;
+  onFinish: (values: TestAnswer[]) => void | Promise<void>;
+  scale?: { value: number; label: string }[];
+  preview?: boolean;
+  activeSection?: number;
 }) {
+  const pageCopy = useCopy("copy.components.section-quiz");
   const [sectionIdx, setSectionIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [answers, setAnswers] = useState<Record<string, TestAnswer>>({});
   const [processing, setProcessing] = useState(false);
-  const [starting, setStarting] = useState(true);
+  const [saveError, setSaveError] = useState("");
+  const [starting, setStarting] = useState(!preview);
+  useEffect(()=>{if(activeSection!==undefined)setSectionIdx(Math.min(activeSection,sections.length-1));},[activeSection,sections.length]);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Активный раздел всегда виден в горизонтальной ленте
@@ -44,8 +59,8 @@ export default function SectionQuiz({
   }, []);
 
   const totalQuestions = sections.reduce((n, s) => n + s.questions.length, 0);
-  const answeredCount = Object.keys(answers).length;
-  const section = sections[sectionIdx];
+  const answeredCount = sections.reduce((n, s, si) => n + s.questions.filter((q, qi) => validAnswer(q, answers[`${si}-${qi}`], scale)).length, 0);
+  const section = sections[Math.min(sectionIdx, sections.length - 1)];
   const last = sectionIdx === sections.length - 1;
 
   function key(si: number, qi: number) {
@@ -54,18 +69,20 @@ export default function SectionQuiz({
 
   function sectionAnswered(si: number) {
     return sections[si].questions.every(
-      (_, qi) => answers[key(si, qi)] !== undefined
+      (q, qi) => validAnswer(q, answers[key(si, qi)], scale)
     );
   }
 
-  function next() {
-    if (!sectionAnswered(sectionIdx)) return;
+  async function next() {
+    if (!sectionAnswered(sectionIdx) || (last && !sections.every((_, i) => sectionAnswered(i)))) return;
     if (last) {
       setProcessing(true);
       const values = sections.flatMap((s, si) =>
         s.questions.map((_, qi) => answers[key(si, qi)])
       );
-      setTimeout(() => onFinish(values), 2500);
+      setSaveError("");
+      try { await onFinish(values); }
+      catch(error) { setSaveError(error instanceof Error ? error.message : pageCopy("x001","Не удалось сохранить ответы. Повторите попытку.")); setProcessing(false); }
     } else {
       setSectionIdx(sectionIdx + 1);
       window.scrollTo({ top: 0 });
@@ -76,8 +93,8 @@ export default function SectionQuiz({
     return (
       <div className="mx-auto max-w-md py-16 text-center">
         <CompassArt className="mx-auto h-36 w-36" />
-        <p className="font-display mt-3 font-medium">Тест начинается…</p>
-        <p className="mt-1 text-sm text-stone-500">Готовим вопросы · {title}</p>
+        <p className="font-display mt-3 font-medium"><ContentText id="copy.components.section-quiz.001" fallback="Тест начинается…" /></p>
+        <p className="mt-1 text-sm text-stone-500"><ContentText id="copy.components.section-quiz.002" fallback="Готовим вопросы · " />{title}</p>
       </div>
     );
   }
@@ -87,11 +104,9 @@ export default function SectionQuiz({
       <div className="mx-auto max-w-md py-16 text-center">
         <IconAI className="mx-auto h-28 w-28" />
         <p className="font-display mt-2 font-medium">
-          Обрабатываем ваши ответы…
-        </p>
+          <ContentText id="copy.components.section-quiz.003" fallback="Обрабатываем ваши ответы…" /></p>
         <p className="mt-1 text-sm text-stone-500">
-          ИИ анализирует результаты и готовит персональный отчёт
-        </p>
+          <ContentText id="copy.components.section-quiz.004" fallback="ИИ анализирует результаты и готовит персональный отчёт" /></p>
       </div>
     );
   }
@@ -102,8 +117,7 @@ export default function SectionQuiz({
       <div className="flex items-baseline justify-between">
         <span className="font-display text-sm font-medium">{title}</span>
         <span className="font-mono text-xs text-stone-400">
-          {answeredCount}/{totalQuestions} ответов
-        </span>
+          {answeredCount}/{totalQuestions} <ContentText id="copy.components.section-quiz.005" fallback=" ответов" /></span>
       </div>
       <div className="mt-3 h-1 overflow-hidden rounded-full bg-stone-200">
         <div
@@ -157,7 +171,7 @@ export default function SectionQuiz({
       {/* Раздел: заголовок */}
       <div className="mt-7">
         <p className="font-mono text-xs text-stone-400">
-          Раздел {sectionIdx + 1} из {sections.length}
+          <ContentText id="copy.components.section-quiz.006" fallback="Раздел " />{sectionIdx + 1} <ContentText id="copy.components.section-quiz.007" fallback=" из " />{sections.length}
         </p>
         <h2 className="font-display mt-2 text-xl font-semibold tracking-tight">
           {section.title}
@@ -175,33 +189,15 @@ export default function SectionQuiz({
               key={k}
               className="rounded-2xl border border-stone-200 bg-white p-6"
             >
-              <p className="font-medium leading-relaxed">{q}</p>
-              <div className="mt-5 flex items-center justify-between gap-2">
-                {scale.map((o) => (
-                  <button
-                    key={o.value}
-                    title={o.label}
-                    onClick={() => setAnswers({ ...answers, [k]: o.value })}
-                    className={`flex h-10 flex-1 items-center justify-center rounded-lg border font-mono text-sm transition ${
-                      selected === o.value
-                        ? "border-violet-500 bg-violet-500 text-white"
-                        : "border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-700"
-                    }`}
-                  >
-                    {o.value}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-2 flex justify-between text-[11px] text-stone-400">
-                <span>{scale[0].label}</span>
-                <span>{scale[4].label}</span>
-              </div>
+              <p className="font-medium leading-relaxed">{questionOf(q).text}</p>
+              <QuestionInput question={questionOf(q, k)} value={selected} scale={scale} onChange={v => setAnswers({ ...answers, [k]: v })} />
             </div>
           );
         })}
       </div>
 
       {/* Навигация */}
+      {saveError && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{saveError}</p>}
       <div className="mt-8 flex items-center justify-between">
         <button
           onClick={() => sectionIdx > 0 && setSectionIdx(sectionIdx - 1)}
@@ -211,14 +207,13 @@ export default function SectionQuiz({
               : "invisible"
           }`}
         >
-          Назад
-        </button>
+          <ContentText id="copy.components.section-quiz.008" fallback="Назад" /></button>
         <button
           onClick={next}
-          disabled={!sectionAnswered(sectionIdx)}
+          disabled={!sectionAnswered(sectionIdx) || (last && !sections.every((_, i) => sectionAnswered(i)))}
           className="rounded-2xl bg-violet-500 px-8 py-3 text-sm font-medium text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-30"
         >
-          {last ? "Завершить тест" : "Следующий раздел"}
+          {last ? pageCopy("x002","Завершить тест") : pageCopy("x003","Следующий раздел")}
         </button>
       </div>
     </div>

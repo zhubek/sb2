@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -6,15 +11,19 @@ import InfoShell from "@/components/info-shell";
 import { workingCategories } from "@/lib/info-data";
 
 // Рабочие профессии Казахстана: 9 отраслей со списками профессий и зарплатами
+const cmsDefaults_workingCategories = workingCategories;
+
 export default function WorkingProfessionsPage() {
+  const pageCopy = useCopy("copy.app.workingprofessionsgen.page");
+  const workingCategories = useContent("info-data.workingCategories", cmsDefaults_workingCategories);
   const [open, setOpen] = useState<string | null>(workingCategories[0].id);
 
   return (
     <InfoShell
       active="/workingprofessionsgen"
-      eyebrow="Справочник"
-      title="Рабочие профессии в Казахстане"
-      lede="Востребованные рабочие специальности по отраслям: чем занимаются и сколько зарабатывают. Многим из них учат в колледжах — на базе 9 или 11 классов."
+      eyebrow={pageCopy("x001","Справочник")}
+      title={pageCopy("x002","Рабочие профессии в Казахстане")}
+      lede={pageCopy("x003","Востребованные рабочие специальности по отраслям: чем занимаются и сколько зарабатывают. Многим из них учат в колледжах — на базе 9 или 11 классов.")}
     >
       <div className="mx-auto max-w-3xl space-y-3">
         {workingCategories.map((c) => {
@@ -75,9 +84,7 @@ export default function WorkingProfessionsPage() {
         })}
       </div>
       <p className="mt-8 text-center text-xs text-stone-400">
-        Диапазоны зарплат — ориентировочные, по открытым данным рынка труда
-        Казахстана.
-      </p>
+        <ContentText id="copy.app.workingprofessionsgen.page.001" fallback="Диапазоны зарплат — ориентировочные, по открытым данным рынка труда Казахстана." /></p>
     </InfoShell>
   );
 }

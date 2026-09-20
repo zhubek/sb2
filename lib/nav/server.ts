@@ -1,3 +1,5 @@
+import { getContent } from "@/lib/cms/server";
+import { institutionPrograms } from "./institution-programs";
 // Серверные данные навигатора: описания заведений, ГОП и отраслей (тяжёлые
 // JSON не попадают в клиентский бандл)
 import "server-only";
@@ -13,6 +15,7 @@ import type { GopUni } from "@/components/navigator/gop-view";
 import type { CollegeView } from "@/components/navigator/college-view";
 
 export interface InstOp {
+  contentId?: string;
   code: string;
   name: string;
   p?: number | null;
@@ -98,6 +101,7 @@ export interface DirectionDesc {
   notfor?: string;
 }
 
+const cmsDefaultIndustries = industries;
 const instList = institutions as unknown as NavInst[];
 const gopList = gops as unknown as Gop[];
 const nogopMap = nogop as unknown as Record<string, NoGopOp[]>;
@@ -105,48 +109,53 @@ const indData = industriesData as unknown as { ind: Record<string, IndustryData>
 const cprog = collegePrograms as unknown as { programs: { code: string; name: string; g: string; ind: number; cols: number[] }[]; agg: Record<string, { l: string[]; d9: string[]; d11: string[] }> };
 
 export function getInstitution(i: number) {
-  return instList.find((x) => x.i === i) ?? null;
+  const base = instList.find((x) => x.i === i);
+  return base ? getContent(`institution.${i}`, base) : null;
 }
 export function getDetail(i: number): InstDetail | null {
-  return (details as unknown as Record<string, InstDetail>)[String(i)] ?? null;
+  const base = (details as unknown as Record<string, InstDetail>)[String(i)] ?? null;
+  const detail=getContent(`institution.${i}`, { detail: base }).detail;
+  return detail?{...detail,ops:detail.ops?.map((op,index)=>({...op,contentId:`program.${i}.${index}`}))}:null;
 }
 export function getGop(code: string) {
-  return gopList.find((g) => g.code === code) ?? null;
+  const base = gopList.find((g) => g.code === code);
+  return base ? getContent(`gop.${code}`, base) : null;
 }
 export function allGops() {
-  return gopList;
+  return getContent("nav.gops", gopList);
 }
 export function getNoGop(i: number) {
-  return nogopMap[String(i)] ?? [];
+  return getContent(`nogop.${i}`, nogopMap[String(i)] ?? []);
 }
 export function getIndustryData(name: string) {
-  return indData.ind[name] ?? null;
+  return getContent(`industry.${name}`, indData.ind[name] ?? null);
 }
 export function getDirectionDesc(g: string) {
-  return indData.TD[g] ?? null;
+  return getContent(`direction.${g}`, indData.TD[g] ?? null);
 }
 export function getProfessionDesc(p: string) {
-  return indData.pd[p] ?? null;
+  return getContent(`profession.${p}`, indData.pd[p] ?? null);
 }
 export function collegeAgg(code: string) {
-  return cprog.agg[code] ?? null;
+  return getContent("nav.college-aggregates", cprog.agg)[code] ?? null;
 }
 export function collegeProgramsOf(i: number) {
-  return cprog.programs.filter((p) => p.cols.includes(i));
+  return getContent("nav.college-programs", cprog).programs.filter((p) => p.cols.includes(i));
 }
 
 export function getCollegeProgram(code: string) {
-  return cprog.programs.find((p) => p.code === code) ?? null;
+  return getContent("nav.college-programs", cprog).programs.find((p) => p.code === code) ?? null;
 }
 
 // Программы заведения, сгруппированные для страницы: вуз — по ГОП (остальные —
 // по отраслям), колледж — по направлениям с описанием направления
 export function buildInstitutionGroups(d: NavInst): ViewGroup[] {
+  const industries = getContent("nav-meta.industries", cmsDefaultIndustries);
   const groups: ViewGroup[] = [];
   const detail = getDetail(d.i);
   if (d.kind === "v") {
     const byGop = new Map<string, ViewGroup>();
-    (detail?.ops ?? []).forEach((o) => {
+    institutionPrograms(d.kind, detail?.ops ?? [], []).forEach((o) => {
       const code = o.g ?? "";
       if (!byGop.has(code)) {
         const g = code ? getGop(code) : null;
@@ -169,7 +178,7 @@ export function buildInstitutionGroups(d: NavInst): ViewGroup[] {
           ops: [],
         });
       }
-      byGop.get(code)!.ops.push({ code: o.code, name: o.name, p: o.p, t: o.t, e: o.e, l: o.l, dur: o.dur });
+      byGop.get(code)!.ops.push({ contentId: o.contentId, code: o.code, name: o.name, p: o.p, t: o.t, e: o.e, l: o.l, dur: o.dur });
     });
     // Программы вне ГОП — по отраслям (без отдельной «собственной» категории)
     const byInd = new Map<string, ViewGroup>();
@@ -200,7 +209,7 @@ export function buildInstitutionGroups(d: NavInst): ViewGroup[] {
     );
   } else if (d.kind === "c") {
     const byDir = new Map<string, ViewGroup>();
-    const progs = (detail?.ops ?? []).length ? detail!.ops! : collegeProgramsOf(d.i);
+    const progs = institutionPrograms<InstOp>(d.kind, detail?.ops ?? [], collegeProgramsOf(d.i));
     progs.forEach((o) => {
       const dir = (o as { g?: string }).g ?? "Другое";
       if (!byDir.has(dir)) {
@@ -224,7 +233,8 @@ export function buildInstitutionGroups(d: NavInst): ViewGroup[] {
       }
       const agg = collegeAgg(o.code);
       const dur = agg ? [...new Set([...agg.d9, ...agg.d11])].join(" / ") : undefined;
-      byDir.get(dir)!.ops.push({ code: o.code, name: o.name, l: agg?.l.join(", "), dur });
+      const op=o as InstOp;
+      byDir.get(dir)!.ops.push({ contentId:op.contentId,code:o.code,name:o.name,p:op.p,t:op.t,e:op.e,l:op.l||agg?.l.join(", "),dur:op.dur??dur });
     });
     groups.push(...[...byDir.values()].sort((a, b) => a.name.localeCompare(b.name, "ru")));
   }
@@ -247,6 +257,7 @@ export function buildGopUnis(g: Gop): GopUni[] {
 
 // Специальность колледжа: код, направление с описанием, сроки, языки и колледжи
 export function buildCollegeView(code: string): CollegeView | null {
+  const industries = getContent("nav-meta.industries", cmsDefaultIndustries);
   const p = getCollegeProgram(code);
   if (!p) return null;
   const agg = collegeAgg(code);

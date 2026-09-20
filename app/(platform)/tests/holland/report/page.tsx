@@ -1,3 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import Link from "next/link";
 import {
   HollandBars,
@@ -17,7 +23,21 @@ import {
 export const metadata = { title: "Отчёт Holland RIASEC — Smart Bolashaq" };
 
 // Отчёт по тесту Голланда — по структуре референсного PDF «Отчёт по Holland RIASEC»
-export default function HollandReportPage() {
+const cmsDefaults_hollandScales = hollandScales;
+const cmsDefaults_hollandCodeMeaning = hollandCodeMeaning;
+const cmsDefaults_hollandProfessions = hollandProfessions;
+const cmsDefaults_hollandSixTypes = hollandSixTypes;
+const cmsDefaults_hollandTopTypes = hollandTopTypes;
+const cmsDefaults_hollandWhatIs = hollandWhatIs;
+
+function HollandReportPage() {
+  const pageCopy = getCopy("copy.app.platform.tests.holland.report.page");
+  const hollandScales = getContent("mock-data.hollandScales", cmsDefaults_hollandScales);
+  const hollandProfessions = getContent("report-data.hollandProfessions", cmsDefaults_hollandProfessions);
+  const hollandWhatIs = getContent("report-data.hollandWhatIs", cmsDefaults_hollandWhatIs);
+  const hollandSixTypes = getContent("report-data.hollandSixTypes", cmsDefaults_hollandSixTypes);
+  const hollandCodeMeaning = getContent("report-data.hollandCodeMeaning", cmsDefaults_hollandCodeMeaning);
+  const hollandTopTypes = getContent("report-data.hollandTopTypes", cmsDefaults_hollandTopTypes);
   const sorted = [...hollandScales].sort((a, b) => b.score - a.score);
   const code = sorted.slice(0, 3).map((s) => s.code).join("");
   const codeNames = sorted.slice(0, 3).map((s) => s.name).join(", ");
@@ -25,17 +45,16 @@ export default function HollandReportPage() {
 
   return (
     <ReportShell
-      eyebrow="AI Профориентатор · Профессиональные интересы"
+      eyebrow={pageCopy("x001","AI Профориентатор · Профессиональные интересы")}
       title="Holland RIASEC"
-      subtitle="Профиль профессиональных интересов"
+      subtitle={pageCopy("x002","Профиль профессиональных интересов")}
     >
       {/* Хиро: код, ведущий тип, топ-профессия */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-7 md:p-8">
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Код Холланда
-            </p>
+              <ContentText id="copy.app.platform.tests.holland.report.page.001" fallback="Код Холланда" /></p>
             <p className="font-display mt-1 text-3xl tracking-[0.15em] text-violet-700">
               {code}
             </p>
@@ -43,19 +62,16 @@ export default function HollandReportPage() {
           </div>
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Ведущий тип интересов
-            </p>
+              <ContentText id="copy.app.platform.tests.holland.report.page.002" fallback="Ведущий тип интересов" /></p>
             <p className="font-display mt-1 text-2xl text-violet-700">
               {sorted[0].name}
             </p>
             <p className="mt-1 text-xs text-stone-500">
-              {sorted[0].score}% выраженности
-            </p>
+              {sorted[0].score}<ContentText id="copy.app.platform.tests.holland.report.page.003" fallback="% выраженности" /></p>
           </div>
           <div className="rounded-2xl bg-white px-5 py-4">
             <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-              Совпадение с топ-профессией
-            </p>
+              <ContentText id="copy.app.platform.tests.holland.report.page.004" fallback="Совпадение с топ-профессией" /></p>
             <p className="font-display mt-1 text-3xl text-violet-700">
               {topProf.match}%
             </p>
@@ -64,16 +80,13 @@ export default function HollandReportPage() {
         </div>
       </section>
 
-      <Sect title="Что такое Holland RIASEC?">
+      <Sect title={pageCopy("x003","Что такое Holland RIASEC?")}>
         <p className="max-w-2xl leading-relaxed text-stone-600">{hollandWhatIs}</p>
       </Sect>
 
-      <Sect title="Шесть типов интересов">
+      <Sect title={pageCopy("x004","Шесть типов интересов")}>
         <p className="mb-4 max-w-2xl text-sm leading-relaxed text-stone-500">
-          Модель Холланда описывает шесть базовых типов. У каждого человека
-          выражены все шесть в разной степени — важно их сочетание. Выделены
-          цветом те, что вошли в твой код.
-        </p>
+          <ContentText id="copy.app.platform.tests.holland.report.page.005" fallback="Модель Холланда описывает шесть базовых типов. У каждого человека выражены все шесть в разной степени — важно их сочетание. Выделены цветом те, что вошли в твой код." /></p>
         <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {hollandSixTypes.map((t) => {
             const inCode = code.includes(t.code);
@@ -107,7 +120,7 @@ export default function HollandReportPage() {
         </div>
       </Sect>
 
-      <Sect kicker="Диагностика" title="Твои результаты">
+      <Sect kicker={pageCopy("x005","Диагностика")} title={pageCopy("x006","Твои результаты")}>
         <div className="space-y-4">
           <HollandTopTiles />
           <div className="rounded-3xl border border-stone-200 bg-white p-6">
@@ -132,7 +145,7 @@ export default function HollandReportPage() {
               className="rounded-3xl border border-stone-200 bg-white p-6 md:p-7"
             >
               <h3 className="font-display text-lg text-stone-800">
-                {t.name} тип ({t.code}) —{" "}
+                {t.name} <ContentText id="copy.app.platform.tests.holland.report.page.006" fallback=" тип (" />{t.code}) —{" "}
                 <span className="text-violet-600">{scale.score}%</span>
               </h3>
               <p className="mt-2.5 text-sm leading-relaxed text-stone-600">
@@ -141,8 +154,7 @@ export default function HollandReportPage() {
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
                 <div>
                   <p className="text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-                    Сильные стороны
-                  </p>
+                    <ContentText id="copy.app.platform.tests.holland.report.page.007" fallback="Сильные стороны" /></p>
                   <ul className="mt-2 space-y-1.5">
                     {t.strengths.map((s) => (
                       <li key={s} className="flex gap-2 text-sm text-stone-600">
@@ -154,8 +166,7 @@ export default function HollandReportPage() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-                    Где раскрывается
-                  </p>
+                    <ContentText id="copy.app.platform.tests.holland.report.page.008" fallback="Где раскрывается" /></p>
                   <ul className="mt-2 space-y-1.5">
                     {t.where.map((s) => (
                       <li key={s} className="flex gap-2 text-sm text-stone-600">
@@ -172,11 +183,9 @@ export default function HollandReportPage() {
       </div>
 
       {/* Рекомендуемые профессии */}
-      <Sect kicker="Рекомендации" title="Рекомендуемые профессии">
+      <Sect kicker={pageCopy("x007","Рекомендации")} title={pageCopy("x008","Рекомендуемые профессии")}>
         <p className="mb-4 max-w-2xl text-sm leading-relaxed text-stone-500">
-          Подобраны по совпадению с твоим кодом {code}. Процент показывает,
-          насколько интересы профессии соответствуют твоему профилю.
-        </p>
+          <ContentText id="copy.app.platform.tests.holland.report.page.009" fallback="Подобраны по совпадению с твоим кодом " />{code}<ContentText id="copy.app.platform.tests.holland.report.page.010" fallback=". Процент показывает, насколько интересы профессии соответствуют твоему профилю." /></p>
         <div className="space-y-2">
           {hollandProfessions.map((p) => (
             <div
@@ -208,9 +217,10 @@ export default function HollandReportPage() {
           href="/tests/report"
           className="inline-block rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
-          Открыть комплексный отчёт
-        </Link>
+          <ContentText id="copy.app.platform.tests.holland.report.page.011" fallback="Открыть комплексный отчёт" /></Link>
       </div>
     </ReportShell>
   );
 }
+
+export default withPublishedContent(HollandReportPage);

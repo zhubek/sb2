@@ -1,3 +1,5 @@
+
+import { ContentText } from "@/lib/cms/client";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { LostArt } from "@/components/brand-art";
@@ -8,19 +10,15 @@ export default function NotFound() {
       <LostArt className="h-52 w-52" />
       <p className="font-mono mt-6 text-sm text-stone-400">404</p>
       <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight">
-        Кажется, мы сбились с курса
-      </h1>
+        <ContentText id="copy.app.not-found.001" fallback="Кажется, мы сбились с курса" /></h1>
       <p className="mt-3 max-w-md text-stone-500">
-        Такой страницы нет. Но компас всегда найдёт дорогу обратно — к тестам,
-        рекомендациям и вашему будущему университету.
-      </p>
+        <ContentText id="copy.app.not-found.002" fallback="Такой страницы нет. Но компас всегда найдёт дорогу обратно — к тестам, рекомендациям и вашему будущему университету." /></p>
       <Link
         href="/dashboard"
         className="group mt-8 flex items-center gap-2 rounded-2xl bg-violet-500 py-3 pr-7 pl-5 text-sm font-medium text-white transition hover:bg-violet-600"
       >
         <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
-        В личный кабинет
-      </Link>
+        <ContentText id="copy.app.not-found.003" fallback="В личный кабинет" /></Link>
     </div>
   );
 }

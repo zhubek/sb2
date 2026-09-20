@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Download, FileText, Search } from "lucide-react";
 import { useState } from "react";
@@ -10,7 +15,11 @@ type LevelFilter = "all" | TeacherReport["level"];
 const selectCls =
   "rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-teal-400";
 
+const cmsDefaults_teacherReports = teacherReports;
+
 export default function ReportsPage() {
+  const pageCopy = useCopy("copy.app.teacher.panel.reports.page");
+  const teacherReports = useContent("teacher-mock-data.teacherReports", cmsDefaults_teacherReports);
   const [search, setSearch] = useState("");
   const [source, setSource] = useState<SourceFilter>("all");
   const [level, setLevel] = useState<LevelFilter>("all");
@@ -33,12 +42,9 @@ export default function ReportsPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Отчёты
-        </h1>
+          <ContentText id="copy.app.teacher.panel.reports.page.001" fallback="Отчёты" /></h1>
         <p className="mt-1 text-slate-500">
-          Все сгенерированные отчёты — созданные вручную и сформированные
-          системой автоматически
-        </p>
+          <ContentText id="copy.app.teacher.panel.reports.page.002" fallback="Все сгенерированные отчёты — созданные вручную и сформированные системой автоматически" /></p>
       </div>
 
       {/* Фильтры и поиск */}
@@ -51,7 +57,7 @@ export default function ReportsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск по названию…"
+            placeholder={pageCopy("x001","Поиск по названию…")}
             className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm outline-none transition focus:border-teal-400 sm:w-64"
           />
         </div>
@@ -60,24 +66,24 @@ export default function ReportsPage() {
           onChange={(e) => setSource(e.target.value as SourceFilter)}
           className={selectCls}
         >
-          <option value="all">Все типы</option>
-          <option value="manual">Созданные вручную</option>
-          <option value="auto">Автоматические</option>
+          <option value="all">{pageCopy("x002","Все типы")}</option>
+          <option value="manual">{pageCopy("x003","Созданные вручную")}</option>
+          <option value="auto">{pageCopy("x004","Автоматические")}</option>
         </select>
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value as LevelFilter)}
           className={selectCls}
         >
-          <option value="all">Все уровни</option>
-          <option value="Школа">Школа</option>
-          <option value="Класс">Класс</option>
-          <option value="Ученик">Ученик</option>
+          <option value="all">{pageCopy("x005","Все уровни")}</option>
+          <option value={pageCopy("x006","Школа")}>{pageCopy("x007","Школа")}</option>
+          <option value={pageCopy("x008","Класс")}>{pageCopy("x009","Класс")}</option>
+          <option value={pageCopy("x010","Ученик")}>{pageCopy("x011","Ученик")}</option>
         </select>
       </div>
 
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Найдено отчётов: {filtered.length}</h2>
+        <h2 className="font-semibold"><ContentText id="copy.app.teacher.panel.reports.page.003" fallback="Найдено отчётов: " />{filtered.length}</h2>
         <ul className="mt-3 divide-y divide-slate-100">
           {filtered.map((r) => (
             <li key={r.id} className="flex flex-wrap items-center gap-3 py-3.5">
@@ -97,7 +103,7 @@ export default function ReportsPage() {
                     : "bg-teal-50 text-teal-700"
                 }`}
               >
-                {r.source === "auto" ? "Автоматически" : "Вручную"}
+                {r.source === "auto" ? pageCopy("x012","Автоматически") : pageCopy("x013","Вручную")}
               </span>
               <span className="ml-auto flex sm:hidden" />
               <button
@@ -109,14 +115,13 @@ export default function ReportsPage() {
                 }`}
               >
                 <Download size={13} />
-                {downloaded === r.id ? "Скачан (демо)" : "Скачать"}
+                {downloaded === r.id ? pageCopy("x014","Скачан (демо)") : pageCopy("x015","Скачать")}
               </button>
             </li>
           ))}
           {filtered.length === 0 && (
             <li className="py-8 text-center text-sm text-slate-400">
-              По заданным фильтрам отчёты не найдены
-            </li>
+              <ContentText id="copy.app.teacher.panel.reports.page.004" fallback="По заданным фильтрам отчёты не найдены" /></li>
           )}
         </ul>
       </section>

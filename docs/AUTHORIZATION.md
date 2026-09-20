@@ -1,0 +1,18 @@
+# Authentication and feature authorization
+
+## Contract
+
+- Data: existing users and organizations remain intact. Profile phone/jobTitle fields persist in User alongside name and surname. AuthCredential stores a salted scrypt password hash, enabled flag, session version and content-editor grant separately from public profile fields. Six provisioned test identities cover two students, two teachers in different schools, a content editor and a platform administrator. Passwords are generated on the VM and written only to an ignored private credentials file.
+- Authentication: Auth.js keeps its HttpOnly JWT session. Next.js sends short-lived standard HS256 JWTs to Nest, with fixed issuer/audience/algorithm and expiry. Nest reloads identity, role, organization and credential state from PostgreSQL on every authenticated request. Disabled credentials or a changed version invalidate existing sessions. No tokens in localStorage. The legacy admin login also issues a JWT scoped to content administration.
+- Registration: retain the current development-only student registration/OTP screens until SMTP is connected. This shortcut cannot authenticate password-protected or privileged accounts. Production continues to reject demo registration. Teacher login now verifies actual credentials; arbitrary passwords are rejected.
+- Policies: auth only constructs the actor. Profile, tests, course, chat and achievements each own a policy without database access. Queries apply that policy's record scope in Prisma before reading. Use cases enforce it before writes. Only platform ADMIN has cross-user access; content-editor access never implies access to student records. Teacher organization access requires matching school and TEACHER role.
+- Processes: password verification is read-only and rate-limited with bounded process-local state. Provisioning is an explicit idempotent remote script restricted to the isolated development database; it never overwrites unrelated users. Account creation and credentials commit together. Existing content transactions/revision conflicts are unchanged; no automatic mutation retries are introduced.
+- Queries/frontend: password login uses an explicit auth GraphQL input/result operation in features/auth/graphql. Login errors are generic; GraphQL errors including HTTP 200 are failures. Existing REST callers remain supported. The browser sees session identity, not password hashes or backend bearer tokens.
+- Realtime: none. Authorization is rechecked on each backend request; session UI refreshes on its next request.
+- Acceptance: real login for all roles, wrong password and malformed/expired/wrong-audience JWT rejection, disabled/version-revoked credentials, blocked OTP bypass, no password hash in profile output, owner/cross-user/cross-school and content-editor rejection across modules. Exercise public, student, teacher and CMS routes, editor preview/save/publish/restore, test attempt persistence, logout and registration. Run production builds and integration/browser checks remotely; report demo-only and untested paths explicitly.
+
+## Deployment
+
+Use only /mnt/sb2dev/sb2 and sb2-dev-* services on 136.112.254.16. The app remains a development deployment on port 3025 to preserve the requested registration prototype. Do not modify live services. Source files stay local; dependencies, execution and database work stay remote. The existing HTTP endpoint is for disposable testing accounts, not real credentials; TLS and SMTP remain future deployment work.
+
+JWT signing/verifying uses [jose](https://www.npmjs.com/package/jose); password hashing uses [Node scrypt](https://nodejs.org/api/crypto.html#cryptoscryptpassword-salt-keylen-options-callback) with random 16-byte salts.

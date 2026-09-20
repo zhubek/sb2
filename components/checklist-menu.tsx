@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
@@ -11,7 +16,11 @@ import { checklist } from "@/lib/mock-data";
 // Чек-лист в шапке. Пункты отмечаются АВТОМАТИЧЕСКИ по событию о реальном
 // прогрессе: список открывается сам, конфетти на весь экран, пункт
 // зачёркивается анимацией.
+const cmsDefaults_checklist = checklist;
+
 export default function ChecklistMenu() {
+  const pageCopy = useCopy("copy.components.checklist-menu");
+  const checklist = useContent("mock-data.checklist", cmsDefaults_checklist);
   const [open, setOpen] = useState(false);
   const [done, setDone] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(checklist.map((c) => [c.id, c.done]))
@@ -101,7 +110,7 @@ export default function ChecklistMenu() {
 
       <button
         onClick={() => setOpen(!open)}
-        aria-label="Чек-лист и прогресс"
+        aria-label={pageCopy("x001","Чек-лист и прогресс")}
         className={`flex items-center gap-2 rounded-full border py-1.5 pr-3 pl-2 text-sm transition ${
           open
             ? "border-violet-300 bg-violet-100"
@@ -139,7 +148,7 @@ export default function ChecklistMenu() {
         // containing block) — раскрываем на всю ширину экрана
         <div className="fixed inset-x-3 top-16 z-50 rounded-2xl border border-stone-200 bg-white p-4 shadow-xl sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-80">
           <div className="flex items-baseline justify-between">
-            <p className="font-display text-sm font-medium">Мой прогресс</p>
+            <p className="font-display text-sm font-medium"><ContentText id="copy.components.checklist-menu.001" fallback="Мой прогресс" /></p>
             <p className="font-mono text-xs text-stone-400">{pct}%</p>
           </div>
           <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-stone-100">

@@ -1,3 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import Link from "next/link";
 import { CheckList, MbtiBars, ReportShell, Sect } from "@/components/report-blocks";
 import { mbtiReport, mbtiWhatIs } from "@/lib/report-data";
@@ -5,11 +11,17 @@ import { mbtiReport, mbtiWhatIs } from "@/lib/report-data";
 export const metadata = { title: "Отчёт MBTI — Smart Bolashaq" };
 
 // Отчёт по тесту MBTI — по структуре референсного PDF «Отчёт по MBTI»
-export default function MbtiReportPage() {
+const cmsDefaults_mbtiReport = mbtiReport;
+const cmsDefaults_mbtiWhatIs = mbtiWhatIs;
+
+function MbtiReportPage() {
+  const pageCopy = getCopy("copy.app.platform.tests.mbti.report.page");
+  const mbtiReport = getContent("report-data.mbtiReport", cmsDefaults_mbtiReport);
+  const mbtiWhatIs = getContent("report-data.mbtiWhatIs", cmsDefaults_mbtiWhatIs);
   const r = mbtiReport;
   return (
     <ReportShell
-      eyebrow="AI Профориентатор · Отчёт MBTI"
+      eyebrow={pageCopy("x001","AI Профориентатор · Отчёт MBTI")}
       title={`${r.type} — ${r.title}`}
       subtitle={r.tagline}
     >
@@ -26,11 +38,11 @@ export default function MbtiReportPage() {
         </div>
       </section>
 
-      <Sect title="Что такое MBTI?">
+      <Sect title={pageCopy("x002","Что такое MBTI?")}>
         <p className="max-w-2xl leading-relaxed text-stone-600">{mbtiWhatIs}</p>
       </Sect>
 
-      <Sect kicker="Твой тип" title={`${r.type} — ${r.title}`}>
+      <Sect kicker={pageCopy("x003","Твой тип")} title={`${r.type} — ${r.title}`}>
         <div className="space-y-4">
           {r.descParas.map((p) => (
             <p key={p.slice(0, 24)} className="leading-relaxed text-stone-600">
@@ -40,20 +52,20 @@ export default function MbtiReportPage() {
         </div>
       </Sect>
 
-      <Sect kicker="Диагностика" title="Показатели по шкалам">
+      <Sect kicker={pageCopy("x004","Диагностика")} title={pageCopy("x005","Показатели по шкалам")}>
         <div className="rounded-3xl border border-stone-200 bg-white p-6">
           <MbtiBars />
         </div>
       </Sect>
 
-      <Sect title="Твои сильные стороны">
+      <Sect title={pageCopy("x006","Твои сильные стороны")}>
         <p className="mb-4 max-w-2xl text-sm leading-relaxed text-stone-600">
           {r.strengthsIntro}
         </p>
         <CheckList items={r.strengths} />
       </Sect>
 
-      <Sect title="Полезно развивать">
+      <Sect title={pageCopy("x007","Полезно развивать")}>
         <p className="mb-4 max-w-2xl text-sm leading-relaxed text-stone-600">
           {r.developIntro}
         </p>
@@ -70,7 +82,7 @@ export default function MbtiReportPage() {
         </ul>
       </Sect>
 
-      <Sect title="Рекомендации">
+      <Sect title={pageCopy("x008","Рекомендации")}>
         <p className="max-w-2xl leading-relaxed text-stone-600">
           {r.recommendation}
         </p>
@@ -79,8 +91,7 @@ export default function MbtiReportPage() {
       {/* Итог */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-violet-600 uppercase">
-          Итог
-        </p>
+          <ContentText id="copy.app.platform.tests.mbti.report.page.001" fallback="Итог" /></p>
         <p className="mt-3 leading-relaxed text-violet-900/80">{r.summary}</p>
       </section>
 
@@ -106,9 +117,10 @@ export default function MbtiReportPage() {
           href="/tests/report"
           className="inline-block rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
-          Открыть комплексный отчёт
-        </Link>
+          <ContentText id="copy.app.platform.tests.mbti.report.page.002" fallback="Открыть комплексный отчёт" /></Link>
       </div>
     </ReportShell>
   );
 }
+
+export default withPublishedContent(MbtiReportPage);

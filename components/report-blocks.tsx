@@ -1,3 +1,9 @@
+"use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import DownloadPdf from "@/components/download-pdf";
@@ -5,6 +11,12 @@ import { currentUser, hollandScales, mbtiScales, skills } from "@/lib/mock-data"
 import { reportDisclaimer } from "@/lib/report-data";
 
 // ─── Общие блоки страниц-отчётов (редакционный стиль платформы) ──────────────
+
+const cmsDefaults_currentUser = currentUser;
+const cmsDefaults_hollandScales = hollandScales;
+const cmsDefaults_mbtiScales = mbtiScales;
+const cmsDefaults_skills = skills;
+const cmsDefaults_reportDisclaimer = reportDisclaimer;
 
 export function ReportShell({
   eyebrow,
@@ -17,6 +29,8 @@ export function ReportShell({
   subtitle?: string;
   children: React.ReactNode;
 }) {
+  const currentUser = useContent("mock-data.currentUser", cmsDefaults_currentUser);
+  const reportDisclaimer = useContent("report-data.reportDisclaimer", cmsDefaults_reportDisclaimer);
   return (
     <div className="mx-auto max-w-3xl [-webkit-print-color-adjust:exact] [print-color-adjust:exact]">
       <Link
@@ -24,8 +38,7 @@ export function ReportShell({
         className="inline-flex items-center gap-1.5 text-sm text-stone-400 transition hover:text-stone-600 print:hidden"
       >
         <ArrowLeft size={14} />
-        К тестам
-      </Link>
+        <ContentText id="copy.components.report-blocks.001" fallback="К тестам" /></Link>
 
       {/* Шапка отчёта */}
       <div className="mt-6 border-b-2 border-stone-900 pb-6">
@@ -45,8 +58,7 @@ export function ReportShell({
           <span className="font-medium text-stone-800">
             {currentUser.firstName} {currentUser.lastName}
           </span>{" "}
-          · {currentUser.grade} · {currentUser.school} · 16 июля 2026
-        </p>
+          · {currentUser.grade} · {currentUser.school} <ContentText id="copy.components.report-blocks.002" fallback=" · 16 июля 2026" /></p>
       </div>
 
       <div className="mt-8 space-y-8">{children}</div>
@@ -104,6 +116,7 @@ export function CheckList({ items }: { items: string[] }) {
 
 // Топ-3 навыка — нумерация и названия как в отчёте
 export function TopSkillCards() {
+  const skills = useContent("mock-data.skills", cmsDefaults_skills);
   return (
     <div className="grid gap-2 sm:grid-cols-3 sm:gap-2.5">
       {skills.slice(0, 3).map((s, i) => (
@@ -123,6 +136,7 @@ export function TopSkillCards() {
 
 // Плитки топ-3 типов Голланда — как в отчёте: буква, «топ n», название, %
 export function HollandTopTiles({ small = false }: { small?: boolean }) {
+  const hollandScales = useContent("mock-data.hollandScales", cmsDefaults_hollandScales);
   const sorted = [...hollandScales].sort((a, b) => b.score - a.score).slice(0, 3);
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
@@ -133,7 +147,7 @@ export function HollandTopTiles({ small = false }: { small?: boolean }) {
         >
           {/* «ТОП n» — в углу, всё остальное по центру, как в отчёте */}
           <span className="absolute top-2 right-2.5 font-mono text-[10px] tracking-wider text-violet-500 uppercase">
-            топ {i + 1}
+            <ContentText id="copy.components.report-blocks.003" fallback="топ " />{i + 1}
           </span>
           <p className={`font-display leading-none text-violet-700 ${small ? "mt-1 text-2xl" : "mt-2 text-4xl"}`}>
             {s.code}
@@ -152,6 +166,7 @@ export function HollandTopTiles({ small = false }: { small?: boolean }) {
 
 // Шкалы Голланда — как в отчёте: топ-3 с градиентом, остальные серые
 export function HollandBars({ compact = false }: { compact?: boolean }) {
+  const hollandScales = useContent("mock-data.hollandScales", cmsDefaults_hollandScales);
   const sorted = [...hollandScales].sort((a, b) => b.score - a.score);
   return (
     <div className={compact ? "space-y-2.5" : "space-y-3.5"}>
@@ -197,19 +212,19 @@ export function HollandBars({ compact = false }: { compact?: boolean }) {
 
 // Мини-обложка отчёта — иллюстративный элемент для баннеров
 export function ReportThumb() {
+  const pageCopy = useCopy("copy.components.report-blocks");
+  const currentUser = useContent("mock-data.currentUser", cmsDefaults_currentUser);
   return (
     <div className="w-44 rotate-2 rounded-xl bg-white p-4 shadow-lg shadow-violet-900/20">
       <p className="text-[7px] font-semibold tracking-[0.16em] text-violet-600 uppercase">
-        AI Профориентатор
-      </p>
+        <ContentText id="copy.components.report-blocks.004" fallback="AI Профориентатор" /></p>
       <p className="font-display mt-1 text-[11px] leading-tight font-semibold text-stone-800">
-        Комплексный отчёт
-      </p>
+        <ContentText id="copy.components.report-blocks.005" fallback="Комплексный отчёт" /></p>
       <p className="mt-0.5 text-[7px] text-stone-400">
         {currentUser.firstName} {currentUser.lastName} · {currentUser.grade}
       </p>
       <div className="mt-2 grid grid-cols-3 gap-1">
-        {["Креативность", "ENFJ", "ASE"].map((v) => (
+        {[pageCopy("x001","Креативность"), "ENFJ", "ASE"].map((v) => (
           <div key={v} className="rounded bg-violet-100 px-1 py-1.5 text-center">
             <p className="truncate text-[6.5px] font-bold text-violet-800">{v}</p>
           </div>
@@ -238,6 +253,7 @@ export function ReportThumb() {
 // закреплён у края выигравшего полюса и тянется к середине; процент — между
 // треком и правой подписью, выигравший полюс выделен жирным
 export function MbtiBars({ compact = false }: { compact?: boolean }) {
+  const mbtiScales = useContent("mock-data.mbtiScales", cmsDefaults_mbtiScales);
   const label = compact ? "text-[11px]" : "text-xs";
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>

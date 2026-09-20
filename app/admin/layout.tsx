@@ -1,12 +1,9 @@
-import AdminNav from "@/components/admin-nav";
-
-export default function AdminLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <div className="flex min-h-screen bg-stone-50">
-      <AdminNav />
-      <main className="flex-1 overflow-x-auto px-8 py-8">{children}</main>
-    </div>
-  );
+import AdminShell from "@/components/admin/shell";
+import AdminLogin from "@/components/admin/login";
+import { isAdmin, isLocalAdminMode } from "@/lib/cms/auth";
+import "@/components/admin/admin.css";
+export const dynamic="force-dynamic";
+export default async function AdminLayout({children}:{children:React.ReactNode}) {
+  if(!await isAdmin())return <AdminLogin local={await isLocalAdminMode()}/>;
+  return <AdminShell>{children}</AdminShell>;
 }

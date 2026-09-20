@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Award, Calendar, FileBadge, FileText, Paperclip, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,7 +18,11 @@ const years = ["2026", "2025", "2024", "2023", "2022", "2021", "2020"];
 const inputCls =
   "w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100";
 
+const cmsDefaults_portfolioItems = portfolioItems;
+
 export default function PortfolioPage() {
+  const pageCopy = useCopy("copy.app.platform.portfolio.page");
+  const portfolioItems = useContent("mock-data.portfolioItems", cmsDefaults_portfolioItems);
   const [items, setItems] = useState<Item[]>(portfolioItems);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -38,7 +47,7 @@ export default function PortfolioPage() {
         name: d.name,
         date: new Date(d.uploaded).getFullYear().toString(),
         year: new Date(d.uploaded).getFullYear().toString(),
-        type: d.type === "DIPLOMA" ? "Диплом" : "Сертификат",
+        type: d.type === "DIPLOMA" ? pageCopy("x001","Диплом") : pageCopy("x002","Сертификат"),
         description: "",
         fileName: d.fileUrl ?? "dokument.pdf",
       }));
@@ -56,7 +65,7 @@ export default function PortfolioPage() {
       name,
       date: year,
       year,
-      type: "Сертификат",
+      type: pageCopy("x003","Сертификат"),
       description,
       fileName: fileName || "dokument.pdf",
     };
@@ -81,19 +90,16 @@ export default function PortfolioPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            Портфолио
-          </h1>
+            <ContentText id="copy.app.platform.portfolio.page.001" fallback="Портфолио" /></h1>
           <p className="mt-1 text-stone-500">
-            Дипломы, грамоты и сертификаты в одном месте
-          </p>
+            <ContentText id="copy.app.platform.portfolio.page.002" fallback="Дипломы, грамоты и сертификаты в одном месте" /></p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex flex-none items-center gap-2 rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
           <Upload size={15} />
-          Загрузить
-        </button>
+          <ContentText id="copy.app.platform.portfolio.page.003" fallback="Загрузить" /></button>
       </div>
 
       {/* Карточки документов: мини-превью, клик — подробный просмотр */}
@@ -136,9 +142,8 @@ export default function PortfolioPage() {
           <CertificateArt className="w-56" />
         </div>
         <p className="mt-3 text-sm text-stone-500">
-          Перетащите файл сюда или нажмите «Загрузить»
-        </p>
-        <p className="mt-1 text-xs text-stone-400">PNG, JPG, PDF · до 10 МБ</p>
+          <ContentText id="copy.app.platform.portfolio.page.004" fallback="Перетащите файл сюда или нажмите «Загрузить»" /></p>
+        <p className="mt-1 text-xs text-stone-400"><ContentText id="copy.app.platform.portfolio.page.005" fallback="PNG, JPG, PDF · до 10 МБ" /></p>
       </button>
 
       {/* Форма загрузки достижения */}
@@ -155,17 +160,17 @@ export default function PortfolioPage() {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              aria-label="Закрыть"
+              aria-label={pageCopy("x004","Закрыть")}
               className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
             >
               <X size={16} />
             </button>
-            <h2 className="font-display text-lg">Новое достижение</h2>
+            <h2 className="font-display text-lg"><ContentText id="copy.app.platform.portfolio.page.006" fallback="Новое достижение" /></h2>
             <input
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Название сертификата"
+              placeholder={pageCopy("x005","Название сертификата")}
               className={inputCls}
             />
             <select
@@ -175,8 +180,7 @@ export default function PortfolioPage() {
               className={inputCls}
             >
               <option value="" disabled>
-                Год вручения
-              </option>
+                {pageCopy("x006","Год вручения")}</option>
               {years.map((y) => (
                 <option key={y}>{y}</option>
               ))}
@@ -184,7 +188,7 @@ export default function PortfolioPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Описание: за что получено, что было сделано…"
+              placeholder={pageCopy("x007","Описание: за что получено, что было сделано…")}
               rows={3}
               className={`${inputCls} resize-none`}
             />
@@ -197,7 +201,7 @@ export default function PortfolioPage() {
             >
               <Paperclip size={15} className="shrink-0" />
               <span className="truncate">
-                {fileName || "Прикрепить файл (PNG, JPG или PDF)"}
+                {fileName || pageCopy("x008","Прикрепить файл (PNG, JPG или PDF)")}
               </span>
               <input
                 type="file"
@@ -210,8 +214,7 @@ export default function PortfolioPage() {
               type="submit"
               className="w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Сохранить в портфолио
-            </button>
+              <ContentText id="copy.app.platform.portfolio.page.007" fallback="Сохранить в портфолио" /></button>
           </form>
         </div>
       )}
@@ -228,7 +231,7 @@ export default function PortfolioPage() {
           >
             <button
               onClick={() => setOpenItem(null)}
-              aria-label="Закрыть"
+              aria-label={pageCopy("x009","Закрыть")}
               className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
             >
               <X size={16} />

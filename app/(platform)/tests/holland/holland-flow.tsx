@@ -1,4 +1,10 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { defaultTests } from "@/lib/cms/test-defaults";
+import { useContent } from "@/lib/cms/client";
+
 
 import Link from "next/link";
 import { useState } from "react";
@@ -11,7 +17,14 @@ import { recordTestAttempt } from "@/lib/api";
 
 type Stage = "intro" | "quiz" | "result";
 
+const cmsDefaults_hollandScales = hollandScales;
+const cmsDefaults_hollandSections = hollandSections;
+
 export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
+  const pageCopy = useCopy("copy.app.platform.tests.holland.holland-flow");
+  const definition = useContent("test.holland", defaultTests.find(t => t.slug === "holland")!);
+  const hollandSections = useContent("mock-data.hollandSections", cmsDefaults_hollandSections);
+  const hollandScales = useContent("mock-data.hollandScales", cmsDefaults_hollandScales);
   const [stage, setStage] = useState<Stage>(initialStage);
 
   if (stage === "intro") {
@@ -19,30 +32,23 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
       <div className="mx-auto max-w-xl text-center">
         <InterestsArt className="mx-auto h-44 w-56" />
         <span className="mt-2 inline-block rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          Модель профессиональных интересов Дж. Холланда (RIASEC)
-        </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Мои интересы</h1>
+          {definition.method}</span>
+        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">{definition.name}</h1>
         <p className="mt-4 leading-relaxed text-stone-600">
-          Определит ваши профессиональные интересы по 6 типам направленности:
-          реалистичный, исследовательский, артистичный, социальный,
-          предприимчивый и конвенциональный. Это последний тест до вашего
-          комплексного отчёта ИИ!
-        </p>
+          {definition.tagline}</p>
         <div className="mt-6 flex justify-center gap-6 text-sm text-stone-500">
-          <span>≈ 8 минут</span>
+          <span>{definition.duration}</span>
           <span>·</span>
           <span>
-            {hollandSections.length} раздела ·{" "}
+            {hollandSections.length} <ContentText id="copy.app.platform.tests.holland.holland-flow.005" fallback=" раздела ·" />{" "}
             {hollandSections.reduce((n, s) => n + s.questions.length, 0)}{" "}
-            вопросов (демо)
-          </span>
+            <ContentText id="copy.app.platform.tests.holland.holland-flow.006" fallback="вопросов (демо)" /></span>
         </div>
         <button
           onClick={() => setStage("quiz")}
           className="mt-8 rounded-2xl bg-violet-500 px-8 py-3 font-medium text-white transition hover:bg-violet-600"
         >
-          Начать тест
-        </button>
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.007" fallback="Начать тест" /></button>
       </div>
     );
   }
@@ -50,13 +56,10 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
   if (stage === "quiz") {
     return (
       <SectionQuiz
-        title="Мои интересы"
+        title={definition.name} scale={definition.scale}
         sections={hollandSections}
-        onFinish={(values) => {
-          setStage("result");
-          completeChecklistStep("c6");
-          recordTestAttempt("holland", values, { summary: "Код ASE · Артистичный тип", code: "ASE" });
-        }}
+        onFinish={async (values) => { await recordTestAttempt("holland", values, { summary: pageCopy("x001","Код ASE · Артистичный тип"), code: "ASE" }, definition); setStage("result");
+completeChecklistStep("c6"); }}
       />
     );
   }
@@ -68,14 +71,11 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
     <div className="mx-auto max-w-2xl">
       <div className="text-center">
         <p className="text-sm font-medium text-violet-600">
-          Результат теста по модели Дж. Холланда (RIASEC)
-        </p>
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.008" fallback="Результат теста по модели Дж. Холланда (RIASEC)" /></p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
-          {top.map((t) => t.name).join(" + ")} тип
-        </h1>
+          {top.map((t) => t.name).join(" + ")} <ContentText id="copy.app.platform.tests.holland.holland-flow.009" fallback=" тип" /></h1>
         <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700">
-          Код RIASEC:
-          <span className="font-mono text-base font-bold tracking-[0.2em] text-violet-800">
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.010" fallback="Код RIASEC:" /><span className="font-mono text-base font-bold tracking-[0.2em] text-violet-800">
             {sorted
               .slice(0, 3)
               .map((s) => s.code)
@@ -83,14 +83,11 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
           </span>
         </p>
         <p className="mx-auto mt-3 max-w-lg text-stone-600">
-          Ваши ведущие интересы — творчество и работа с людьми. Вам подходят
-          профессии, где можно создавать новое и напрямую взаимодействовать с
-          аудиторией: медиа, образование, культура, коммуникации.
-        </p>
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.011" fallback="Ваши ведущие интересы — творчество и работа с людьми. Вам подходят профессии, где можно создавать новое и напрямую взаимодействовать с аудиторией: медиа, образование, культура, коммуникации." /></p>
       </div>
 
       <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-6">
-        <h2 className="font-semibold">Профиль интересов (RIASEC)</h2>
+        <h2 className="font-semibold"><ContentText id="copy.app.platform.tests.holland.holland-flow.012" fallback="Профиль интересов (RIASEC)" /></h2>
         <div className="mt-5 space-y-4">
           <HollandTopTiles />
           <HollandBars />
@@ -101,12 +98,8 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
         <CertificateArt className="hidden w-40 shrink-0 sm:block" />
         <p className="text-sm leading-relaxed text-stone-700">
           <span className="font-display font-medium">
-            Все 3 теста пройдены!
-          </span>{" "}
-          ИИ готовит ваш комплексный отчёт: сводный анализ личности, сильных
-          сторон, интересов и карьерных рекомендаций. Он появится в личном
-          кабинете.
-        </p>
+            <ContentText id="copy.app.platform.tests.holland.holland-flow.013" fallback="Все 3 теста пройдены!" /></span>{" "}
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.014" fallback="ИИ готовит ваш комплексный отчёт: сводный анализ личности, сильных сторон, интересов и карьерных рекомендаций. Он появится в личном кабинете." /></p>
       </div>
 
       <div className="mt-6 flex justify-center gap-3">
@@ -114,14 +107,12 @@ export default function HollandFlow({ initialStage }: { initialStage: Stage }) {
           href="/tests/holland/report"
           className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
         >
-          Открыть полный отчёт
-        </Link>
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.015" fallback="Открыть полный отчёт" /></Link>
         <Link
           href="/tests/report"
           className="rounded-xl border border-stone-200 px-6 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
         >
-          Комплексный отчёт
-        </Link>
+          <ContentText id="copy.app.platform.tests.holland.holland-flow.016" fallback="Комплексный отчёт" /></Link>
       </div>
     </div>
   );

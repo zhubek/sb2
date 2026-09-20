@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { Download, Eye, X } from "lucide-react";
 import { useState } from "react";
@@ -11,6 +15,7 @@ export default function ReportPreview({
   title: string;
   rows: { label: string; value: string }[];
 }) {
+  const pageCopy = useCopy("copy.components.report-preview");
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<"idle" | "generating" | "done">("idle");
 
@@ -27,8 +32,7 @@ export default function ReportPreview({
         className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
       >
         <Eye size={15} />
-        Посмотреть отчёт
-      </button>
+        <ContentText id="copy.components.report-preview.001" fallback="Посмотреть отчёт" /></button>
 
       {open && (
         <div
@@ -42,15 +46,14 @@ export default function ReportPreview({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="font-mono text-xs text-slate-400">
-                  Предпросмотр отчёта · демо
-                </p>
+                  <ContentText id="copy.components.report-preview.002" fallback="Предпросмотр отчёта · демо" /></p>
                 <h2 className="font-display mt-1 text-lg font-semibold tracking-tight">
                   {title}
                 </h2>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Закрыть"
+                aria-label={pageCopy("x001","Закрыть")}
                 className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
               >
                 <X size={17} />
@@ -74,8 +77,7 @@ export default function ReportPreview({
                 onClick={() => setOpen(false)}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
               >
-                Закрыть
-              </button>
+                <ContentText id="copy.components.report-preview.003" fallback="Закрыть" /></button>
               <button
                 onClick={download}
                 disabled={state === "generating"}
@@ -88,16 +90,14 @@ export default function ReportPreview({
                 {state === "idle" && (
                   <>
                     <Download size={15} />
-                    Скачать
-                  </>
+                    <ContentText id="copy.components.report-preview.004" fallback="Скачать" /></>
                 )}
                 {state === "generating" && (
                   <>
                     <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Формируем…
-                  </>
+                    <ContentText id="copy.components.report-preview.005" fallback="Формируем…" /></>
                 )}
-                {state === "done" && <>✓ Отчёт скачан (демо)</>}
+                {state === "done" && <><ContentText id="copy.components.report-preview.006" fallback="✓ Отчёт скачан (демо)" /></>}
               </button>
             </div>
           </div>

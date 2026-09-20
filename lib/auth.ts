@@ -1,105 +1,75 @@
+import { backendToken } from "./backend-identity";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { consumeOtp } from "@/lib/otp";
+import { PASSWORD_LOGIN } from "@/features/auth/graphql/operations";
 
-// Google включается только когда в окружении есть ключи OAuth —
-// без них демо работает на одном OTP-входе.
-export const googleEnabled = !!(
-  process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
-);
-
+export const googleEnabled = !!(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
+const apiUrl = () => process.env.API_URL ?? "http://127.0.0.1:3030/api";
+async function passwordIdentity(credentials: Partial<Record<"email" | "password", unknown>>, teacherOnly = false) {
+  const email = String(credentials.email ?? "").trim().toLowerCase();
+  const password = String(credentials.password ?? "");
+  if (!email || !password || email.length > 254 || password.length > 256) return null;
+  try {
+    const response = await fetch(apiUrl() + "/graphql", { method: "POST",
+      headers: { "Content-Type": "application/json" }, cache: "no-store", signal: AbortSignal.timeout(10000),
+      body: JSON.stringify({ query: PASSWORD_LOGIN, variables: { input: { email, password } } }) });
+    const result = await response.json();
+    const user = result.data?.passwordLogin;
+    if (!response.ok || result.errors?.length || !user || teacherOnly && !["TEACHER", "ADMIN"].includes(user.role)) return null;
+    return { id: user.email, email: user.email, name: user.name, backendId: user.id,
+      credentialVersion: user.credentialVersion, contentAdmin: user.contentAdmin,
+      role: user.role === "ADMIN" ? "admin" as const : user.role === "TEACHER" ? "teacher" as const : "student" as const };
+  } catch { return null; }
+}
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
-  secret: process.env.AUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 24 * 60 * 60,
-  },
-  pages: {
-    signIn: "/auth",
-  },
+  trustHost: true, secret: process.env.AUTH_SECRET,
+  session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
+  pages: { signIn: "/auth" },
   providers: [
-    ...(googleEnabled
-      ? [
-          Google({
-            clientId: process.env.AUTH_GOOGLE_ID,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET,
-            allowDangerousEmailAccountLinking: true,
-          }),
-        ]
-      : []),
-    // Вход ученика по коду из письма (в демо код показывается на экране)
-    Credentials({
-      id: "otp",
-      name: "Email OTP",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        code: { label: "Код", type: "text" },
-      },
+    ...(googleEnabled ? [Google({ clientId: process.env.AUTH_GOOGLE_ID, clientSecret: process.env.AUTH_GOOGLE_SECRET })] : []),
+    Credentials({ id: "password", name: "Email and password",
+      credentials: { email: {}, password: {} }, authorize: c => passwordIdentity(c) }),
+    Credentials({ id: "teacher", name: "Teacher",
+      credentials: { email: {}, password: {} }, authorize: c => passwordIdentity(c, true) }),
+    Credentials({ id: "otp", name: "Email OTP", credentials: { email: {}, code: {} },
       async authorize(credentials) {
-        const email = String(credentials?.email ?? "").toLowerCase().trim();
-        const code = String(credentials?.code ?? "");
-        if (!email || !code) return null;
-        // Дев-режим: универсальный код 000000 — регистрация без проверки
-        // почты (убрать при подключении реальной отправки писем)
+        if (process.env.NODE_ENV === "production") return null;
+        const email = String(credentials.email ?? "").toLowerCase().trim();
+        const code = String(credentials.code ?? "");
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !code) return null;
         if (code !== "000000" && !consumeOtp(email, code)) return null;
-        // Прод: найти/создать пользователя в БД (см. authConfig старой платформы)
         return { id: email, email, role: "student" as const };
-      },
-    }),
-    // Вход педагога по учётным данным, выданным администратором.
-    // Демо: принимается любая пара, кроме домена wrong.kz (ветка ошибки входа).
-    Credentials({
-      id: "teacher",
-      name: "Педагог",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Пароль", type: "password" },
-      },
-      async authorize(credentials) {
-        const email = String(credentials?.email ?? "").toLowerCase().trim();
-        const password = String(credentials?.password ?? "");
-        if (!email || !password) return null;
-        if (email.endsWith("@wrong.kz")) return null;
-        // Прод: проверка пары в БД (bcrypt), учётки создаёт администратор школы
-        return { id: email, email, role: "teacher" as const };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.email ?? user.id;
         token.role = user.role ?? "student";
-        // Связываем сессию с пользователем в БД бекенда (upsert по почте)
-        try {
-          const apiUrl =
-            process.env.API_URL ??
-            process.env.NEXT_PUBLIC_API_URL ??
-            "http://localhost:3002/api";
+        token.contentAdmin = user.contentAdmin ?? false;
+        token.credentialVersion = user.credentialVersion;
+        token.backendId = user.backendId;
+        if (!token.backendId) {
           const email = user.email ?? "";
-          const res = await fetch(`${apiUrl}/users`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email,
-              name: user.name?.split(" ")[0] || email.split("@")[0] || "Ученик",
-              surname: user.name?.split(" ").slice(1).join(" ") || undefined,
-              role: token.role === "teacher" ? "TEACHER" : "STUDENT",
-            }),
-          });
-          if (res.ok) token.backendId = (await res.json()).id;
-        } catch {
-          // Бекенд недоступен — сессия работает без backendId (мок-режим)
+          const response = await fetch(apiUrl() + "/users", { method: "POST", signal: AbortSignal.timeout(10000),
+            headers: { "Content-Type": "application/json", Authorization: await backendToken({ scope: "identity:provision", email }) },
+            body: JSON.stringify({ email, name: user.name?.split(" ")[0] || email.split("@")[0], surname: user.name?.split(" ").slice(1).join(" ") || "" }) });
+          if (!response.ok) throw new Error("Identity provisioning rejected");
+          const profile = await response.json();
+          token.backendId = profile.id;
         }
       }
       return token;
     },
     session({ session, token }) {
       session.user.id = token.id as string;
-      session.user.role = (token.role as "student" | "teacher") ?? "student";
-      session.user.backendId = token.backendId as number | undefined;
+      session.user.role = token.role === "admin" ? "admin" : token.role === "teacher" ? "teacher" : "student";
+      session.user.backendId = typeof token.backendId === "number" ? token.backendId : undefined;
+      session.user.credentialVersion = typeof token.credentialVersion === "number" ? token.credentialVersion : undefined;
+      session.user.contentAdmin = token.contentAdmin === true;
       return session;
     },
   },

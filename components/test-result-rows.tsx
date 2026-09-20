@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -12,7 +17,15 @@ import {
 import { currentUser, hollandScales, skills } from "@/lib/mock-data";
 
 // Раскрывающиеся строки с результатами тестов — редакционный список
+const cmsDefaults_currentUser = currentUser;
+const cmsDefaults_hollandScales = hollandScales;
+const cmsDefaults_skills = skills;
+
 export default function TestResultRows() {
+  const pageCopy = useCopy("copy.components.test-result-rows");
+  const skills = useContent("mock-data.skills", cmsDefaults_skills);
+  const currentUser = useContent("mock-data.currentUser", cmsDefaults_currentUser);
+  const hollandScales = useContent("mock-data.hollandScales", cmsDefaults_hollandScales);
   const [open, setOpen] = useState<string | null>(null);
 
   function toggle(id: string) {
@@ -23,12 +36,12 @@ export default function TestResultRows() {
     {
       id: "debruce",
       n: "01",
-      name: "Мои навыки",
-      meth: "Методика НАО им. Ы. Алтынсарина",
+      name: pageCopy("x001","Мои навыки"),
+      meth: pageCopy("x002","Методика НАО им. Ы. Алтынсарина"),
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
-          Топ-3:{" "}
+          <ContentText id="copy.components.test-result-rows.001" fallback="Топ-3:" />{" "}
           <span className="text-stone-800">
             {skills
               .slice(0, 3)
@@ -42,21 +55,18 @@ export default function TestResultRows() {
           {/* Топ-3 способности — нумерация как в отчёте */}
           <TopSkillCards />
           <p className="mt-3 text-xs text-stone-400">
-            Полный рейтинг всех навыков — в отчёте
-          </p>
+            <ContentText id="copy.components.test-result-rows.002" fallback="Полный рейтинг всех навыков — в отчёте" /></p>
           <div className="flex items-center gap-3 pt-4">
             <Link
               href="/tests/debruce/report"
               className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Открыть отчёт
-            </Link>
+              <ContentText id="copy.components.test-result-rows.003" fallback="Открыть отчёт" /></Link>
             <Link
               href="/tests/debruce"
               className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
             >
-              Перепройти тест
-            </Link>
+              <ContentText id="copy.components.test-result-rows.004" fallback="Перепройти тест" /></Link>
           </div>
         </div>
       ),
@@ -64,8 +74,8 @@ export default function TestResultRows() {
     {
       id: "mbti",
       n: "02",
-      name: "Мой тип личности",
-      meth: "Индикатор типов Майерс — Бриггс (MBTI)",
+      name: pageCopy("x003","Мой тип личности"),
+      meth: pageCopy("x004","Индикатор типов Майерс — Бриггс (MBTI)"),
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
@@ -84,14 +94,12 @@ export default function TestResultRows() {
               href="/tests/mbti/report"
               className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Открыть отчёт
-            </Link>
+              <ContentText id="copy.components.test-result-rows.005" fallback="Открыть отчёт" /></Link>
             <Link
               href="/tests/mbti"
               className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
             >
-              Перепройти тест
-            </Link>
+              <ContentText id="copy.components.test-result-rows.006" fallback="Перепройти тест" /></Link>
           </div>
         </div>
       ),
@@ -99,12 +107,12 @@ export default function TestResultRows() {
     {
       id: "holland",
       n: "03",
-      name: "Мои интересы",
-      meth: "Модель профессиональных интересов Дж. Холланда (RIASEC)",
+      name: pageCopy("x005","Мои интересы"),
+      meth: pageCopy("x006","Модель профессиональных интересов Дж. Холланда (RIASEC)"),
       passed: true,
       preview: (
         <p className="text-sm text-stone-500">
-          Код{" "}
+          <ContentText id="copy.components.test-result-rows.007" fallback="Код" />{" "}
           <span className="font-mono font-semibold tracking-[0.15em] text-violet-600">
             {[...hollandScales]
               .sort((a, b) => b.score - a.score)
@@ -114,8 +122,7 @@ export default function TestResultRows() {
           </span>{" "}
           <span className="text-stone-800">
             ·{" "}
-            {[...hollandScales].sort((a, b) => b.score - a.score)[0].name} тип
-          </span>
+            {[...hollandScales].sort((a, b) => b.score - a.score)[0].name} <ContentText id="copy.components.test-result-rows.008" fallback=" тип" /></span>
         </p>
       ),
       expanded: (
@@ -128,14 +135,12 @@ export default function TestResultRows() {
               href="/tests/holland/report"
               className="rounded-2xl bg-violet-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
             >
-              Открыть отчёт
-            </Link>
+              <ContentText id="copy.components.test-result-rows.009" fallback="Открыть отчёт" /></Link>
             <Link
               href="/tests/holland"
               className="rounded-2xl border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:bg-stone-50"
             >
-              Перепройти тест
-            </Link>
+              <ContentText id="copy.components.test-result-rows.010" fallback="Перепройти тест" /></Link>
           </div>
         </div>
       ),
@@ -160,12 +165,10 @@ export default function TestResultRows() {
                   <span className="font-display font-medium">{row.name}</span>
                   {row.passed ? (
                     <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
-                      пройден
-                    </span>
+                      <ContentText id="copy.components.test-result-rows.011" fallback="пройден" /></span>
                   ) : (
                     <span className="rounded bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium text-stone-500">
-                      не пройден
-                    </span>
+                      <ContentText id="copy.components.test-result-rows.012" fallback="не пройден" /></span>
                   )}
                 </div>
                 <p className="mt-0.5 text-xs text-stone-400">{row.meth}</p>
@@ -176,7 +179,7 @@ export default function TestResultRows() {
                   e.stopPropagation();
                   toggle(row.id);
                 }}
-                aria-label={isOpen ? "Свернуть" : "Подробнее"}
+                aria-label={isOpen ? pageCopy("x007","Свернуть") : pageCopy("x008","Подробнее")}
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                   isOpen
                     ? "border-violet-500 bg-violet-500 text-white"

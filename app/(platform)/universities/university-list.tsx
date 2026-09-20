@@ -1,4 +1,6 @@
 "use client";
+import { ContentText } from "@/lib/cms/client";
+
 
 import { Target } from "lucide-react";
 import { useState } from "react";
@@ -12,17 +14,16 @@ export default function UniversityList({ presetIndustry }: { presetIndustry: str
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Навигатор образования</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight"><ContentText id="copy.app.platform.universities.university-list.001" fallback="Навигатор образования" /></h1>
         <p className="mt-1 text-stone-500">
-          Все вузы и колледжи Казахстана, зарубежные университеты и образовательные программы
-        </p>
+          <ContentText id="copy.app.platform.universities.university-list.002" fallback="Все вузы и колледжи Казахстана, зарубежные университеты и образовательные программы" /></p>
       </div>
 
       {showPreset && presetIndustry && (
         <div className="flex items-center justify-between rounded-2xl border border-violet-200 bg-violet-100 px-5 py-3.5 text-sm">
           <span>
             <Target size={15} className="mr-1.5 -mt-0.5 inline text-violet-600" />
-            Фильтр по вашей отрасли: <span className="font-semibold">{presetIndustry}</span>
+            <ContentText id="copy.app.platform.universities.university-list.003" fallback="Фильтр по вашей отрасли: " /><span className="font-semibold">{presetIndustry}</span>
           </span>
           <button
             onClick={() => {
@@ -31,8 +32,7 @@ export default function UniversityList({ presetIndustry }: { presetIndustry: str
             }}
             className="font-medium text-violet-600 hover:text-violet-700"
           >
-            Сбросить
-          </button>
+            <ContentText id="copy.app.platform.universities.university-list.004" fallback="Сбросить" /></button>
         </div>
       )}
 

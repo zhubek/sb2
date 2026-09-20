@@ -1,7 +1,12 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Bot, Send, X } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useContentPathname as usePathname } from "@/lib/cms/client";
 import { useState } from "react";
 import { IconAI } from "@/components/compass-marks";
 import { aiMockReplies, aiTemplateQuestions } from "@/lib/mock-data";
@@ -11,7 +16,13 @@ interface Message {
   text: string;
 }
 
+const cmsDefaults_aiMockReplies = aiMockReplies;
+const cmsDefaults_aiTemplateQuestions = aiTemplateQuestions;
+
 export default function AiAssistant() {
+  const pageCopy = useCopy("copy.components.ai-assistant");
+  const aiMockReplies = useContent("mock-data.aiMockReplies", cmsDefaults_aiMockReplies);
+  const aiTemplateQuestions = useContent("mock-data.aiTemplateQuestions", cmsDefaults_aiTemplateQuestions);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -19,7 +30,7 @@ export default function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      text: "Привет, Айгерим! Я ваш ИИ-ассистент по профориентации. Помогу разобраться в результатах тестов, расскажу о профессиях и подскажу следующий шаг. Все три теста пройдены — ваш комплексный отчёт готов, загляните в раздел «Тесты»!",
+      text: pageCopy("x001","Привет, Айгерим! Я ваш ИИ-ассистент по профориентации. Помогу разобраться в результатах тестов, расскажу о профессиях и подскажу следующий шаг. Все три теста пройдены — ваш комплексный отчёт готов, загляните в раздел «Тесты»!"),
     },
   ]);
 
@@ -42,7 +53,7 @@ export default function AiAssistant() {
       {/* Плавающая кнопка — доступна на каждой странице */}
       <button
         onClick={() => setOpen(!open)}
-        aria-label="ИИ-ассистент"
+        aria-label={pageCopy("x002","ИИ-ассистент")}
         className="fixed right-4 bottom-[4.75rem] z-50 flex h-13 w-13 items-center justify-center rounded-2xl bg-violet-500 md:right-5 md:bottom-5 md:h-14 md:w-14 text-white shadow-lg shadow-stone-900/25 transition hover:scale-105 hover:bg-violet-600 print:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Bot className="h-6 w-6" />}
@@ -51,10 +62,9 @@ export default function AiAssistant() {
       {open && (
         <div className="fixed right-4 bottom-[8.5rem] z-50 flex h-[min(520px,calc(100dvh-11rem))] w-[360px] max-w-[calc(100vw-2rem)] md:right-5 md:bottom-24 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl print:hidden">
           <div className="bg-violet-100 px-4 py-3">
-            <p className="font-display text-sm text-violet-800">ИИ-ассистент</p>
+            <p className="font-display text-sm text-violet-800"><ContentText id="copy.components.ai-assistant.001" fallback="ИИ-ассистент" /></p>
             <p className="text-xs text-violet-800/60">
-              Помогу с тестами, профессиями и выбором ВУЗа
-            </p>
+              <ContentText id="copy.components.ai-assistant.002" fallback="Помогу с тестами, профессиями и выбором ВУЗа" /></p>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
@@ -75,7 +85,7 @@ export default function AiAssistant() {
             {thinking && (
               <div className="flex items-center gap-1.5 rounded-2xl bg-stone-100 py-1 pr-3.5 pl-1.5">
                 <IconAI className="h-8 w-8" />
-                <span className="text-xs text-stone-400">думает…</span>
+                <span className="text-xs text-stone-400"><ContentText id="copy.components.ai-assistant.003" fallback="думает…" /></span>
               </div>
             )}
 
@@ -105,7 +115,7 @@ export default function AiAssistant() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Задайте вопрос…"
+              placeholder={pageCopy("x003","Задайте вопрос…")}
               className="flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-violet-400"
             />
             <button

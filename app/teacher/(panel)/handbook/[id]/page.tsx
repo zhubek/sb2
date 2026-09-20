@@ -1,8 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
 import { notFound } from "next/navigation";
 import InstitutionView from "@/components/navigator/institution-view";
 import { buildInstitutionGroups, getDetail, getInstitution } from "@/lib/nav/server";
 
-export default async function TeacherInstitutionPage({
+async function TeacherInstitutionPage({
   params,
   searchParams,
 }: {
@@ -27,3 +28,5 @@ export default async function TeacherInstitutionPage({
     />
   );
 }
+
+export default withPublishedContent(TeacherInstitutionPage);

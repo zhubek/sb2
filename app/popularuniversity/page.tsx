@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { useContent } from "@/lib/cms/client";
+
 
 import { Globe2, MapPin } from "lucide-react";
 import { useState } from "react";
@@ -10,6 +14,9 @@ import {
 } from "@/lib/info-data";
 
 type Tab = "kz" | "world";
+
+const cmsDefaults_kzUniversities = kzUniversities;
+const cmsDefaults_worldUniversities = worldUniversities;
 
 function UniCard({ u, world }: { u: InfoUniversity; world: boolean }) {
   return (
@@ -38,15 +45,18 @@ function UniCard({ u, world }: { u: InfoUniversity; world: boolean }) {
 }
 
 export default function PopularUniversityPage() {
+  const pageCopy = useCopy("copy.app.popularuniversity.page");
+  const kzUniversities = useContent("info-data.kzUniversities", cmsDefaults_kzUniversities);
+  const worldUniversities = useContent("info-data.worldUniversities", cmsDefaults_worldUniversities);
   const [tab, setTab] = useState<Tab>("kz");
   const list = tab === "kz" ? kzUniversities : worldUniversities;
 
   return (
     <InfoShell
       active="/popularuniversity"
-      eyebrow="Справочник"
-      title="Популярные университеты"
-      lede="Ведущие вузы Казахстана и мира: чем они известны, какие направления в них сильны и где их искать."
+      eyebrow={pageCopy("x001","Справочник")}
+      title={pageCopy("x002","Популярные университеты")}
+      lede={pageCopy("x003","Ведущие вузы Казахстана и мира: чем они известны, какие направления в них сильны и где их искать.")}
     >
       <div className="mb-8 flex justify-center">
         <div className="flex rounded-2xl bg-stone-100 p-1 text-sm font-medium">

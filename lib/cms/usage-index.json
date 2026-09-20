@@ -1,0 +1,795 @@
+{
+  "assistant.teacher-replies": [
+    "/teacher/assistant"
+  ],
+  "copy.app.auth.auth-client": [
+    "/auth"
+  ],
+  "copy.app.not-found": [
+    "/"
+  ],
+  "copy.app.onboarding.page": [
+    "/onboarding"
+  ],
+  "copy.app.page": [
+    "/"
+  ],
+  "copy.app.platform.chat.page": [
+    "/chat"
+  ],
+  "copy.app.platform.dashboard.page": [
+    "/dashboard"
+  ],
+  "copy.app.platform.portfolio.page": [
+    "/portfolio"
+  ],
+  "copy.app.platform.profile.page": [
+    "/profile"
+  ],
+  "copy.app.platform.tests.debruce.debruce-flow": [
+    "/tests/debruce"
+  ],
+  "copy.app.platform.tests.debruce.report.page": [
+    "/tests/debruce/report"
+  ],
+  "copy.app.platform.tests.holland.holland-flow": [
+    "/tests/holland"
+  ],
+  "copy.app.platform.tests.holland.report.page": [
+    "/tests/holland/report"
+  ],
+  "copy.app.platform.tests.mbti.mbti-flow": [
+    "/tests/mbti"
+  ],
+  "copy.app.platform.tests.mbti.report.page": [
+    "/tests/mbti/report"
+  ],
+  "copy.app.platform.tests.page": [
+    "/tests"
+  ],
+  "copy.app.platform.tests.report.page": [
+    "/tests/report"
+  ],
+  "copy.app.platform.universities.industries.page": [
+    "/universities/industries"
+  ],
+  "copy.app.platform.universities.university-list": [
+    "/universities"
+  ],
+  "copy.app.popularuniversity.page": [
+    "/popularuniversity"
+  ],
+  "copy.app.professions.page": [
+    "/professions"
+  ],
+  "copy.app.skills.page": [
+    "/skills"
+  ],
+  "copy.app.teacher.login.page": [
+    "/teacher/login"
+  ],
+  "copy.app.teacher.panel.analytics.class.id.page": [
+    "/teacher/analytics/class/9a"
+  ],
+  "copy.app.teacher.panel.analytics.classes.page": [
+    "/teacher/analytics/classes"
+  ],
+  "copy.app.teacher.panel.analytics.page": [
+    "/teacher/analytics"
+  ],
+  "copy.app.teacher.panel.analytics.student.id.page": [
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.app.teacher.panel.analytics.students.page": [
+    "/teacher/analytics/students"
+  ],
+  "copy.app.teacher.panel.assistant.page": [
+    "/teacher/assistant"
+  ],
+  "copy.app.teacher.panel.bonus.page": [
+    "/teacher/bonus"
+  ],
+  "copy.app.teacher.panel.course.module1.page": [
+    "/teacher/course/module1"
+  ],
+  "copy.app.teacher.panel.course.page": [
+    "/teacher/course"
+  ],
+  "copy.app.teacher.panel.guide.page": [
+    "/teacher/guide"
+  ],
+  "copy.app.teacher.panel.handbook.page": [
+    "/teacher/handbook"
+  ],
+  "copy.app.teacher.panel.page": [
+    "/teacher"
+  ],
+  "copy.app.teacher.panel.profile.edit.page": [
+    "/teacher/profile/edit"
+  ],
+  "copy.app.teacher.panel.profile.page": [
+    "/teacher/profile"
+  ],
+  "copy.app.teacher.panel.reports.page": [
+    "/teacher/reports"
+  ],
+  "copy.app.verify.id.page": [
+    "/verify/PRF-PREVIEW"
+  ],
+  "copy.app.workingprofessionsgen.page": [
+    "/workingprofessionsgen"
+  ],
+  "copy.components.activity-chart": [
+    "/teacher",
+    "/teacher/analytics"
+  ],
+  "copy.components.ai-assistant": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "copy.components.checklist-menu": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "copy.components.download-pdf": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report"
+  ],
+  "copy.components.info-shell": [
+    "/skills",
+    "/professions",
+    "/popularuniversity",
+    "/workingprofessionsgen"
+  ],
+  "copy.components.legacy-test-history": [
+    "/tests"
+  ],
+  "copy.components.navigator.college-view": [
+    "/universities/college/01120100"
+  ],
+  "copy.components.navigator.gop-view": [
+    "/universities/gop/B001"
+  ],
+  "copy.components.navigator.industry-view": [
+    "/universities/industry/0"
+  ],
+  "copy.components.navigator.institution-view": [
+    "/universities/0",
+    "/teacher/handbook/0",
+    "/universities/gop/B001",
+    "/universities/college/01120100"
+  ],
+  "copy.components.navigator.navigator": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "copy.components.platform-nav": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "copy.components.profession-carousel": [
+    "/"
+  ],
+  "copy.components.report-blocks": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report"
+  ],
+  "copy.components.report-button": [
+    "/teacher/analytics",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.components.report-preview": [
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.components.section-quiz": [
+    "/tests/mbti",
+    "/tests/debruce",
+    "/tests/holland"
+  ],
+  "copy.components.teacher-ai-button": [
+    "/teacher",
+    "/teacher/bonus",
+    "/teacher/guide",
+    "/teacher/course",
+    "/teacher/profile",
+    "/teacher/reports",
+    "/teacher/handbook",
+    "/teacher/analytics",
+    "/teacher/assistant",
+    "/teacher/handbook/0",
+    "/teacher/profile/edit",
+    "/teacher/course/module1",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.components.teacher-nav": [
+    "/teacher",
+    "/teacher/bonus",
+    "/teacher/guide",
+    "/teacher/course",
+    "/teacher/profile",
+    "/teacher/reports",
+    "/teacher/handbook",
+    "/teacher/analytics",
+    "/teacher/assistant",
+    "/teacher/handbook/0",
+    "/teacher/profile/edit",
+    "/teacher/course/module1",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.components.teacher-onboarding": [
+    "/teacher",
+    "/teacher/bonus",
+    "/teacher/guide",
+    "/teacher/course",
+    "/teacher/profile",
+    "/teacher/reports",
+    "/teacher/handbook",
+    "/teacher/analytics",
+    "/teacher/assistant",
+    "/teacher/handbook/0",
+    "/teacher/profile/edit",
+    "/teacher/course/module1",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "copy.components.test-result-rows": [
+    "/dashboard"
+  ],
+  "course-module1.module1Lessons": [
+    "/teacher/course/module1"
+  ],
+  "course-module1.module1Meta": [
+    "/teacher/course/module1"
+  ],
+  "course-module1.module1Quiz": [
+    "/teacher/course/module1"
+  ],
+  "info-data.hardSkills": [
+    "/skills"
+  ],
+  "info-data.kzUniversities": [
+    "/popularuniversity"
+  ],
+  "info-data.mainSkills": [
+    "/skills"
+  ],
+  "info-data.professionSectors": [
+    "/professions"
+  ],
+  "info-data.softSkills": [
+    "/skills"
+  ],
+  "info-data.workingCategories": [
+    "/workingprofessionsgen"
+  ],
+  "info-data.worldUniversities": [
+    "/popularuniversity"
+  ],
+  "inline.app.auth.auth-client.letters": [
+    "/auth"
+  ],
+  "inline.app.platform.chat.page.LONG_ANSWER": [
+    "/chat"
+  ],
+  "inline.app.teacher.panel.analytics.page.periods": [
+    "/teacher/analytics"
+  ],
+  "inline.app.teacher.panel.analytics.students.page.testFilters": [
+    "/teacher/analytics/students"
+  ],
+  "inline.app.teacher.panel.page.severityStyles": [
+    "/teacher"
+  ],
+  "inline.components.activity-chart.periods": [
+    "/teacher",
+    "/teacher/analytics"
+  ],
+  "inline.components.analytics-tabs.tabs": [
+    "/teacher/analytics",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students"
+  ],
+  "inline.components.info-shell.pages": [
+    "/skills",
+    "/professions",
+    "/popularuniversity",
+    "/workingprofessionsgen"
+  ],
+  "inline.components.profession-carousel.skills": [
+    "/"
+  ],
+  "inline.components.teacher-onboarding.steps": [
+    "/teacher",
+    "/teacher/bonus",
+    "/teacher/guide",
+    "/teacher/course",
+    "/teacher/profile",
+    "/teacher/reports",
+    "/teacher/handbook",
+    "/teacher/analytics",
+    "/teacher/assistant",
+    "/teacher/handbook/0",
+    "/teacher/profile/edit",
+    "/teacher/course/module1",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "landing.codes": [
+    "/"
+  ],
+  "landing.faq": [
+    "/"
+  ],
+  "landing.finalCta": [
+    "/"
+  ],
+  "landing.hero": [
+    "/"
+  ],
+  "landing.how": [
+    "/"
+  ],
+  "landing.nav": [
+    "/"
+  ],
+  "landing.paneScreens": [
+    "/"
+  ],
+  "landing.panes": [
+    "/"
+  ],
+  "landing.privacy": [
+    "/"
+  ],
+  "landing.skills": [
+    "/"
+  ],
+  "landing.what": [
+    "/"
+  ],
+  "mock-data.aiMockReplies": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "mock-data.aiTemplateQuestions": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "mock-data.checklist": [
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "mock-data.currentUser": [
+    "/",
+    "/chat",
+    "/tests",
+    "/profile",
+    "/dashboard",
+    "/portfolio",
+    "/universities",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/universities/0",
+    "/universities/industries",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100",
+    "/universities/program/program.0.0"
+  ],
+  "mock-data.debruceSections": [
+    "/tests/debruce"
+  ],
+  "mock-data.hollandScales": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report"
+  ],
+  "mock-data.hollandSections": [
+    "/tests/holland"
+  ],
+  "mock-data.mbtiScales": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report"
+  ],
+  "mock-data.mbtiSections": [
+    "/tests/mbti"
+  ],
+  "mock-data.portfolioItems": [
+    "/portfolio"
+  ],
+  "mock-data.skills": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/debruce",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report",
+    "/teacher/analytics/student/st1"
+  ],
+  "mock-data.tests": [
+    "/tests",
+    "/dashboard"
+  ],
+  "mock-data.universities": [
+    "/teacher/analytics/student/st1"
+  ],
+  "nav-meta.industries": [
+    "/universities",
+    "/tests/debruce",
+    "/universities/0",
+    "/teacher/handbook",
+    "/universities/industries",
+    "/teacher/handbook/0",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100"
+  ],
+  "nav-meta.obls": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "nav-meta.rank": [
+    "/universities/industries"
+  ],
+  "nav-meta.regionCities": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "nav.college-aggregates": [
+    "/universities/0",
+    "/universities/industries",
+    "/teacher/handbook/0",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100"
+  ],
+  "nav.college-programs": [
+    "/universities",
+    "/universities/0",
+    "/teacher/handbook",
+    "/universities/industries",
+    "/teacher/handbook/0",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100"
+  ],
+  "nav.gops": [
+    "/universities/0",
+    "/universities/industries",
+    "/teacher/handbook/0",
+    "/universities/gop/B001",
+    "/universities/industry/0",
+    "/universities/college/01120100"
+  ],
+  "nav.gops-compact": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "nav.institutions": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "nav.nogop-compact": [
+    "/universities",
+    "/teacher/handbook"
+  ],
+  "report-data.debruceAdditional": [
+    "/tests/debruce/report"
+  ],
+  "report-data.debruceAdditionalIndustries": [
+    "/tests/debruce/report"
+  ],
+  "report-data.debruceIndustries": [
+    "/tests/report",
+    "/tests/debruce/report"
+  ],
+  "report-data.debruceTop": [
+    "/tests/debruce/report"
+  ],
+  "report-data.debruceWhatIs": [
+    "/tests/report",
+    "/tests/debruce/report"
+  ],
+  "report-data.generalReport": [
+    "/tests/report"
+  ],
+  "report-data.hollandCodeMeaning": [
+    "/tests/holland/report"
+  ],
+  "report-data.hollandProfessions": [
+    "/tests/report",
+    "/tests/holland/report"
+  ],
+  "report-data.hollandSixTypes": [
+    "/tests/holland/report"
+  ],
+  "report-data.hollandTopTypes": [
+    "/tests/holland/report"
+  ],
+  "report-data.hollandWhatIs": [
+    "/tests/report",
+    "/tests/holland/report"
+  ],
+  "report-data.mbtiReport": [
+    "/tests/report",
+    "/tests/mbti/report"
+  ],
+  "report-data.mbtiWhatIs": [
+    "/tests/report",
+    "/tests/mbti/report"
+  ],
+  "report-data.reportDisclaimer": [
+    "/",
+    "/dashboard",
+    "/tests/mbti",
+    "/tests/report",
+    "/tests/holland",
+    "/tests/mbti/report",
+    "/tests/debruce/report",
+    "/tests/holland/report"
+  ],
+  "teacher-mock-data.activityData": [
+    "/teacher",
+    "/teacher/analytics"
+  ],
+  "teacher-mock-data.attentionSignals": [
+    "/teacher"
+  ],
+  "teacher-mock-data.bonusTransactions": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.courseInfo": [
+    "/teacher/course"
+  ],
+  "teacher-mock-data.courseModules": [
+    "/teacher/course",
+    "/teacher/profile"
+  ],
+  "teacher-mock-data.coverageProgress": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.decidedStudents": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.eduPrograms": [
+    "/teacher/analytics/student/st1"
+  ],
+  "teacher-mock-data.leaderPeriodLabels": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.leaderboards": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.moduleStatusLabels": [
+    "/teacher/course",
+    "/teacher/profile"
+  ],
+  "teacher-mock-data.periodSummary": [
+    "/teacher/analytics"
+  ],
+  "teacher-mock-data.pointsRules": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.popularProfessions": [
+    "/teacher/analytics"
+  ],
+  "teacher-mock-data.schoolClasses": [
+    "/teacher",
+    "/teacher/analytics",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a"
+  ],
+  "teacher-mock-data.schoolInterests": [
+    "/teacher/analytics"
+  ],
+  "teacher-mock-data.schoolStats": [
+    "/teacher",
+    "/teacher/analytics"
+  ],
+  "teacher-mock-data.season": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.seasonPoints": [
+    "/teacher/bonus"
+  ],
+  "teacher-mock-data.studentGuides": [
+    "/teacher/guide"
+  ],
+  "teacher-mock-data.teacher": [
+    "/teacher",
+    "/teacher/bonus",
+    "/teacher/guide",
+    "/teacher/course",
+    "/teacher/profile",
+    "/teacher/reports",
+    "/teacher/handbook",
+    "/teacher/analytics",
+    "/teacher/assistant",
+    "/teacher/handbook/0",
+    "/teacher/profile/edit",
+    "/teacher/course/module1",
+    "/teacher/analytics/classes",
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "teacher-mock-data.teacherAiTemplates": [
+    "/teacher/assistant"
+  ],
+  "teacher-mock-data.teacherBadges": [
+    "/teacher/bonus",
+    "/teacher/profile"
+  ],
+  "teacher-mock-data.teacherReports": [
+    "/teacher/reports"
+  ],
+  "teacher-mock-data.teacherStudents": [
+    "/teacher/analytics/students",
+    "/teacher/analytics/class/9a",
+    "/teacher/analytics/student/st1"
+  ],
+  "teacher-mock-data.trainingFaq": [
+    "/teacher/guide"
+  ],
+  "teacher-mock-data.trainingGuides": [
+    "/teacher/guide"
+  ],
+  "teacher-mock-data.trainingVideos": [
+    "/teacher/guide"
+  ],
+  "test.debruce": [
+    "/tests/debruce"
+  ],
+  "test.holland": [
+    "/tests/holland"
+  ],
+  "test.mbti": [
+    "/tests/mbti"
+  ]
+}

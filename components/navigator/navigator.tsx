@@ -1,4 +1,9 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import {
   BedDouble,
@@ -52,6 +57,10 @@ interface Filters {
   mil: boolean;
 }
 
+const cmsDefaults_industries = industries;
+const cmsDefaults_obls = obls;
+const cmsDefaults_regionCities = regionCities;
+
 function instPasses(d: NavInst, f: Filters, ignoreKind = false) {
   if (!ignoreKind && d.kind !== f.kind) return false;
   if (f.obls.length && !f.obls.includes(d.obl)) return false;
@@ -101,7 +110,16 @@ export default function Navigator({
   base?: string;
   savable?: boolean;
 }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
+  const industries = useContent("nav-meta.industries", cmsDefaults_industries);
+  const regionCities = useContent("nav-meta.regionCities", cmsDefaults_regionCities);
+  const obls = useContent("nav-meta.obls", cmsDefaults_obls);
   const presetIdx = industries.findIndex((x) => x.name === presetIndustry);
+  const INSTS = useContent("nav.institutions", institutionsJson) as unknown as NavInst[];
+  const GOPS = useContent("nav.gops-compact", gopsJson) as unknown as GopCompact[];
+  const NOGOP = useContent("nav.nogop-compact", nogopJson) as unknown as Record<string, NoGopCompact[]>;
+  const CPROG = (useContent("nav.college-programs", collegeJson) as unknown as { programs: CollegeProgram[] }).programs;
+  const BY_IDX = new Map(INSTS.map(d => [d.i, d]));
   const [view, setView] = useState<"inst" | "op">("inst");
   const [f, setF] = useState<Filters>({
     q: "",
@@ -207,10 +225,10 @@ export default function Navigator({
   const kind = view === "op" && f.kind === "a" ? "v" : f.kind;
   const count =
     view === "inst"
-      ? `${insts.length} ${plural(insts.length, ["заведение", "заведения", "заведений"])}`
+      ? `${insts.length} ${plural(insts.length, [pageCopy("x001","заведение"), pageCopy("x002","заведения"), pageCopy("x003","заведений")])}`
       : kind === "v"
-        ? `${gops.length + nogops.length} ${plural(gops.length + nogops.length, ["карточка", "карточки", "карточек"])} · ${gops.reduce((a, g) => a + gopUnis(g).length, 0) + nogops.length} программ`
-        : `${cprogs.length} ${plural(cprogs.length, ["программа", "программы", "программ"])}`;
+        ? `${gops.length + nogops.length} ${plural(gops.length + nogops.length, [pageCopy("x004","карточка"), pageCopy("x005","карточки"), pageCopy("x006","карточек")])} · ${gops.reduce((a, g) => a + gopUnis(g).length, 0) + nogops.length} программ`
+        : `${cprogs.length} ${plural(cprogs.length, [pageCopy("x007","программа"), pageCopy("x008","программы"), pageCopy("x009","программ")])}`;
 
   const activeFilters =
     f.obls.length + f.locs.length + f.branches.length + (f.dorm ? 1 : 0) + (f.mil ? 1 : 0) + (f.price < PMAX ? 1 : 0) + (f.score > 0 ? 1 : 0);
@@ -252,8 +270,8 @@ export default function Navigator({
         <div className="grid grid-cols-2 rounded-xl bg-stone-100 p-1 text-sm font-medium">
           {(
             [
-              ["inst", "Заведения"],
-              ["op", "Программы"],
+              ["inst", pageCopy("x010","Заведения")],
+              ["op", pageCopy("x011","Программы")],
             ] as const
           ).map(([k, label]) => (
             <button
@@ -274,7 +292,7 @@ export default function Navigator({
         {savable && (
           <span className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600">
             <Star size={13} className={fav.size ? "text-amber-400" : ""} fill={fav.size ? "currentColor" : "none"} />
-            <span className="hidden sm:inline">Избранное ·</span> {fav.size}
+            <span className="hidden sm:inline"><ContentText id="copy.components.navigator.navigator.001" fallback="Избранное ·" /></span> {fav.size}
           </span>
         )}
       </div>
@@ -285,11 +303,11 @@ export default function Navigator({
         <input
           value={f.q}
           onChange={(e) => set("q", e.target.value)}
-          placeholder={view === "inst" ? "Название, город или профессия" : "Группа, специальность или код"}
+          placeholder={view === "inst" ? pageCopy("x012","Название, город или профессия") : pageCopy("x013","Группа, специальность или код")}
           className="w-full bg-transparent py-3 text-sm outline-none"
         />
         {f.q && (
-          <button onClick={() => set("q", "")} aria-label="Очистить" className="text-stone-400 hover:text-stone-600">
+          <button onClick={() => set("q", "")} aria-label={pageCopy("x014","Очистить")} className="text-stone-400 hover:text-stone-600">
             <X size={15} />
           </button>
         )}
@@ -298,14 +316,14 @@ export default function Navigator({
       {/* Тип заведения — чипы со счётчиками */}
       <div className="flex flex-wrap items-center gap-2">
         <Chip on={kind === "v"} onClick={() => set("kind", "v")}>
-          Вузы <span className="ml-1 font-mono opacity-70">{kindCounts.v}</span>
+          <ContentText id="copy.components.navigator.navigator.002" fallback="Вузы " /><span className="ml-1 font-mono opacity-70">{kindCounts.v}</span>
         </Chip>
         <Chip on={kind === "c"} onClick={() => set("kind", "c")} tone="teal">
-          Колледжи <span className="ml-1 font-mono opacity-70">{kindCounts.c}</span>
+          <ContentText id="copy.components.navigator.navigator.003" fallback="Колледжи " /><span className="ml-1 font-mono opacity-70">{kindCounts.c}</span>
         </Chip>
         {view === "inst" && (
           <Chip on={kind === "a"} onClick={() => set("kind", "a")} tone="purple">
-            Зарубеж <span className="ml-1 font-mono opacity-70">{kindCounts.a}</span>
+            <ContentText id="copy.components.navigator.navigator.004" fallback="Зарубеж " /><span className="ml-1 font-mono opacity-70">{kindCounts.a}</span>
           </Chip>
         )}
         <button
@@ -313,8 +331,7 @@ export default function Navigator({
           className="ml-auto flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 transition hover:bg-stone-50 lg:hidden"
         >
           <SlidersHorizontal size={13} />
-          Фильтры
-          {activeFilters > 0 && (
+          <ContentText id="copy.components.navigator.navigator.005" fallback="Фильтры" />{activeFilters > 0 && (
             <span className="rounded-full bg-violet-500 px-1.5 text-[10px] text-white">{activeFilters}</span>
           )}
         </button>
@@ -324,17 +341,16 @@ export default function Navigator({
         {/* Панель фильтров */}
         <aside className={`${showFilters ? "block" : "hidden"} space-y-5 self-start rounded-2xl border border-stone-200 bg-white p-5 lg:sticky lg:top-20 lg:block`}>
           <div className="flex items-center justify-between">
-            <p className="font-semibold">Фильтры</p>
+            <p className="font-semibold"><ContentText id="copy.components.navigator.navigator.006" fallback="Фильтры" /></p>
             {activeFilters > 0 && (
               <button onClick={reset} className="text-xs font-medium text-violet-600 hover:text-violet-700">
-                Сбросить
-              </button>
+                <ContentText id="copy.components.navigator.navigator.007" fallback="Сбросить" /></button>
             )}
           </div>
 
-          <FilterGroup label="Область" count={f.obls.length}>
+          <FilterGroup label={pageCopy("x015","Область")} count={f.obls.length}>
             <CheckList
-              options={obls.map((o) => ({ value: o, label: o.replace("область", "обл.") }))}
+              options={obls.map((o) => ({ value: o, label: o.replace(pageCopy("x016","область"), pageCopy("x017","обл.")) }))}
               selected={f.obls}
               onToggle={(o) => {
                 const next = toggleIn(f.obls, o);
@@ -346,7 +362,7 @@ export default function Navigator({
           </FilterGroup>
 
           {locOptions.length > 0 && (
-            <FilterGroup label="Город / район" count={f.locs.length}>
+            <FilterGroup label={pageCopy("x018","Город / район")} count={f.locs.length}>
               <CheckList
                 options={locOptions.map((c) => ({ value: c, label: c }))}
                 selected={f.locs}
@@ -355,7 +371,7 @@ export default function Navigator({
             </FilterGroup>
           )}
 
-          <FilterGroup label="Отрасль" count={f.branches.length}>
+          <FilterGroup label={pageCopy("x019","Отрасль")} count={f.branches.length}>
             <CheckList
               options={industries.map((ind, i) => ({ value: i, label: ind.short, color: ind.c }))}
               selected={f.branches}
@@ -363,7 +379,7 @@ export default function Navigator({
             />
           </FilterGroup>
 
-          <FilterGroup label="Стоимость в год">
+          <FilterGroup label={pageCopy("x020","Стоимость в год")}>
             <input
               type="range"
               min={0}
@@ -374,12 +390,12 @@ export default function Navigator({
               className="w-full accent-violet-500"
             />
             <p className="mt-1 font-mono text-xs text-stone-500">
-              {f.price >= PMAX ? "любая" : `до ${fmt(f.price)} ₸`}
+              {f.price >= PMAX ? pageCopy("x021","любая") : `до ${fmt(f.price)} ₸`}
             </p>
           </FilterGroup>
 
           {kind === "v" && (
-            <FilterGroup label="Порог гранта (балл ЕНТ)">
+            <FilterGroup label={pageCopy("x022","Порог гранта (балл ЕНТ)")}>
               <input
                 type="range"
                 min={0}
@@ -390,17 +406,17 @@ export default function Navigator({
                 className="w-full accent-violet-500"
               />
               <p className="mt-1 font-mono text-xs text-stone-500">
-                {f.score > 0 ? `мой балл: ${f.score}` : "не учитывать"}
+                {f.score > 0 ? `мой балл: ${f.score}` : pageCopy("x023","не учитывать")}
               </p>
             </FilterGroup>
           )}
 
           {kind !== "a" && (
-            <FilterGroup label="Дополнительно">
+            <FilterGroup label={pageCopy("x024","Дополнительно")}>
               <div className="flex flex-wrap gap-1.5">
-                <Chip on={f.dorm} onClick={() => set("dorm", !f.dorm)}>Есть общежитие</Chip>
+                <Chip on={f.dorm} onClick={() => set("dorm", !f.dorm)}><ContentText id="copy.components.navigator.navigator.008" fallback="Есть общежитие" /></Chip>
                 {kind === "v" && (
-                  <Chip on={f.mil} onClick={() => set("mil", !f.mil)}>Есть военная кафедра</Chip>
+                  <Chip on={f.mil} onClick={() => set("mil", !f.mil)}><ContentText id="copy.components.navigator.navigator.009" fallback="Есть военная кафедра" /></Chip>
                 )}
               </div>
             </FilterGroup>
@@ -413,8 +429,7 @@ export default function Navigator({
 
           {total === 0 && (
             <div className="rounded-2xl border border-dashed border-stone-200 py-12 text-center text-stone-400">
-              Ничего не нашлось. Попробуйте убрать один из фильтров.
-            </div>
+              <ContentText id="copy.components.navigator.navigator.010" fallback="Ничего не нашлось. Попробуйте убрать один из фильтров." /></div>
           )}
 
           {view === "inst" &&
@@ -433,7 +448,7 @@ export default function Navigator({
               onClick={() => setLimit(limit + PAGE)}
               className="w-full rounded-2xl border border-stone-200 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
             >
-              Показать ещё ({total - limit})
+              <ContentText id="copy.components.navigator.navigator.011" fallback="Показать ещё (" />{total - limit})
             </button>
           )}
         </div>
@@ -466,6 +481,7 @@ function CheckList<T extends string | number>({
   onToggle: (v: T) => void;
   visible?: number;
 }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
   const [all, setAll] = useState(false);
   const sel = options.filter((o) => selected.includes(o.value));
   const rest = options.filter((o) => !selected.includes(o.value));
@@ -497,7 +513,7 @@ function CheckList<T extends string | number>({
       })}
       {(hidden > 0 || all) && (
         <button onClick={() => setAll(!all)} className="mt-1 px-2 text-xs font-medium text-violet-600 hover:text-violet-700">
-          {all ? "Свернуть" : `Показать все (${hidden})`}
+          {all ? pageCopy("x025","Свернуть") : `Показать все (${hidden})`}
         </button>
       )}
     </div>
@@ -507,6 +523,7 @@ function CheckList<T extends string | number>({
 // ── Карточки ───────────────────────────────────────────────────────────────
 
 function InstCard({ d, base, fav, onFav }: { d: NavInst; base: string; fav: boolean; onFav?: () => void }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
   const k = KIND[d.kind];
   const isA = d.kind === "a";
   return (
@@ -532,7 +549,7 @@ function InstCard({ d, base, fav, onFav }: { d: NavInst; base: string; fav: bool
             </p>
           </div>
           {onFav && (
-            <button onClick={onFav} aria-label="В избранное" className={`shrink-0 ${fav ? "text-amber-400" : "text-stone-300 hover:text-amber-300"}`}>
+            <button onClick={onFav} aria-label={pageCopy("x026","В избранное")} className={`shrink-0 ${fav ? "text-amber-400" : "text-stone-300 hover:text-amber-300"}`}>
               <Star size={18} fill={fav ? "currentColor" : "none"} />
             </button>
           )}
@@ -544,12 +561,12 @@ function InstCard({ d, base, fav, onFav }: { d: NavInst; base: string; fav: bool
             </span>
           )}
           {d.kind === "v" && d.th != null && (
-            <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-medium text-violet-700">грант от {d.th}</span>
+            <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-medium text-violet-700"><ContentText id="copy.components.navigator.navigator.012" fallback="грант от " />{d.th}</span>
           )}
-          {isA && <span className="rounded-full bg-fuchsia-100 px-2.5 py-0.5 text-[11px] font-medium text-fuchsia-800">подробности на странице</span>}
+          {isA && <span className="rounded-full bg-fuchsia-100 px-2.5 py-0.5 text-[11px] font-medium text-fuchsia-800"><ContentText id="copy.components.navigator.navigator.013" fallback="подробности на странице" /></span>}
           <span className="ml-auto flex items-center gap-1.5 text-stone-400">
-            {d.dorm && <BedDouble size={14} className="text-teal-600" aria-label="Есть общежитие" />}
-            {d.kind === "v" && d.mil && <Shield size={14} className="text-violet-600" aria-label="Есть военная кафедра" />}
+            {d.dorm && <BedDouble size={14} className="text-teal-600" aria-label={pageCopy("x027","Есть общежитие")} />}
+            {d.kind === "v" && d.mil && <Shield size={14} className="text-violet-600" aria-label={pageCopy("x028","Есть военная кафедра")} />}
           </span>
         </div>
       </div>
@@ -558,6 +575,7 @@ function InstCard({ d, base, fav, onFav }: { d: NavInst; base: string; fav: bool
 }
 
 function GopCard({ g, n, base }: { g: GopCompact; n: number; base: string }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
   const cities = Object.keys(g.univ)
     .map((ui) => BY_IDX.get(Number(ui))?.city)
     .filter(Boolean) as string[];
@@ -569,10 +587,10 @@ function GopCard({ g, n, base }: { g: GopCompact; n: number; base: string }) {
     <Link href={`${base}/gop/${g.code}`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[11px] font-semibold tracking-wide text-violet-600 uppercase">ГОП {g.code}</p>
+          <p className="font-mono text-[11px] font-semibold tracking-wide text-violet-600 uppercase"><ContentText id="copy.components.navigator.navigator.014" fallback="ГОП " />{g.code}</p>
           <p className="font-display mt-0.5 font-medium">{g.name}</p>
           <p className="mt-1.5 font-mono text-xs text-stone-400">
-            <b className="text-stone-700">{n}</b> {plural(n, ["вуз", "вуза", "вузов"])}
+            <b className="text-stone-700">{n}</b> {plural(n, [pageCopy("x029","вуз"), pageCopy("x030","вуза"), pageCopy("x031","вузов")])}
             {cityLine && ` · ${cityLine}`}
             {g.dur && ` · ${g.dur}`}
           </p>
@@ -584,18 +602,20 @@ function GopCard({ g, n, base }: { g: GopCompact; n: number; base: string }) {
 }
 
 function NoGopCard({ d, op, base }: { d: NavInst; op: NoGopCompact; base: string }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
+  const industries = useContent("nav-meta.industries", cmsDefaults_industries);
   return (
     <Link href={`${base}/${d.i}?tab=programs`} className="block rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-violet-300">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate font-mono text-[11px] font-semibold tracking-wide text-violet-600 uppercase">
-            {industries[op.ind]?.short ?? "Программа вуза"} · {d.name}
+            {industries[op.ind]?.short ?? pageCopy("x032","Программа вуза")} · {d.name}
           </p>
           <p className="font-display mt-0.5 font-medium">{op.name}</p>
           <p className="mt-1.5 font-mono text-xs text-stone-400">
             {d.city} · {priceLabel(op.p)}
             {op.t != null && ` · порог ${op.t}`}
-            {op.dur && ` · ${op.dur} ${plural(op.dur, ["год", "года", "лет"])}`}
+            {op.dur && ` · ${op.dur} ${plural(op.dur, [pageCopy("x033","год"), pageCopy("x034","года"), pageCopy("x035","лет")])}`}
           </p>
         </div>
         <ChevronRight size={17} className="shrink-0 text-stone-300" />
@@ -605,6 +625,8 @@ function NoGopCard({ d, op, base }: { d: NavInst; op: NoGopCompact; base: string
 }
 
 function CollegeProgramCard({ p, cols, base }: { p: CollegeProgram; cols: number[]; base: string }) {
+  const pageCopy = useCopy("copy.components.navigator.navigator");
+  const industries = useContent("nav-meta.industries", cmsDefaults_industries);
   const cities = cols.map((ci) => BY_IDX.get(ci)?.city).filter(Boolean) as string[];
   const cnt: Record<string, number> = {};
   cities.forEach((c) => (cnt[c] = (cnt[c] ?? 0) + 1));
@@ -620,7 +642,7 @@ function CollegeProgramCard({ p, cols, base }: { p: CollegeProgram; cols: number
           </p>
           <p className="font-display mt-0.5 font-medium">{p.name}</p>
           <p className="mt-1.5 font-mono text-xs text-stone-400">
-            <b className="text-stone-700">{n}</b> {plural(n, ["колледж", "колледжа", "колледжей"])}
+            <b className="text-stone-700">{n}</b> {plural(n, [pageCopy("x036","колледж"), pageCopy("x037","колледжа"), pageCopy("x038","колледжей")])}
             {cityLine && ` · ${cityLine}`}
             {industries[p.ind] && ` · ${industries[p.ind].short}`}
           </p>

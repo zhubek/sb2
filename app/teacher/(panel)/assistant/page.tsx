@@ -1,7 +1,12 @@
-﻿"use client";
+"use client";
+import { useCopy } from "@/lib/cms/client";
 
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
 import Link from "next/link";
 import { useState } from "react";
+import defaultTeacherReplies from "@/lib/cms/teacher-replies.json";
 import { teacherAiTemplates } from "@/lib/teacher-mock-data";
 
 interface StudentRef {
@@ -17,77 +22,53 @@ interface Message {
 }
 
 // Мок-ответы AI: анализ данных школы → результат с переходом к объектам
-function mockAnswer(query: string): Message {
+const cmsDefaults_teacherAiTemplates = teacherAiTemplates;
+
+function mockAnswer(query: string, replies: Record<string, Message>): Message {
   const q = query.toLowerCase();
 
   if (q.includes("инжен")) {
-    return {
-      role: "ai",
-      text: "По результатам DeBruce я нашла 2 учеников 10-х классов с выраженным инженерным потенциалом (высокие «Техническая грамотность», «Критическое мышление» и «Работа с данными»):",
-      students: [
-        { id: "st4", name: "Алишер Нурланулы", note: "10 «Б» · топ-навык «Техническая грамотность» · Голланд: Реалистичный" },
-        { id: "st8", name: "Ерасыл Мухтар", note: "10 «Б» · топ-навык «Работа с данными» · MBTI: ISTJ" },
-      ],
-    };
+    return replies.engineering;
   }
   if (q.includes("не прошли") || q.includes("не начали")) {
-    return {
-      role: "ai",
-      text: "В 10 «Б» диагностику не начал 1 ученик. Рекомендую напомнить о тесте DeBruce на классном часе — это первый шаг чек-листа:",
-      students: [
-        { id: "st5", name: "Камила Ержанова", note: "10 «Б» · 0 из 3 тестов · последняя активность 2 недели назад" },
-      ],
-    };
+    return replies.notStarted;
   }
   if (q.includes("характеристик")) {
-    return {
-      role: "ai",
-      text: "Черновик характеристики (Айгерим Сатпаева, 10 «Б»):\n\nАйгерим — творческий и коммуникабельный ученик. По результатам диагностики DeBruce её сильные стороны — креативность (92), коммуникация (88) и эмпатия (85). Тип личности ENFJ («Протагонист») указывает на лидерский потенциал и умение работать с людьми. Рекомендуемое направление — медиа и коммуникации: журналистика, PR, реклама. Рекомендую поддержать интерес участием в школьной медиастудии и олимпиадах по литературе.\n\nМогу адаптировать текст для встречи с родителями или для портфолио.",
-      students: [
-        { id: "st1", name: "Айгерим Сатпаева", note: "Открыть карточку ученика" },
-      ],
-    };
+    return replies.characteristic;
   }
   if (q.includes("сравни")) {
-    return {
-      role: "ai",
-      text: "Сравнение 10 «А» и 10 «Б»:\n\n• Прохождение тестов: 10 «А» — 25 из 28 (89%), 10 «Б» — 24 из 27 (89%). Паритет.\n• Полные профили (3/3): 10 «А» — 14, 10 «Б» — 12.\n• Ведущее направление: 10 «А» — инженерия, 10 «Б» — культура и искусство.\n• Вывод: оба класса вовлечены; в 10 «Б» стоит мотивировать 3 учеников завершить тест Голланда для комплексных отчётов.",
-    };
+    return replies.comparison;
   }
   if (q.includes("професси")) {
-    return {
-      role: "ai",
-      text: "Топ-5 профессий по выбору учеников школы:\n\n1. Программист — 58 учеников\n2. Врач — 44\n3. Дизайнер — 39\n4. Инженер — 35\n5. Предприниматель — 31\n\nЗа последнюю четверть заметно вырос интерес к IT-направлению (+18%). Подробное распределение — в разделе «Аналитика».",
-    };
+    return replies.professions;
   }
-  return {
-    role: "ai",
-    text: "Я проанализировала данные вашей школы. Уточните, пожалуйста, запрос — могу найти учеников по критериям, сравнить классы, подготовить характеристику или черновик отчёта. Также отвечу на вопросы о профессиях, специальностях и вузах.",
-  };
+  return replies.default;
 }
 
 export default function TeacherAssistantPage() {
+  const pageCopy = useCopy("copy.app.teacher.panel.assistant.page");
+  const teacherAiTemplates = useContent("teacher-mock-data.teacherAiTemplates", cmsDefaults_teacherAiTemplates);
+  const replies = useContent("assistant.teacher-replies", defaultTeacherReplies) as Record<string, Message>;
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
-      text: "Здравствуйте, Гульнара! Я AI-помощник профориентатора. У меня есть доступ к данным вашей школы: результаты тестов, активность учеников, справочник образования. Задайте вопрос свободно или выберите шаблон ниже.",
+      text: pageCopy("x001","Здравствуйте, Гульнара! Я AI-помощник профориентатора. У меня есть доступ к данным вашей школы: результаты тестов, активность учеников, справочник образования. Задайте вопрос свободно или выберите шаблон ниже."),
     },
   ]);
 
   function send(text: string) {
     if (!text.trim()) return;
-    setMessages((m) => [...m, { role: "user", text }, mockAnswer(text)]);
+    setMessages((m) => [...m, { role: "user", text }, mockAnswer(text, replies)]);
     setInput("");
   }
 
   return (
     <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col">
       <div>
-        <h1 className="text-2xl font-bold">AI-помощник</h1>
+        <h1 className="text-2xl font-bold"><ContentText id="copy.app.teacher.panel.assistant.page.001" fallback="AI-помощник" /></h1>
         <p className="mt-1 text-slate-500">
-          Анализ данных школы, поиск учеников, характеристики, отчёты
-        </p>
+          <ContentText id="copy.app.teacher.panel.assistant.page.002" fallback="Анализ данных школы, поиск учеников, характеристики, отчёты" /></p>
       </div>
 
       <div className="mt-6 flex-1 space-y-4 overflow-y-auto rounded-xl border border-slate-200 bg-white p-5">
@@ -150,15 +131,14 @@ export default function TeacherAssistantPage() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Свободный запрос: «Найди учеников, которым подходит медицина»…"
+          placeholder={pageCopy("x002","Свободный запрос: «Найди учеников, которым подходит медицина»…")}
           className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-teal-400"
         />
         <button
           type="submit"
           className="rounded-xl bg-teal-600 px-6 text-sm font-medium text-white transition hover:bg-teal-700"
         >
-          Отправить
-        </button>
+          <ContentText id="copy.app.teacher.panel.assistant.page.003" fallback="Отправить" /></button>
       </form>
     </div>
   );

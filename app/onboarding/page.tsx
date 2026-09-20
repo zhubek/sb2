@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -36,6 +40,7 @@ const slides = [
 ];
 
 export default function OnboardingPage() {
+  const pageCopy = useCopy("copy.app.onboarding.page");
   const router = useRouter();
   const [step, setStep] = useState(0);
   const slide = slides[step];
@@ -65,20 +70,21 @@ export default function OnboardingPage() {
           </div>
 
           <button
+            data-cms-navigation={last || undefined}
             onClick={() =>
               last ? router.push("/dashboard") : setStep(step + 1)
             }
             className="mt-8 w-full rounded-2xl bg-violet-500 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
           >
-            {last ? "Перейти в личный кабинет" : "Далее"}
+            {last ? pageCopy("x001","Перейти в личный кабинет") : pageCopy("x002","Далее")}
           </button>
         </div>
         <button
+          data-cms-navigation="true"
           onClick={() => router.push("/dashboard")}
           className="mt-4 text-sm text-stone-400 hover:text-stone-600"
         >
-          Пропустить
-        </button>
+          <ContentText id="copy.app.onboarding.page.001" fallback="Пропустить" /></button>
       </div>
     </div>
   );

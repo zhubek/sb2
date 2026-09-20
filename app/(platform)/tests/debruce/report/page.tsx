@@ -1,3 +1,9 @@
+import { withPublishedContent } from "@/lib/cms/server";
+
+import { getCopy } from "@/lib/cms/server";
+
+import { ContentText } from "@/lib/cms/client";
+import { getContent } from "@/lib/cms/server";
 import Link from "next/link";
 import { industryMeta } from "@/components/industry-meta";
 import { ReportShell, Sect } from "@/components/report-blocks";
@@ -13,18 +19,31 @@ import {
 export const metadata = { title: "Отчёт DeBruce — Smart Bolashaq" };
 
 // Отчёт по тесту DeBruce — по структуре референсного PDF «Отчёт DeBruce»
-export default function DebruceReportPage() {
+const cmsDefaults_skills = skills;
+const cmsDefaults_debruceAdditional = debruceAdditional;
+const cmsDefaults_debruceAdditionalIndustries = debruceAdditionalIndustries;
+const cmsDefaults_debruceIndustries = debruceIndustries;
+const cmsDefaults_debruceTop = debruceTop;
+const cmsDefaults_debruceWhatIs = debruceWhatIs;
+
+function DebruceReportPage() {
+  const pageCopy = getCopy("copy.app.platform.tests.debruce.report.page");
+  const debruceTop = getContent("report-data.debruceTop", cmsDefaults_debruceTop);
+  const debruceWhatIs = getContent("report-data.debruceWhatIs", cmsDefaults_debruceWhatIs);
+  const skills = getContent("mock-data.skills", cmsDefaults_skills);
+  const debruceAdditional = getContent("report-data.debruceAdditional", cmsDefaults_debruceAdditional);
+  const debruceIndustries = getContent("report-data.debruceIndustries", cmsDefaults_debruceIndustries);
+  const debruceAdditionalIndustries = getContent("report-data.debruceAdditionalIndustries", cmsDefaults_debruceAdditionalIndustries);
   return (
     <ReportShell
-      eyebrow="AI Профориентатор · Отчёт по способностям"
+      eyebrow={pageCopy("x001","AI Профориентатор · Отчёт по способностям")}
       title="DeBruce Agilities"
-      subtitle="Профессиональные способности"
+      subtitle={pageCopy("x002","Профессиональные способности")}
     >
       {/* Хиро: топ-3 способности */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-7 md:p-8">
         <p className="text-xs font-semibold tracking-[0.14em] text-violet-600 uppercase">
-          Три ведущие способности
-        </p>
+          <ContentText id="copy.app.platform.tests.debruce.report.page.001" fallback="Три ведущие способности" /></p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {debruceTop.map((a, i) => (
             <div key={a.name} className="rounded-2xl bg-white px-4 py-4">
@@ -40,7 +59,7 @@ export default function DebruceReportPage() {
         </div>
       </section>
 
-      <Sect title="Что такое DeBruce Agilities?">
+      <Sect title={pageCopy("x003","Что такое DeBruce Agilities?")}>
         <p className="max-w-2xl leading-relaxed text-stone-600">{debruceWhatIs}</p>
       </Sect>
 
@@ -63,8 +82,7 @@ export default function DebruceReportPage() {
           <div className="mt-5 grid gap-5 md:grid-cols-3">
             <div>
               <p className="text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-                Как проявляется
-              </p>
+                <ContentText id="copy.app.platform.tests.debruce.report.page.002" fallback="Как проявляется" /></p>
               <ul className="mt-2.5 space-y-2">
                 {a.manifest.map((m) => (
                   <li key={m} className="flex gap-2 text-sm text-stone-600">
@@ -76,8 +94,7 @@ export default function DebruceReportPage() {
             </div>
             <div>
               <p className="text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-                Сильные стороны
-              </p>
+                <ContentText id="copy.app.platform.tests.debruce.report.page.003" fallback="Сильные стороны" /></p>
               <ul className="mt-2.5 space-y-2">
                 {a.strengths.map((m) => (
                   <li key={m} className="flex gap-2 text-sm text-stone-600">
@@ -89,8 +106,7 @@ export default function DebruceReportPage() {
             </div>
             <div>
               <p className="text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase">
-                Как развивать
-              </p>
+                <ContentText id="copy.app.platform.tests.debruce.report.page.004" fallback="Как развивать" /></p>
               <ul className="mt-2.5 space-y-2">
                 {a.develop.map((m) => (
                   <li key={m} className="flex gap-2 text-sm text-stone-600">
@@ -105,7 +121,7 @@ export default function DebruceReportPage() {
       ))}
 
       {/* Полный рейтинг */}
-      <Sect kicker="Рейтинг" title="Все 10 навыков">
+      <Sect kicker={pageCopy("x004","Рейтинг")} title={pageCopy("x005","Все 10 навыков")}>
         <div className="space-y-2">
           {skills.map((s, i) => (
             <div key={s.id} className="flex items-center gap-3">
@@ -134,7 +150,7 @@ export default function DebruceReportPage() {
       </Sect>
 
       {/* Дополнительные способности */}
-      <Sect kicker="Подробнее" title="Дополнительные способности">
+      <Sect kicker={pageCopy("x006","Подробнее")} title={pageCopy("x007","Дополнительные способности")}>
         <div className="space-y-3">
           {debruceAdditional.map((a, i) => (
             <div
@@ -157,7 +173,7 @@ export default function DebruceReportPage() {
       </Sect>
 
       {/* Рекомендуемые отрасли */}
-      <Sect kicker="Рекомендации" title="Рекомендуемые отрасли">
+      <Sect kicker={pageCopy("x008","Рекомендации")} title={pageCopy("x009","Рекомендуемые отрасли")}>
         <div className="space-y-3">
           {debruceIndustries.map((ind) => {
             const m = industryMeta(ind.name);
@@ -176,8 +192,7 @@ export default function DebruceReportPage() {
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   <span className="mr-1 text-sm font-semibold text-stone-700">
-                    Рекомендуемые профессии:
-                  </span>
+                    <ContentText id="copy.app.platform.tests.debruce.report.page.005" fallback="Рекомендуемые профессии:" /></span>
                   {ind.professions.map((p) => (
                     <span key={p} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${m.chip}`}>
                       {p}
@@ -189,12 +204,9 @@ export default function DebruceReportPage() {
           })}
         </div>
         <p className="mt-6 text-sm font-semibold text-stone-700">
-          Дополнительные рекомендации
-        </p>
+          <ContentText id="copy.app.platform.tests.debruce.report.page.006" fallback="Дополнительные рекомендации" /></p>
         <p className="mt-1 text-sm text-stone-500">
-          Эти отрасли также могут быть интересны, поскольку соответствуют двум
-          из твоих ведущих способностей.
-        </p>
+          <ContentText id="copy.app.platform.tests.debruce.report.page.007" fallback="Эти отрасли также могут быть интересны, поскольку соответствуют двум из твоих ведущих способностей." /></p>
         <div className="mt-3 space-y-3">
           {debruceAdditionalIndustries.map((ind) => (
             <div
@@ -207,8 +219,7 @@ export default function DebruceReportPage() {
               </p>
               <p className="mt-3 text-sm text-stone-500">
                 <span className="font-semibold text-stone-700">
-                  Рекомендуемые профессии:
-                </span>{" "}
+                  <ContentText id="copy.app.platform.tests.debruce.report.page.008" fallback="Рекомендуемые профессии:" /></span>{" "}
                 {ind.professions.join(" · ")}
               </p>
             </div>
@@ -219,27 +230,24 @@ export default function DebruceReportPage() {
       {/* Следующий шаг */}
       <section className="rounded-[28px] border border-violet-200/70 bg-violet-100 p-6 text-center md:p-7 print:hidden">
         <p className="font-display text-lg text-violet-800">
-          Что дальше?
-        </p>
+          <ContentText id="copy.app.platform.tests.debruce.report.page.009" fallback="Что дальше?" /></p>
         <p className="mx-auto mt-1.5 max-w-lg text-sm text-violet-900/75">
-          По этим способностям навигатор уже подобрал подходящие программы и
-          учебные заведения.
-        </p>
+          <ContentText id="copy.app.platform.tests.debruce.report.page.010" fallback="По этим способностям навигатор уже подобрал подходящие программы и учебные заведения." /></p>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           <Link
             href="/tests/debruce?view=industry"
             className="rounded-2xl bg-violet-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-violet-600"
           >
-            Перейти к рекомендациям
-          </Link>
+            <ContentText id="copy.app.platform.tests.debruce.report.page.011" fallback="Перейти к рекомендациям" /></Link>
           <Link
             href="/tests/report"
             className="rounded-2xl bg-white px-6 py-2.5 text-sm font-medium text-violet-700 transition hover:text-violet-800"
           >
-            Комплексный отчёт
-          </Link>
+            <ContentText id="copy.app.platform.tests.debruce.report.page.012" fallback="Комплексный отчёт" /></Link>
         </div>
       </section>
     </ReportShell>
   );
 }
+
+export default withPublishedContent(DebruceReportPage);

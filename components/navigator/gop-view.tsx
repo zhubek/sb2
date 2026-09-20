@@ -1,4 +1,8 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+
+import { ContentText } from "@/lib/cms/client";
+
 
 import { Check, Star } from "lucide-react";
 import Link from "next/link";
@@ -43,6 +47,7 @@ export default function GopView({
   base?: string;
   savable?: boolean;
 }) {
+  const pageCopy = useCopy("copy.components.navigator.gop-view");
   const [tab, setTab] = useState<"about" | "where">("about");
   const [fav, setFav] = useState(false);
   const accent = g.accent ?? "#5A5FE8";
@@ -51,22 +56,22 @@ export default function GopView({
   return (
     <div className="mx-auto max-w-3xl">
       <Link href={base} className="text-sm text-stone-400 hover:text-stone-600">
-        ← {base === "/universities" ? "К навигатору" : "К справочнику"}
+        ← {base === "/universities" ? pageCopy("x001","К навигатору") : pageCopy("x002","К справочнику")}
       </Link>
 
       <div className="mt-5 rounded-3xl p-5 text-white sm:p-7" style={{ background: accent }}>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase opacity-80">ГОП {g.code} · {g.ind}</p>
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase opacity-80"><ContentText id="copy.components.navigator.gop-view.001" fallback="ГОП " />{g.code} · {g.ind}</p>
             <h1 className="font-display mt-1 text-xl leading-snug font-semibold sm:text-2xl">{g.name}</h1>
             <p className="mt-2 text-sm opacity-85">
-              {g.no} {plural(g.no, ["программа", "программы", "программ"])} в {g.nu} {plural(g.nu, ["вузе", "вузах", "вузах"])}
+              {g.no} {plural(g.no, [pageCopy("x003","программа"), pageCopy("x004","программы"), pageCopy("x005","программ")])} <ContentText id="copy.components.navigator.gop-view.002" fallback=" в " />{g.nu} {plural(g.nu, [pageCopy("x006","вузе"), pageCopy("x007","вузах"), pageCopy("x008","вузах")])}
             </p>
           </div>
           {savable && (
             <button
               onClick={() => setFav(!fav)}
-              aria-label="В избранное"
+              aria-label={pageCopy("x009","В избранное")}
               className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl transition ${fav ? "bg-amber-400 text-stone-900" : "bg-white/15 hover:bg-white/25"}`}
             >
               <Star size={17} fill={fav ? "currentColor" : "none"} />
@@ -78,7 +83,7 @@ export default function GopView({
       <div className="mt-5 flex gap-6 border-b border-stone-200">
         {(
           [
-            ["about", "О группе"],
+            ["about", pageCopy("x010","О группе")],
             ["where", `Где учат · ${unis.length}`],
           ] as const
         ).map(([key, label]) => (
@@ -95,15 +100,15 @@ export default function GopView({
       {tab === "about" ? (
         <div className="mt-5 space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
-            <Q label="Уровень" value="Бакалавриат" />
-            <Q label="Срок обучения" value={g.dur ?? "—"} />
-            <Q label="Языки обучения" value={g.langs?.length ? g.langs.map(langAbbr).join(" · ") : "—"} />
-            <Q label="Предметы ЕНТ" value={g.ent ?? "—"} />
+            <Q label={pageCopy("x011","Уровень")} value={pageCopy("x012","Бакалавриат")} />
+            <Q label={pageCopy("x013","Срок обучения")} value={g.dur ?? "—"} />
+            <Q label={pageCopy("x014","Языки обучения")} value={g.langs?.length ? g.langs.map(langAbbr).join(" · ") : "—"} />
+            <Q label={pageCopy("x015","Предметы ЕНТ")} value={g.ent ?? "—"} />
           </div>
-          {g.about && <Block title="О чём эта группа">{g.about}</Block>}
+          {g.about && <Block title={pageCopy("x016","О чём эта группа")}>{g.about}</Block>}
           {g.fit && (
             <div className="rounded-2xl px-5 py-4" style={{ background: tint }}>
-              <p className="text-sm font-semibold" style={{ color: accent }}>Стоит присмотреться, если</p>
+              <p className="text-sm font-semibold" style={{ color: accent }}><ContentText id="copy.components.navigator.gop-view.003" fallback="Стоит присмотреться, если" /></p>
               <ul className="mt-2 space-y-1.5">
                 {bullets(g.fit).map((x) => (
                   <li key={x} className="flex gap-2 text-sm text-stone-700">
@@ -114,11 +119,11 @@ export default function GopView({
               </ul>
             </div>
           )}
-          {g.skills && <Block title="Чему конкретно научат">{g.skills}</Block>}
-          {g.format && <Block title="Формат работы">{g.format}</Block>}
+          {g.skills && <Block title={pageCopy("x017","Чему конкретно научат")}>{g.skills}</Block>}
+          {g.format && <Block title={pageCopy("x018","Формат работы")}>{g.format}</Block>}
           {g.roles && (
             <div className="rounded-2xl border border-stone-200 bg-white p-5">
-              <p className="font-semibold">Кем можно работать</p>
+              <p className="font-semibold"><ContentText id="copy.components.navigator.gop-view.004" fallback="Кем можно работать" /></p>
               <div className="mt-2.5 flex flex-wrap gap-1.5">
                 {g.roles.split(/\s*;\s*/).filter(Boolean).map((r) => (
                   <span key={r} className="rounded-full bg-violet-100 px-3 py-1 text-xs text-violet-800">{r}</span>
@@ -128,7 +133,7 @@ export default function GopView({
           )}
           {g.notfor && (
             <div className="rounded-2xl bg-amber-50 px-5 py-4">
-              <p className="text-sm font-semibold text-amber-800">Кому точно не подойдёт</p>
+              <p className="text-sm font-semibold text-amber-800"><ContentText id="copy.components.navigator.gop-view.005" fallback="Кому точно не подойдёт" /></p>
               <p className="mt-1 text-sm leading-relaxed text-amber-900/80">{g.notfor}</p>
             </div>
           )}
@@ -148,13 +153,12 @@ export default function GopView({
                 <span className="font-display block truncate font-medium">{d.name}</span>
                 <span className="mt-0.5 block text-xs text-stone-400">
                   {d.city}
-                  {p != null && ` · ${p === 0 ? "бесплатно" : `от ${fmt(p)} ₸`}`}
+                  {p != null && ` · ${p === 0 ? pageCopy("x019","бесплатно") : `от ${fmt(p)} ₸`}`}
                   {th != null && ` · порог ${th}`}
                 </span>
               </span>
               <span className="flex-none rounded-full bg-stone-100 px-2.5 py-1 font-mono text-[11px] font-medium text-stone-600">
-                {k} ОП
-              </span>
+                {k} <ContentText id="copy.components.navigator.gop-view.006" fallback=" ОП" /></span>
             </Link>
           ))}
         </div>

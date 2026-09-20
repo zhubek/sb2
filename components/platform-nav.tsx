@@ -1,11 +1,18 @@
 "use client";
+import { useCopy } from "@/lib/cms/client";
+import { LanguageSwitcher } from "./content-language";
+
+import { ContentText } from "@/lib/cms/client";
+import { useContent } from "@/lib/cms/client";
+
 
 import { Bot, Compass, FolderOpen, Home, ListChecks } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useContentPathname as usePathname } from "@/lib/cms/client";
 import { useEffect, useState } from "react";
 import ChecklistMenu from "@/components/checklist-menu";
 import { LogoMark } from "@/components/compass-marks";
+import { currentProfile } from "@/lib/current-profile";
 import { currentUser } from "@/lib/mock-data";
 
 const links = [
@@ -16,44 +23,32 @@ const links = [
   { href: "/chat", label: "AI чат", icon: Bot },
 ];
 
-type Lang = "ru" | "kk";
+
+
+const cmsDefaults_currentUser = currentUser;
 
 export default function PlatformNav() {
+  const pageCopy = useCopy("copy.components.platform-nav");
+  const currentUser = useContent("mock-data.currentUser", cmsDefaults_currentUser);
   const pathname = usePathname();
   const [name, setName] = useState({
     firstName: currentUser.firstName,
     lastName: currentUser.lastName,
   });
-  // Язык интерфейса — доступен прямо в шапке (демо: сохраняется локально)
-  const [lang, setLang] = useState<Lang>("ru");
+
 
   // Имя из «Мой профиль» (localStorage), обновляется без перезагрузки
   useEffect(() => {
     function sync() {
-      const stored = localStorage.getItem("student-profile");
-      if (stored) {
-        const p = JSON.parse(stored);
-        setName({
-          firstName: p.firstName || currentUser.firstName,
-          lastName: p.lastName || currentUser.lastName,
-        });
-      }
+      currentProfile().then(p => setName({ firstName: p.name, lastName: p.surname })).catch(() => setName({firstName: "", lastName: ""}));
     }
     sync();
-    try {
-      const l = localStorage.getItem("student-lang");
-      if (l === "ru" || l === "kk") setLang(l);
-    } catch {}
+
     window.addEventListener("student-profile-updated", sync);
     return () => window.removeEventListener("student-profile-updated", sync);
   }, []);
 
-  function pickLang(l: Lang) {
-    setLang(l);
-    try {
-      localStorage.setItem("student-lang", l);
-    } catch {}
-  }
+
 
   return (
     <>
@@ -65,7 +60,7 @@ export default function PlatformNav() {
               className="font-display flex items-center gap-2 text-sm font-semibold tracking-tight"
             >
               <LogoMark className="h-6 w-6 shrink-0" />
-              <span className="hidden min-[440px]:inline">профориентатор<span className="text-violet-600">.</span></span>
+              <span className="hidden min-[440px]:inline"><ContentText id="copy.components.platform-nav.001" fallback="профориентатор" /><span className="text-violet-600">.</span></span>
             </Link>
             <nav className="hidden gap-5 md:flex">
               {links.map((l) => {
@@ -88,23 +83,11 @@ export default function PlatformNav() {
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <ChecklistMenu />
-            <div className="flex overflow-hidden rounded-full border border-stone-200 text-[12px] font-semibold">
-              {(["kk", "ru"] as Lang[]).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => pickLang(l)}
-                  className={`px-2.5 py-1 tracking-wide transition ${
-                    lang === l ? "bg-stone-800 text-white" : "text-stone-500 hover:text-stone-800"
-                  }`}
-                >
-                  {l === "kk" ? "ҚАЗ" : "РУС"}
-                </button>
-              ))}
-            </div>
+            <LanguageSwitcher labels={{kk:pageCopy("x001","ҚАЗ"),ru:pageCopy("x002","РУС")}}/>
             <Link
               href="/profile"
               className="group flex items-center gap-2.5"
-              aria-label="Мой профиль"
+              aria-label={pageCopy("x003","Мой профиль")}
             >
               <span className="hidden text-sm font-medium transition group-hover:text-violet-700 sm:block">
                 {name.firstName}
